@@ -1,0 +1,219 @@
+{
+  "icons": [
+    {
+      "shortName": "Document",
+      "iconPrefix": "far",
+      "iconName": "file-alt",
+      "description": "Custom icon for PDFs, essays, papers, etc.",
+      "regexToMatch": "document: "
+    },
+
+    {
+      "shortName": "Music",
+      "iconPrefix": "fas",
+      "iconName": "music",
+      "description": "Custom icon for playlists or audio",
+      "regexToMatch": "music: "
+    },
+
+    {
+      "shortName": "Video",
+      "iconPrefix": "fas",
+      "iconName": "video",
+      "description": "Custom icon for videos",
+      "regexToMatch": "video: "
+    },
+
+    {
+      "shortName": "Image",
+      "iconPrefix": "far",
+      "iconName": "image",
+      "description": "Custom icon for images",
+      "regexToMatch": "image: "
+    },
+
+    {
+      "shortName": "Email",
+      "iconPrefix": "fas",
+      "iconName": "envelope",
+      "description": "Default email icon",
+      "regexToMatch": "mailto:"
+    },
+
+    {
+      "shortName": "Discord",
+      "iconPrefix": "fab",
+      "iconName": "discord",
+      "description": "Default Discord icon",
+      "regexToMatch": "https://discord.gg/"
+    },
+
+    {
+      "shortName": "Spotify",
+      "iconPrefix": "fab",
+      "iconName": "spotify",
+      "description": "Default Spotify icon",
+      "regexToMatch": "\\.spotify\\.com"
+    },
+
+    {
+      "shortName": "YouTube",
+      "iconPrefix": "fab",
+      "iconName": "youtube",
+      "description": "Default YouTube icon",
+      "regexToMatch": "\\youtube\\.com"
+    },
+
+    {
+      "shortName": "Xbox",
+      "iconPrefix": "fab",
+      "iconName": "xbox",
+      "description": "Default Xbox icon",
+      "regexToMatch": "xbox: "
+    },
+
+    {
+      "shortName": "PlayStation",
+      "iconPrefix": "fab",
+      "iconName": "playstation",
+      "description": "Default PlayStation icon",
+      "regexToMatch": "playstation: "
+    },
+
+    {
+      "shortName": "Steam",
+      "iconPrefix": "fab",
+      "iconName": "steam",
+      "description": "Default Steam icon",
+      "regexToMatch": "steamcommunity\\.com | steam: "
+    },
+
+    {
+      "shortName": "Twitch",
+      "iconPrefix": "fab",
+      "iconName": "twitch",
+      "description": "Default Twitch icon",
+      "regexToMatch": "twitch\\.tv"
+    },
+
+    {
+      "shortName": "Netflix",
+      "iconPrefix": "fab",
+      "iconName": "netflix",
+      "description": "Default Netflix icon",
+      "regexToMatch": "netflix\\.com"
+    },
+
+    {
+      "shortName": "Hulu",
+      "iconPrefix": "fab",
+      "iconName": "hulu",
+      "description": "Default Hulu icon",
+      "regexToMatch": "hulu\\.com"
+    },
+
+    {
+      "shortName": "Reddit",
+      "iconPrefix": "fab",
+      "iconName": "reddit",
+      "description": "Default Reddit icon",
+      "regexToMatch": "reddit\\.com"
+    },
+
+    {
+      "shortName": "Twitter",
+      "iconPrefix": "fab",
+      "iconName": "twitter",
+      "description": "Default Twitter icon",
+      "regexToMatch": "twitter\\.com"
+    },
+
+    {
+      "shortName": "Instagram",
+      "iconPrefix": "fab",
+      "iconName": "instagram",
+      "description": "Default Instagram icon",
+      "regexToMatch": "instagram\\.com"
+    },
+
+    {
+      "shortName": "Facebook",
+      "iconPrefix": "fab",
+      "iconName": "facebook",
+      "description": "Default Facebook icon",
+      "regexToMatch": "facebook\\.com"
+    },
+
+    {
+      "shortName": "LinkedIn",
+      "iconPrefix": "fab",
+      "iconName": "linkedin",
+      "description": "Default LinkedIn icon",
+      "regexToMatch": "linkedin\\.com"
+    },
+
+    {
+      "shortName": "GitHub",
+      "iconPrefix": "fab",
+      "iconName": "github",
+      "description": "Default GitHub icon",
+      "regexToMatch": "github\\.com"
+    },
+
+    {
+      "shortName": "GitLab",
+      "iconPrefix": "fab",
+      "iconName": "gitlab",
+      "description": "Default GitLab icon",
+      "regexToMatch": "gitlab\\.com"
+    },
+
+    {
+      "shortName": "BitBucket",
+      "iconPrefix": "fab",
+      "iconName": "bitbucket",
+      "description": "Default BitBucket icon",
+      "regexToMatch": "bitbucket\\.org"
+    },
+
+    {
+      "shortName": "StackOverflow",
+      "iconPrefix": "fab",
+      "iconName": "stack-overflow",
+      "description": "Default StackOverflow icon",
+      "regexToMatch": "stackoverflow\\.com"
+    },
+
+    {
+      "shortName": "Wikipedia",
+      "iconPrefix": "fab",
+      "iconName": "wikipedia-w",
+      "description": "Default Wikipedia icon",
+      "regexToMatch": "wikipedia\\.org"
+    },
+
+    {
+      "shortName": "Google",
+      "iconPrefix": "fab",
+      "iconName": "google",
+      "description": "Default Google icon",
+      "regexToMatch": "google\\.com"
+    },
+
+    {
+      "shortName": "Google Drive",
+      "iconPrefix": "fab",
+      "iconName": "google-drive",
+      "description": "Default Google Drive icon",
+      "regexToMatch": "drive\\.google\\.com"
+    },
+
+    {
+      "shortName": "Google Scholar",
+      "iconPrefix": "fab",
+      "iconName": "google-scholar",
+      "description": "Default Google Scholar icon",
+      "regexToMatch": "scholar\\.google\\.com"
+    }
+  ]
+}
