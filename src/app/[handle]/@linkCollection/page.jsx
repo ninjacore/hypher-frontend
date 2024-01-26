@@ -9,6 +9,8 @@ export default function Page() {
 }
 
 function LinkCollection() {
+  const sectionTitle = "LET'S CONNECT"
+
   const profile = useContext(ProfileContext)
   const { linkedCollectionData } = profile
   const linkedCollection = linkedCollectionData
@@ -33,7 +35,7 @@ function LinkCollection() {
   }, [])
   return (
     <>
-      <b>LET'S CONNECT</b>
+      <b>{sectionTitle}</b>
       <>{innerHTML}</>
     </>
   )
