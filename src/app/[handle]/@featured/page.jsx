@@ -4,6 +4,15 @@ import { useContext } from "react"
 import { ProfileContext } from "../ProfileProvider"
 import { IconMapper } from "../../../components/iconMapper"
 
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+
 export default function Page() {
   return <Featured />
 }
@@ -21,36 +30,30 @@ function Featured() {
   let title = featuredContent.shortTitle
   const innerHTML = featuredContent.contentBox.map((contentBox) => {
     return (
-      <div className="space-y-6" key={"cb-" + contentBox.position}>
-        <div className="space-y-6 lg:grid lg:grid-cols-2 lg:gap-6 lg:space-y-0">
-          <div className="space-y-6">
-            <div key={contentBox.category + contentBox.position}>
-              <a href={contentBox.url}>
-                <IconMapper url={contentBox.url} />
-                <b>
-                  <span className="mx-2">
-                    {contentBox.title.length > 0 ? contentBox.title : ""}
-                  </span>
-                </b>
-              </a>
+      <Card key={contentBox.category + contentBox.position} className="my-4">
+        <a href={contentBox.url} target="_blank">
+          <div className="flex">
+            <div className="text-5xl py-4 px-2">
+              <IconMapper url={contentBox.category + ":"} />
+            </div>
+            <div className="grow p-2">
+              <span>{contentBox.title.length > 0 ? contentBox.title : ""}</span>
               <br />
               <span>
                 {contentBox.description.length > 0
                   ? contentBox.description
                   : contentBox.url}
               </span>
-              <br />
-              <br />
             </div>
           </div>
-        </div>
-      </div>
+        </a>
+      </Card>
     )
   }, [])
   return (
-    <div className="bg-early-spring-night">
+    <>
       <b>{title}</b>
-      {innerHTML}
-    </div>
+      <div className="">{innerHTML}</div>
+    </>
   )
 }
