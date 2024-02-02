@@ -2,10 +2,10 @@
   "icons": [
     {
       "shortName": "Document",
-      "iconPrefix": "far",
-      "iconName": "file-alt",
+      "iconPrefix": "fas",
+      "iconName": "file-lines",
       "description": "Custom icon for PDFs, essays, papers, etc.",
-      "regexToMatch": "document: "
+      "regexToMatch": "featuredDocument"
     },
 
     {
@@ -13,23 +13,23 @@
       "iconPrefix": "fas",
       "iconName": "music",
       "description": "Custom icon for playlists or audio",
-      "regexToMatch": "music: "
+      "regexToMatch": "featuredMusic"
     },
 
     {
       "shortName": "Video",
       "iconPrefix": "fas",
-      "iconName": "video",
+      "iconName": "film",
       "description": "Custom icon for videos",
-      "regexToMatch": "video: "
+      "regexToMatch": "featuredVideo"
     },
 
     {
       "shortName": "Image",
-      "iconPrefix": "far",
+      "iconPrefix": "fas",
       "iconName": "image",
       "description": "Custom icon for images",
-      "regexToMatch": "image: "
+      "regexToMatch": "featuredImage"
     },
 
     {

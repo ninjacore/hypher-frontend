@@ -77,28 +77,28 @@
     "contentBox": [
       {
         "title": "Quantum Spinning",
-        "category": "document",
+        "category": "featuredDocument",
         "url": "https://www.sciencedirect.com/science/article/abs/pii/0003491689902765",
         "position": "3",
         "description": "Molecular spins for quantum computation"
       },
       {
         "title": "Nuclear Quantification",
-        "category": "document",
+        "category": "featuredDocument",
         "url": "https://www.osti.gov/etdeweb/biblio/5121383",
         "position": "2",
         "description": "Utilizing quantum effects for nuclear power generation"
       },
       {
         "title": "Quantum Folding",
-        "category": "document",
+        "category": "featuredDocument",
         "url": "https://inis.iaea.org/Search/search.aspx?orig_q=RN:7225789",
         "position": "1",
         "description": "DNA folding with quantum simulations"
       },
       {
         "title": "Photonic Darkness",
-        "category": "document",
+        "category": "featuredDocument",
         "url": "https://link.springer.com/chapter/10.1007/978-94-010-1795-4_1",
         "position": "0",
         "description": "Dark matter and anti-gravity within photonic quantum effects"
