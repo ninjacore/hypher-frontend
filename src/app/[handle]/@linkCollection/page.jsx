@@ -12,6 +12,11 @@ function LinkCollection() {
   const sectionTitle = "LET'S CONNECT"
 
   const profile = useContext(ProfileContext)
+  // Check if profile or mainProfileData is not yet defined and return null or a loading state
+  if (!profile || !profile.mainProfileData) {
+    // You can return a loading spinner, a placeholder, or null to avoid rendering this component prematurely
+    return <div>Loading...</div> // or return null;
+  }
   const { linkedCollectionData } = profile
   const linkedCollection = linkedCollectionData
 
