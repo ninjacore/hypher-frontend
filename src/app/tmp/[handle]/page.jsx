@@ -15,7 +15,12 @@ function Profile() {
 
   useEffect(() => {
     fetch(apiUrl)
-      .then((res) => res.json())
+      .then((res) => {
+        if (!res.status.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`)
+        }
+        return res.json()
+      })
       .then((data) => {
         setData(data)
         setLoading(false)
