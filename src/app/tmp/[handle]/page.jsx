@@ -1,6 +1,8 @@
 "use client"
 import { useState, useEffect } from "react"
 
+import splitProfileData from "../../[handle]/components/splitProfileData"
+
 function Profile() {
   const [data, setData] = useState(null)
   const [isLoading, setLoading] = useState(true)
@@ -16,15 +18,20 @@ function Profile() {
   useEffect(() => {
     fetch(apiUrl)
       .then((res) => {
-        if (!res.status.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
+        if (!res.status.toString().startsWith("2")) {
+          throw new Error(`HTTP error! status: ${res.status}`)
         }
         return res.json()
       })
       .then((data) => {
-        setData(data)
+        let splitData = splitProfileData(data)
+        setData(splitData)
         setLoading(false)
       })
+    // .then((data) => {
+    //   setData(data)
+    //   setLoading(false)
+    // })
   }, [])
 
   if (isLoading) return <p>Loading...</p>
@@ -32,7 +39,9 @@ function Profile() {
 
   return (
     <div>
-      <p>{data}</p>
+      <p>{data.mainProfileData.contentType.toString()}</p>
+      <p>{data.linkCollectionData.contentType.toString()}</p>
+      <p>{data.featuredContentData.contentType.toString()}</p>
     </div>
   )
 }

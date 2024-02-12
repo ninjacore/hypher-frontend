@@ -63,7 +63,7 @@ function splitProfileData(profileData) {
 
   return {
     mainProfileData,
-    linkedCollectionData: linkCollectionData,
+    linkCollectionData,
     featuredContentData,
   }
 }
