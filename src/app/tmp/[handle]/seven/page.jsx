@@ -22,29 +22,39 @@ function ValueOfInterest() {
     // fetch("http://localhost:5678/api/v1/profilePage/dnt.is").then(() =>
     //   setLoaded(true)
     // )
-    fetch("http://localhost:5678/api/v1/profilePage/dnt.is")
-      .then((res) => {
-        if (!res.status.toString().startsWith("2")) {
-          throw new Error(`HTTP error! status: ${res.status}`)
-        }
-        setLoaded(true)
-        console.log("res=")
-        console.log(res)
-        // promiese to decode the response body as json
-        return res.json()
-      })
+    // fetch("http://localhost:5678/api/v1/profilePage/dnt.is")
+    //   .then((res) => {
+    //     if (!res.status.toString().startsWith("2")) {
+    //       throw new Error(`HTTP error! status: ${res.status}`)
+    //     }
+    //     setLoaded(true)
+    //     console.log("res=")
+    //     console.log(res)
+    //     // promiese to decode the response body as json
+    //     return res.json()
+    //   })
+    let url = "http://localhost:5678/api/v1/profilePage/dnt.is"
+    fetch(url)
+      .then((response) =>
+        response
+          .json()
+          .then((data) => ({
+            data: data,
+            status: response.status,
+          }))
+          .then((res) => {
+            console.log("decodedResponse=", res)
+          })
+      )
       // once deconstructed, we can use the data
-      .then((decodedResponse) => {
-        console.log("decodedResponse=")
-        console.log(decodedResponse)
-      })
       .then((profileData) => {
         // split profile data to make it usable
         let splitData = splitProfileData(profileData)
         console.log("splitData=")
         console.log(splitData)
+        setData(splitData.mainProfileData.contentType.toString())
+        setLoaded(true)
       })
-    setData(value)
   }, [])
 
   return (
