@@ -4,6 +4,7 @@ import React, { createContext, useContext, useEffect, useState } from "react"
 import { ProfileContext, ValueOfInterest } from "../page"
 
 export default function Page() {
+  // explicitly using Context Provider
   return (
     <ValueOfInterest>
       <CoolKid />

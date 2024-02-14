@@ -14,8 +14,6 @@ export default function Page() {
 }
 
 export function ValueOfInterest({ children }) {
-  let value = "a"
-
   // to make sure state is updated once we get the data pt.1
   const [data, setData] = useState(null)
   const [loaded, setLoaded] = useState(false)
@@ -51,11 +49,4 @@ export function ValueOfInterest({ children }) {
       <ProfileContext.Provider value={data}>{children}</ProfileContext.Provider>
     </>
   )
-
-  //   return (
-  //     <div>
-  //       <p>{data}</p>
-  //       <p>{"data loaded: " + loaded}</p>
-  //     </div>
-  //   )
 }
