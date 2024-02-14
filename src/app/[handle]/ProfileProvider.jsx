@@ -1,7 +1,7 @@
 "use client"
 import React, { createContext, useState, useEffect } from "react"
 
-// You might not need this import if you're not using the local file anymore
+// load local file
 // import profileData from "./tmpDB/profile-data.json";
 
 import splitProfileData from "./components/splitProfileData"
@@ -9,28 +9,34 @@ import splitProfileData from "./components/splitProfileData"
 const ProfileContext = createContext()
 
 function ProfileProvider({ children }) {
-  const [profile, setProfile] = useState({}) // Initialize profile state as empty
+  const [profile, setProfile] = useState(null)
+  const [isLoading, setLoading] = useState(true)
+
+  // get handle from url of this page
+  const url = window.location.href
+  const handle = url.split("/").pop()
+  console.log("handle=")
+  console.log(handle)
+
+  const apiUrl = `http://localhost:5678/api/v1/profilePage/${handle}`
 
   useEffect(() => {
-    // Function to fetch profile data
-    const fetchProfileData = async () => {
-      try {
-        const response = await fetch(
-          "http://localhost:5678/api/v1/profilePage/dnt.is"
-        )
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`)
+    fetch(apiUrl)
+      .then((res) => {
+        if (!res.status.toString().startsWith("2")) {
+          throw new Error(`HTTP error! status: ${res.status}`)
         }
-        const data = await response.json()
-        const categorizedData = splitProfileData(data) // Assuming your splitProfileData function can handle the data structure from your backend
-        setProfile(categorizedData) // Update state with fetched and processed data
-      } catch (error) {
-        console.error("Failed to fetch profile data:", error)
-      }
-    }
+        return res.json()
+      })
+      .then((data) => {
+        let profile = splitProfileData(data)
+        setProfile(profile)
+        setLoading(false)
+      })
+  }, [])
 
-    fetchProfileData()
-  }, []) // Empty dependency array means this effect runs once on mount
+  if (isLoading) return <p>Loading...</p>
+  if (!profile) return <p>No profile data</p>
 
   return (
     <ProfileContext.Provider value={profile}>

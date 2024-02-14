@@ -1,11 +1,17 @@
 "use client"
 
 import { useContext } from "react"
-import { ProfileContext } from "../ProfileProvider"
+// import { ProfileContext, Profile } from "../ProfileProvider"
+import { ProfileContext, Profile } from "../page.jsx"
 import { IconMapper } from "../../../components/iconMapper"
 
 export default function Page() {
-  return <LinkCollection />
+  return (
+    <Profile>
+      <LinkCollection />
+    </Profile>
+  )
+  // return <LinkCollection />
 }
 
 function LinkCollection() {
@@ -17,8 +23,8 @@ function LinkCollection() {
     // You can return a loading spinner, a placeholder, or null to avoid rendering this component prematurely
     return <div>Loading...</div> // or return null;
   }
-  const { linkedCollectionData } = profile
-  const linkedCollection = linkedCollectionData
+  const { linkCollectionData } = profile
+  const linkedCollection = linkCollectionData
 
   console.log("linkedCollection.contentBox=")
   console.table(linkedCollection.contentBox)

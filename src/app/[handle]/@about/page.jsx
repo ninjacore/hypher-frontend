@@ -1,13 +1,14 @@
 "use client"
 
 import { useContext } from "react"
-import { ProfileContext } from "../ProfileProvider"
+// import { ProfileContext } from "../ProfileProvider"
+import { ProfileContext, Profile } from "../page.jsx"
 
 export default function Page() {
   return (
-    <>
+    <Profile>
       <About />
-    </>
+    </Profile>
   )
 }
 
@@ -19,7 +20,7 @@ function About() {
     return <div>Loading...</div> // or return null;
   }
   const { mainProfileData } = profile
-  const mainContent = mainProfileData.contentBox[0]
+  const mainContent = mainProfileData.contentBox?.[0]
 
   return <>{mainContent.bio}</>
 }
