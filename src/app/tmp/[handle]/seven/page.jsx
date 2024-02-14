@@ -1,6 +1,9 @@
 "use client"
-import { useContext, useEffect, useState } from "react"
+import React, { createContext, useContext, useEffect, useState } from "react"
 import splitProfileData from "./splitProfileData"
+
+// creating context to use later and in child components
+export const ProfileContext = createContext(null)
 
 export default function Page() {
   return (
@@ -10,7 +13,7 @@ export default function Page() {
   )
 }
 
-function ValueOfInterest() {
+export function ValueOfInterest({ children }) {
   let value = "a"
 
   // to make sure state is updated once we get the data pt.1
@@ -19,20 +22,6 @@ function ValueOfInterest() {
 
   // to make sure state is updated once we get the data pt.2
   useEffect(() => {
-    // fetch("http://localhost:5678/api/v1/profilePage/dnt.is").then(() =>
-    //   setLoaded(true)
-    // )
-    // fetch("http://localhost:5678/api/v1/profilePage/dnt.is")
-    //   .then((res) => {
-    //     if (!res.status.toString().startsWith("2")) {
-    //       throw new Error(`HTTP error! status: ${res.status}`)
-    //     }
-    //     setLoaded(true)
-    //     console.log("res=")
-    //     console.log(res)
-    //     // promiese to decode the response body as json
-    //     return res.json()
-    //   })
     let url = "http://localhost:5678/api/v1/profilePage/dnt.is"
     fetch(url)
       .then((response) =>
@@ -58,9 +47,15 @@ function ValueOfInterest() {
   }, [])
 
   return (
-    <div>
-      <p>{data}</p>
-      <p>{"data loaded: " + loaded}</p>
-    </div>
+    <>
+      <ProfileContext.Provider value={data}>{children}</ProfileContext.Provider>
+    </>
   )
+
+  //   return (
+  //     <div>
+  //       <p>{data}</p>
+  //       <p>{"data loaded: " + loaded}</p>
+  //     </div>
+  //   )
 }
