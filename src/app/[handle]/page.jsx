@@ -18,10 +18,17 @@ export function Profile({ children }) {
   const [data, setData] = useState(null)
   const [loaded, setLoaded] = useState(false)
 
+  // get handle from url of this page
+  const url = window.location.href
+  const handle = url.split("/").pop()
+  console.log("handle=")
+  console.log(handle)
+
+  const apiUrl = `http://localhost:5678/api/v1/profilePage/${handle}`
+
   // to make sure state is updated once we get the data pt.2
   useEffect(() => {
-    let url = "http://localhost:5678/api/v1/profilePage/albert.parcelios"
-    fetch(url).then((response) =>
+    fetch(apiUrl).then((response) =>
       response
         .json()
         .then((data) => ({
@@ -42,19 +49,6 @@ export function Profile({ children }) {
           }
         })
     )
-    // // once deconstructed, we can use the data
-    // .then((profileData) => {
-    //   // only load if there's data
-    //   if (profileData !== undefined) {
-    //     // split profile data to make it usable
-    //     let splitData = splitProfileData(profileData)
-    //     console.log("splitData=")
-    //     console.log(splitData)
-    //     // setData(splitData.mainProfileData.contentType.toString())
-    //     setData(splitData)
-    //     setLoaded(true)
-    //   }
-    // })
   }, [])
 
   return (
