@@ -68,6 +68,7 @@ export default function Layout({
   linkCollection,
   editableLinkCollection,
   featured,
+  editableFeatured,
 }) {
   // edit mode
   if (editMode) {
@@ -96,7 +97,7 @@ export default function Layout({
           <CardContent>{editableLinkCollection}</CardContent>
         </Card>
         <Card className="mb-6">
-          <CardContent>{featured}</CardContent>
+          <CardContent>{editableFeatured}</CardContent>
         </Card>
       </>
     )
