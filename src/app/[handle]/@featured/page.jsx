@@ -4,15 +4,6 @@ import { useContext } from "react"
 // import { ProfileContext, Profile } from "../ProfileProvider"
 import { ProfileContext, Profile } from "../page.jsx"
 import { IconMapper } from "../../../components/iconMapper"
-
-// import {
-//   Card,
-//   CardContent,
-//   CardDescription,
-//   CardFooter,
-//   CardHeader,
-//   CardTitle,
-// } from "@/components/ui/card"
 import { Card } from "@/components/ui/card"
 
 export default function Page() {
@@ -21,7 +12,6 @@ export default function Page() {
       <Featured />
     </Profile>
   )
-  // return <Featured />
 }
 
 function Featured() {

@@ -1,7 +1,6 @@
 "use client"
 
 import { useContext } from "react"
-// import { ProfileContext, Profile } from "../ProfileProvider"
 import { ProfileContext, Profile } from "../page.jsx"
 import { IconMapper } from "../../../components/iconMapper"
 
@@ -11,7 +10,6 @@ export default function Page() {
       <LinkCollection />
     </Profile>
   )
-  // return <LinkCollection />
 }
 
 function LinkCollection() {

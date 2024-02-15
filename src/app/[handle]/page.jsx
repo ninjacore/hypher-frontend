@@ -1,6 +1,6 @@
 "use client"
 import React, { createContext, useContext, useEffect, useState } from "react"
-import splitProfileData from "./components/splitProfileData"
+import splitProfileData from "./utils/splitProfileData"
 
 // creating context to use later and in child components
 export const ProfileContext = createContext(null)
@@ -43,7 +43,6 @@ export function Profile({ children }) {
             let splitData = splitProfileData(res.data)
             console.log("splitData=")
             console.log(splitData)
-            // setData(splitData.mainProfileData.contentType.toString())
             setData(splitData)
             setLoaded(true)
           }

@@ -1,7 +1,6 @@
 "use client"
 
 import { useContext } from "react"
-// import { ProfileContext, Profile } from "../ProfileProvider"
 import { ProfileContext, Profile } from "../page.jsx"
 
 export default function Page() {
@@ -10,7 +9,6 @@ export default function Page() {
       <Name />
     </Profile>
   )
-  // return <Name />
 }
 
 function Name() {
