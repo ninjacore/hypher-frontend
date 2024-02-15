@@ -1,13 +1,16 @@
 "use client"
 
 import { useContext } from "react"
-import { ProfileContext } from "../ProfileProvider"
-
+import { ProfileContext, Profile } from "../page.jsx"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faAngleRight } from "@fortawesome/free-solid-svg-icons"
 
 export default function Page() {
-  return <Tags />
+  return (
+    <Profile>
+      <Tags />
+    </Profile>
+  )
 }
 
 function Tags() {
