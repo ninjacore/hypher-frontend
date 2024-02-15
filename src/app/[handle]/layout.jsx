@@ -13,6 +13,8 @@ import {
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faAngleRight, faPenToSquare } from "@fortawesome/free-solid-svg-icons"
 
+import { EditButton } from "@/components/ui/editButtonPen"
+
 const title = "Profile Page"
 
 // to be handled by token
@@ -45,25 +47,26 @@ function ProfilePageButton({ isOwner }) {
   )
 }
 
-function EditButton() {
-  return (
-    <Button
-      // variant="default"
-      className="group-hover/edit:bg-accent group-hover/edit:text-accent-foreground text-black rounded p-0.5"
-    >
-      <FontAwesomeIcon
-        icon={faPenToSquare}
-        className="fas fa-pen-to-square text-xs px-1.5 my-auto my-2.45 ml-1 py-0"
-      ></FontAwesomeIcon>
-    </Button>
-  )
-}
+// function EditButton() {
+//   return (
+//     <Button
+//       // variant="default"
+//       className="group-hover/edit:bg-accent group-hover/edit:text-accent-foreground text-black rounded p-0.5"
+//     >
+//       <FontAwesomeIcon
+//         icon={faPenToSquare}
+//         className="fas fa-pen-to-square text-xs px-1.5 my-auto my-2.45 ml-1 py-0"
+//       ></FontAwesomeIcon>
+//     </Button>
+//   )
+// }
 
 export default function Layout({
   name,
   about,
   tags,
   linkCollection,
+  editableLinkCollection,
   featured,
 }) {
   // edit mode
@@ -90,7 +93,7 @@ export default function Layout({
           </CardContent>
         </Card>
         <Card className="mb-6">
-          <CardContent>{linkCollection}</CardContent>
+          <CardContent>{editableLinkCollection}</CardContent>
         </Card>
         <Card className="mb-6">
           <CardContent>{featured}</CardContent>
