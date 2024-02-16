@@ -1,3 +1,6 @@
+"use client"
+import React, { useState } from "react"
+
 import { Button } from "@/components/ui/button"
 
 import {
@@ -14,6 +17,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faAngleRight, faPenToSquare } from "@fortawesome/free-solid-svg-icons"
 
 import { EditButton } from "@/components/ui/editButtonPen"
+// import { showTextArea } from "./utils/showTextArea"
+import { Textarea } from "@/components/ui/textarea"
 
 const title = "Profile Page"
 
@@ -23,13 +28,13 @@ const pageOwner = true
 // to be handley by button click
 const editMode = true
 
-export const metadata = {
-  title,
-  openGraph: {
-    title,
-    images: [`/api/og?title=${title}`],
-  },
-}
+// export const metadata = {
+//   title,
+//   openGraph: {
+//     title,
+//     images: [`/api/og?title=${title}`],
+//   },
+// }
 
 function ProfilePageButton({ isOwner }) {
   if (isOwner) {
@@ -72,6 +77,7 @@ export default function Layout({
 }) {
   // edit mode
   if (editMode) {
+    const [editBio, setEditBio] = useState(false)
     return (
       <>
         <Card className="mb-2">
@@ -80,8 +86,20 @@ export default function Layout({
           </CardSingleLineHeader>
           <CardContent>
             <div className="px-1 py-2 group/edit">
-              {about}
-              <EditButton />
+              <div onClick={() => setEditBio(true)}>
+                {editBio ? (
+                  <>
+                    <Textarea
+                      placeholder="Type your message here."
+                      id="aboutText"
+                    />
+                    <Button variant="outline">ok</Button>
+                  </>
+                ) : (
+                  about
+                )}
+                {editBio ? <></> : <EditButton />}
+              </div>
             </div>
 
             <div className="mt-2 px-1">
