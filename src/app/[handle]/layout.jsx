@@ -92,7 +92,9 @@ export default function Layout({
                     <Textarea
                       placeholder="Type your message here."
                       id="aboutText"
-                    />
+                    >
+                      {"prefilled text like this."}
+                    </Textarea>
                     <Button variant="outline">ok</Button>
                   </>
                 ) : (
