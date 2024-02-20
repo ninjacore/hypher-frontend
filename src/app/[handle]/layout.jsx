@@ -1,5 +1,6 @@
 "use client"
-// import React, { useState } from "react"
+
+import React, { useState } from "react"
 
 import { Button } from "@/components/ui/button"
 
@@ -26,7 +27,7 @@ const title = "Profile Page"
 const pageOwner = true
 
 // to be handley by button click
-const editMode = true
+// const editMode = false
 
 // export const metadata = {
 //   title,
@@ -36,10 +37,14 @@ const editMode = true
 //   },
 // }
 
-function ProfilePageButton({ isOwner }) {
+function ProfilePageButton({ isOwner, setEditMode }) {
   if (isOwner) {
     return (
-      <Button variant="outline" className="bg-white text-black">
+      <Button
+        variant="outline"
+        className="bg-white text-black"
+        onClick={() => setEditMode(true)}
+      >
         {"edit"}
       </Button>
     )
@@ -52,20 +57,6 @@ function ProfilePageButton({ isOwner }) {
   )
 }
 
-// function EditButton() {
-//   return (
-//     <Button
-//       // variant="default"
-//       className="group-hover/edit:bg-accent group-hover/edit:text-accent-foreground text-black rounded p-0.5"
-//     >
-//       <FontAwesomeIcon
-//         icon={faPenToSquare}
-//         className="fas fa-pen-to-square text-xs px-1.5 my-auto my-2.45 ml-1 py-0"
-//       ></FontAwesomeIcon>
-//     </Button>
-//   )
-// }
-
 export default function Layout({
   name,
   about,
@@ -76,6 +67,8 @@ export default function Layout({
   featured,
   editableFeatured,
 }) {
+  const [editMode, setEditMode] = useState(false)
+
   // edit mode
   if (editMode) {
     // const [editBio, setEditBio] = useState(false)
@@ -113,7 +106,7 @@ export default function Layout({
       <Card className="mb-2">
         <CardSingleLineHeader className="flex justify-between my-4">
           <h1 className="text-3xl font-bold mx-1">{name}</h1>
-          <ProfilePageButton isOwner={pageOwner} />
+          <ProfilePageButton isOwner={pageOwner} setEditMode={setEditMode} />
         </CardSingleLineHeader>
         <CardContent>
           <div className="px-1 py-2">{about}</div>
