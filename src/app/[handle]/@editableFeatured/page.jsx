@@ -34,7 +34,7 @@ function EditableFeatured() {
   const innerHTML = featuredContent.contentBox.map((contentBox) => {
     return (
       <Card key={contentBox.category + contentBox.position} className="my-4">
-        <a>
+        <a onClick={(e) => editLink(e, 2)} id={contentBox.position + "x"}>
           <div className="flex group/edit">
             <div className="text-5xl py-4 px-2">
               <IconMapper url={contentBox.category + ":"} />
@@ -59,5 +59,17 @@ function EditableFeatured() {
       <b>{title}</b>
       <div className="">{innerHTML}</div>
     </>
+  )
+}
+
+function editLink(event, contentBoxPosition) {
+  console.log(
+    `%c ${event.target}`,
+    "color: cyan; background-color: black; font-size: 16px; padding: 4px; border-radius: 4px;"
+  )
+
+  console.log(
+    `%c link at position ${contentBoxPosition} is getting edited!!`,
+    "color: cyan; background-color: black; font-size: 16px; padding: 4px; border-radius: 4px;"
   )
 }

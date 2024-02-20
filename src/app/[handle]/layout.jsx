@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from "react"
+// import React, { useState } from "react"
 
 import { Button } from "@/components/ui/button"
 
@@ -18,7 +18,7 @@ import { faAngleRight, faPenToSquare } from "@fortawesome/free-solid-svg-icons"
 
 import { EditButton } from "@/components/ui/editButtonPen"
 // import { showTextArea } from "./utils/showTextArea"
-import { Textarea } from "@/components/ui/textarea"
+// import { Textarea } from "@/components/ui/textarea"
 
 const title = "Profile Page"
 
@@ -69,6 +69,7 @@ function ProfilePageButton({ isOwner }) {
 export default function Layout({
   name,
   about,
+  editableAbout,
   tags,
   linkCollection,
   editableLinkCollection,
@@ -77,7 +78,7 @@ export default function Layout({
 }) {
   // edit mode
   if (editMode) {
-    const [editBio, setEditBio] = useState(false)
+    // const [editBio, setEditBio] = useState(false)
     return (
       <>
         <Card className="mb-2">
@@ -85,24 +86,7 @@ export default function Layout({
             <h1 className="text-3xl font-bold mx-1">{name}</h1>
           </CardSingleLineHeader>
           <CardContent>
-            <div className="px-1 py-2 group/edit">
-              <div onClick={() => setEditBio(true)}>
-                {editBio ? (
-                  <>
-                    <Textarea
-                      placeholder="Type your message here."
-                      id="aboutText"
-                    >
-                      {"prefilled text like this."}
-                    </Textarea>
-                    <Button variant="outline">ok</Button>
-                  </>
-                ) : (
-                  about
-                )}
-                {editBio ? <></> : <EditButton />}
-              </div>
-            </div>
+            <div className="px-1 py-2 group/edit">{editableAbout}</div>
 
             <div className="mt-2 px-1">
               <hr className="border-gray-400 border-t-2" />
