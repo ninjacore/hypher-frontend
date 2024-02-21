@@ -14,6 +14,7 @@ import {
   DialogTitle,
   DialogFooter,
   DialogTrigger,
+  DialogClose,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -136,19 +137,21 @@ function EditableFeatured() {
               </div>
             </div>
             <DialogFooter>
-              <Button
-                type="submit"
-                onClick={(e) => {
-                  updpateFeaturedContent(
-                    featuredTitle,
-                    featuredLink,
-                    featuredDescription,
-                    contentBox.position
-                  )
-                }}
-              >
-                Save changes
-              </Button>
+              <DialogClose>
+                <Button
+                  type="submit"
+                  onClick={(e) => {
+                    updpateFeaturedContent(
+                      featuredTitle,
+                      featuredLink,
+                      featuredDescription,
+                      contentBox.position
+                    )
+                  }}
+                >
+                  Save changes
+                </Button>
+              </DialogClose>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -170,6 +173,7 @@ function updpateFeaturedContent(
   contentBoxPosition
 ) {
   // TODO: save to backend
+  // only continue on successful save!
   console.log(
     `%c featuredTitle=${featuredTitle}, featuredLink=${featuredLink}, featuredDescription=${featuredDescription}, contentBoxPosition=${contentBoxPosition}`,
     "color: cyan; background-color: black; font-size: 16px; padding: 4px; border-radius: 4px;"
@@ -187,8 +191,6 @@ function updpateFeaturedContent(
   } else {
     displayedDescription.innerHTML = featuredLink
   }
-
-  // close the Dialog
 }
 
 function editLink(event, contentBoxPosition) {
