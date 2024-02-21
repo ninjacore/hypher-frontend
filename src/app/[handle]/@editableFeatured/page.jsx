@@ -1,6 +1,6 @@
 "use client"
 
-import { useContext, useState } from "react"
+import { useContext, useState, useEffect, use } from "react"
 // import { ProfileContext, Profile } from "../ProfileProvider"
 import { ProfileContext, Profile } from "../page.jsx"
 import { IconMapper } from "../../../components/iconMapper"
@@ -42,13 +42,30 @@ function EditableFeatured() {
   console.log("featuredContent")
   console.log(featuredContent)
 
-  // for the input fields
-  const [featuredTitle, setFeaturedTitle] = useState("")
-  const [featuredLink, setFeaturedLink] = useState("")
-  const [featuredDescription, setFeaturedDescription] = useState("")
-
   let title = featuredContent.shortTitle
   const innerHTML = featuredContent.contentBox.map((contentBox) => {
+    // pre-load from context if available
+    let defaultFeaturedTitle = ""
+    let defaultFeaturedLink = ""
+    let defaultFeaturedDescription = ""
+
+    if (contentBox.title.length > 0) {
+      defaultFeaturedTitle = contentBox.title
+    }
+    if (contentBox.url.length > 0) {
+      defaultFeaturedLink = contentBox.url
+    }
+    if (contentBox.description.length > 0) {
+      defaultFeaturedDescription = contentBox.description
+    }
+
+    // for the input fields
+    const [featuredTitle, setFeaturedTitle] = useState(defaultFeaturedTitle)
+    const [featuredLink, setFeaturedLink] = useState(defaultFeaturedLink)
+    const [featuredDescription, setFeaturedDescription] = useState(
+      defaultFeaturedDescription
+    )
+
     return (
       <Card key={contentBox.category + contentBox.position} className="my-4">
         {/* <a onClick={(e) => editLink(e, 2)} id={contentBox.position + "x"}> */}
@@ -59,12 +76,13 @@ function EditableFeatured() {
                 <IconMapper url={contentBox.category + ":"} />
               </div>
               <div className="grow p-2">
-                <span>
-                  {contentBox.title.length > 0 ? contentBox.title : ""}
+                <span id={"featuredTitle-" + contentBox.position}>
+                  {/* {contentBox.title.length > 0 ? contentBox.title : ""} */}
+                  {defaultFeaturedTitle}
                 </span>
                 <EditButton />
                 <br />
-                <span>
+                <span id={"featuredDescription-" + contentBox.position}>
                   {contentBox.description.length > 0
                     ? contentBox.description
                     : contentBox.url}
@@ -118,7 +136,19 @@ function EditableFeatured() {
               </div>
             </div>
             <DialogFooter>
-              <Button type="submit">Save changes</Button>
+              <Button
+                type="submit"
+                onClick={(e) => {
+                  updpateFeaturedContent(
+                    featuredTitle,
+                    featuredLink,
+                    featuredDescription,
+                    contentBox.position
+                  )
+                }}
+              >
+                Save changes
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
@@ -131,6 +161,34 @@ function EditableFeatured() {
       <div className="">{innerHTML}</div>
     </>
   )
+}
+
+function updpateFeaturedContent(
+  featuredTitle,
+  featuredLink,
+  featuredDescription,
+  contentBoxPosition
+) {
+  // TODO: save to backend
+  console.log(
+    `%c featuredTitle=${featuredTitle}, featuredLink=${featuredLink}, featuredDescription=${featuredDescription}, contentBoxPosition=${contentBoxPosition}`,
+    "color: cyan; background-color: black; font-size: 16px; padding: 4px; border-radius: 4px;"
+  )
+
+  // re-render featured content
+  document.getElementById("featuredTitle-" + contentBoxPosition).innerHTML =
+    featuredTitle
+
+  let displayedDescription = document.getElementById(
+    "featuredDescription-" + contentBoxPosition
+  )
+  if (featuredDescription.length > 0) {
+    displayedDescription.innerHTML = featuredDescription
+  } else {
+    displayedDescription.innerHTML = featuredLink
+  }
+
+  // close the Dialog
 }
 
 function editLink(event, contentBoxPosition) {
