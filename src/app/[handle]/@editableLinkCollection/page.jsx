@@ -78,70 +78,72 @@ function EditableLinkCollection() {
     // }, [])
 
     return (
-      <Dialog>
-        <DialogTrigger asChild>
-          <div className="group/edit">
-            <div
-              key={"pos-" + link.position + "-editable"}
-              className="my-4 mx-2 py-0.5 px-3 bg-konkikyou-blue group/edit"
-            >
-              <a>
-                <IconMapper url={link.url} />
-                <span className="mx-2">
-                  {link.text.length > 0 ? link.text : link.url}
-                </span>
-              </a>
-              <EditButton />
-            </div>
-          </div>
-        </DialogTrigger>
-        <DialogContent className="sm:max-w-[425px]">
-          <DialogHeader>
-            <DialogTitle>Edit Link</DialogTitle>
-            <DialogDescription>
-              Make changes to your link here. Click save when you're done.
-            </DialogDescription>
-          </DialogHeader>
-          <div className="grid gap-4 py-4">
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="linkText" className="text-right">
-                Text
-              </Label>
-              <Input
-                id="linkText"
-                type="text"
-                className="col-span-3"
-                onChange={(e) => setLinkText(e.target.value)}
-                value={linkText}
-              />
-            </div>
-            <div className="grid grid-cols-4 items-center gap-4">
-              <Label htmlFor="linkURL" className="text-right">
-                Link
-              </Label>
-              <Input
-                id="linkURL"
-                type="text"
-                className="col-span-3"
-                onChange={(e) => setlinkURL(e.target.value)}
-                value={linkURL}
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <DialogClose>
-              <Button
-                type="submit"
-                onClick={(e) => {
-                  updateLinkCollection(linkText, linkURL, link.position)
-                }}
+      <div key={"link-" + link.position}>
+        <Dialog>
+          <DialogTrigger asChild>
+            <div className="group/edit">
+              <div
+                key={"pos-" + link.position + "-editable"}
+                className="my-4 mx-2 py-0.5 px-3 bg-konkikyou-blue group/edit"
               >
-                Save changes
-              </Button>
-            </DialogClose>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+                <a>
+                  <IconMapper url={link.url} />
+                  <span className="mx-2">
+                    {link.text.length > 0 ? link.text : link.url}
+                  </span>
+                </a>
+                <EditButton />
+              </div>
+            </div>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Edit Link</DialogTitle>
+              <DialogDescription>
+                Make changes to your link here. Click save when you're done.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="linkText" className="text-right">
+                  Text
+                </Label>
+                <Input
+                  id="linkText"
+                  type="text"
+                  className="col-span-3"
+                  onChange={(e) => setLinkText(e.target.value)}
+                  value={linkText}
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="linkURL" className="text-right">
+                  Link
+                </Label>
+                <Input
+                  id="linkURL"
+                  type="text"
+                  className="col-span-3"
+                  onChange={(e) => setLinkURL(e.target.value)}
+                  value={linkURL}
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <DialogClose>
+                <Button
+                  type="submit"
+                  onClick={(e) => {
+                    updateLinkCollection(linkText, linkURL, link.position)
+                  }}
+                >
+                  Save changes
+                </Button>
+              </DialogClose>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
     )
   }, [])
   return (
@@ -182,7 +184,7 @@ function handleDataUpdate(linkText, linkURL, linkPosition) {
   console.log("handle=")
   console.log(handle)
 
-  const apiURL = `http://localhost:5678/api/v1/linkCollection/${handle}/update?position=${linkPosition}`
+  const apiURL = `http://localhost:5678/api/v1/linkCollections/${handle}/update?position=${linkPosition}`
 
   fetch(apiURL, {
     method: "PUT",
