@@ -78,7 +78,7 @@ function EditableLinkCollection() {
     // }, [])
 
     return (
-      <div key={"link-" + link.position}>
+      <div key={"linkItem-" + link.position}>
         <Dialog>
           <DialogTrigger asChild>
             <div className="group/edit">
@@ -88,7 +88,7 @@ function EditableLinkCollection() {
               >
                 <a>
                   <IconMapper url={link.url} />
-                  <span className="mx-2">
+                  <span id={"linkText-" + link.position} className="mx-2">
                     {link.text.length > 0 ? link.text : link.url}
                   </span>
                 </a>
@@ -163,6 +163,10 @@ function updateLinkCollection(linkText, linkURL, linkPosition) {
     `%c linkText=${linkText}, linkURL=${linkURL}, linkPosition=${linkPosition}`,
     "color: cyan; background-color: black; font-size: 16px; padding: 4px; border-radius: 4px;"
   )
+
+  // re-render featured content (show changes)
+  document.getElementById("linkText-" + linkPosition).innerHTML =
+    linkText.length > 0 ? linkText : linkURL
 }
 
 function editLink(event, linkPosition) {
