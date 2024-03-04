@@ -186,7 +186,7 @@ function updateFeaturedContent(
     "color: cyan; background-color: black; font-size: 16px; padding: 4px; border-radius: 4px;"
   )
 
-  // re-render featured content
+  // re-render featured content (show changes)
   document.getElementById("featuredTitle-" + contentBoxPosition).innerHTML =
     featuredTitle
 
