@@ -141,7 +141,7 @@ function EditableFeatured() {
                 <Button
                   type="submit"
                   onClick={(e) => {
-                    updpateFeaturedContent(
+                    updateFeaturedContent(
                       featuredTitle,
                       featuredLink,
                       featuredDescription,
@@ -166,14 +166,14 @@ function EditableFeatured() {
   )
 }
 
-function updpateFeaturedContent(
+function updateFeaturedContent(
   featuredTitle,
   featuredLink,
   featuredDescription,
   contentBoxPosition
 ) {
   // save to backend
-  updateFeaturedContent(
+  handleDataUpdate(
     featuredTitle,
     featuredLink,
     featuredDescription,
@@ -212,7 +212,7 @@ function editLink(event, contentBoxPosition) {
   )
 }
 
-function updateFeaturedContent(
+function handleDataUpdate(
   featuredTitle,
   featuredLink,
   featuredDescription,
