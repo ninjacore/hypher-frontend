@@ -141,7 +141,7 @@ function EditableFeatured() {
                 <Button
                   type="submit"
                   onClick={(e) => {
-                    updpateFeaturedContent(
+                    updateFeaturedContent(
                       featuredTitle,
                       featuredLink,
                       featuredDescription,
@@ -166,14 +166,21 @@ function EditableFeatured() {
   )
 }
 
-function updpateFeaturedContent(
+function updateFeaturedContent(
   featuredTitle,
   featuredLink,
   featuredDescription,
   contentBoxPosition
 ) {
-  // TODO: save to backend
-  // only continue on successful save!
+  // save to backend
+  handleDataUpdate(
+    featuredTitle,
+    featuredLink,
+    featuredDescription,
+    contentBoxPosition
+  )
+
+  // TODO: only continue on successful save!
   console.log(
     `%c featuredTitle=${featuredTitle}, featuredLink=${featuredLink}, featuredDescription=${featuredDescription}, contentBoxPosition=${contentBoxPosition}`,
     "color: cyan; background-color: black; font-size: 16px; padding: 4px; border-radius: 4px;"
@@ -203,4 +210,41 @@ function editLink(event, contentBoxPosition) {
     `%c link at position ${contentBoxPosition} is getting edited!!`,
     "color: cyan; background-color: black; font-size: 16px; padding: 4px; border-radius: 4px;"
   )
+}
+
+function handleDataUpdate(
+  featuredTitle,
+  featuredLink,
+  featuredDescription,
+  contentBoxPosition
+) {
+  // get handle from url of this page
+  const url = window.location.href
+  const handle = url.split("/").pop()
+  console.log("handle=")
+  console.log(handle)
+
+  // {{SERVICE_IP}}:{{SERVICE_PORT}}/{{API_VERSION}}/featuredContents/dnt.is/update?position=3
+  const apiURL = `http://localhost:5678/api/v1/featuredContents/${handle}/update?position=${contentBoxPosition}`
+
+  fetch(apiURL, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      title: featuredTitle,
+      url: featuredLink,
+      description: featuredDescription,
+    }),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log("Success:", data)
+      return data
+    })
+    .catch((error) => {
+      console.error("Error:", error)
+      return error
+    })
 }
