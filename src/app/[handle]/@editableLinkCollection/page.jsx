@@ -156,38 +156,15 @@ function EditableLinkCollection() {
   )
 }
 
-function updateLinkCollection(
-  linkText,
-  linkURL,
-  linkPosition
-) {
+function updateLinkCollection(linkText, linkURL, linkPosition) {
   // save to backend
-  handleDataUpdate(
-    linkText,
-    linkURL,
-    linkPosition
-  )
+  handleDataUpdate(linkText, linkURL, linkPosition)
 
   // TODO: only continue on successful save!
   console.log(
     `%c linkText=${linkText}, linkURL=${linkURL}, linkPosition=${linkPosition}`,
     "color: cyan; background-color: black; font-size: 16px; padding: 4px; border-radius: 4px;"
   )
-
-  // re-render featured content
-  /*
-  document.getElementById("linkText-" + linkPosition).innerHTML =
-    linkText
-
-  let displayedDescription = document.getElementById(
-    "featuredDescription-" + linkPosition
-  )
-  if (featuredDescription.length > 0) {
-    displayedDescription.innerHTML = featuredDescription
-  } else {
-    displayedDescription.innerHTML = linkURL
-  }
-  */
 }
 
 function editLink(event, linkPosition) {
