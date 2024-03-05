@@ -1,6 +1,9 @@
 "use client"
 import React, { createContext, useContext, useEffect, useState } from "react"
 
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Separator } from "@/components/ui/separator"
+
 export default function Page() {
   return (
     <div>
@@ -37,13 +40,6 @@ export function TagEditor({ children }) {
             console.log(res.data)
             setTags(res.data)
             setLoaded(true)
-
-            // // split profile data to make it usable
-            // let splitData = splitProfileData(res.data)
-            // console.log("splitData=")
-            // console.log(splitData)
-            // setData(splitData)
-            // setLoaded(true)
           }
         })
     )
@@ -67,17 +63,44 @@ export function TagEditor({ children }) {
   // display tags within scroll-area
   return (
     <>
-      <h2>Your Favorite Tags</h2>
-      <div>
-        {tagsArray.map((tag) => (
-          <span
-            key={"tag-" + tagCount++}
-            className="inline-flex mx-1.5 my-1 px-3 py-0.45 rounded text-sm font-medium bg-white text-black"
-          >
-            {tag}
-          </span>
+      <TagScrollArea tags={tagsArray} />
+    </>
+  )
+  // return (
+  //   <>
+  //     <h2>Your Favorite Tags</h2>
+  //     <div>
+  //       {tagsArray.map((tag) => (
+  //         <span
+  //           key={"tag-" + tagCount++}
+  //           className="inline-flex mx-1.5 my-1 px-3 py-0.45 rounded text-sm font-medium bg-white text-black"
+  //         >
+  //           {tag}
+  //         </span>
+  //       ))}
+  //     </div>
+  //   </>
+  // )
+}
+
+function TagScrollArea({ tags }) {
+  if (tags.length === 0) {
+    return <div>No tags found</div>
+  }
+
+  return (
+    <ScrollArea className="h-72 w-48 rounded-md border">
+      <div className="p-4">
+        <h4 className="mb-4 text-sm font-medium leading-none">Tags</h4>
+        {tags.map((tag) => (
+          <>
+            <div key={tag} className="text-sm">
+              {tag}
+            </div>
+            <Separator className="my-2 border" />
+          </>
         ))}
       </div>
-    </>
+    </ScrollArea>
   )
 }
