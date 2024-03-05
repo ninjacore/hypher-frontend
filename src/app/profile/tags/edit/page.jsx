@@ -4,6 +4,7 @@ import React, { createContext, useContext, useEffect, useState } from "react"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Separator } from "@/components/ui/separator"
 import { Progress } from "@/components/ui/progress"
+import { Button } from "@/components/ui/button"
 
 export default function Page() {
   return (
@@ -58,32 +59,46 @@ export function TagEditor({ children }) {
 
   // split tags
   let tagsArray = tags.split(",")
-
+  let tagCount = 0
   let progress = 60
 
-  // display tags within scroll-area
-  return (
-    <>
-      <Progress value={progress} className="w-[60%] my-4" />
-
-      <TagScrollArea tags={tagsArray} />
-    </>
-  )
+  // // display tags within scroll-area
   // return (
   //   <>
-  //     <h2>Your Favorite Tags</h2>
-  //     <div>
-  //       {tagsArray.map((tag) => (
-  //         <span
-  //           key={"tag-" + tagCount++}
-  //           className="inline-flex mx-1.5 my-1 px-3 py-0.45 rounded text-sm font-medium bg-white text-black"
-  //         >
-  //           {tag}
-  //         </span>
-  //       ))}
-  //     </div>
+  //     <Progress value={progress} className="w-[60%] my-4" />
+
+  //     <TagScrollArea tags={tagsArray} />
   //   </>
   // )
+  return (
+    <div className="mx-1">
+      <Progress value={progress} className="w-[60%] my-4" />
+
+      <h2 className="mb-2">
+        <strong>Your Tags</strong>
+      </h2>
+      <div>
+        {tagsArray.map((tag) => (
+          <span
+            key={"tag-" + tagCount++}
+            className="inline-flex mx-1.5 my-1 px-3 py-0.45 rounded text-sm font-medium bg-white text-black"
+          >
+            {tag}
+          </span>
+        ))}
+      </div>
+      <div className="mt-5 flex justify-end">
+        <div className="w-2/4 mt-2 mr-6 flex justify-end gap-5">
+          <Button variant="outline" className="bg-white text-black">
+            REORDER
+          </Button>
+          <Button variant="outline" className="bg-white text-black">
+            ADD
+          </Button>
+        </div>
+      </div>
+    </div>
+  )
 }
 
 function TagScrollArea({ tags }) {
