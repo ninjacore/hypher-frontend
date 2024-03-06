@@ -28,6 +28,7 @@ export function TagEditor({ children }) {
   const [tags, setTags] = useState(null)
   const [loaded, setLoaded] = useState(false)
 
+  // const [progress, setProgress] = useState(0)
   const [newTagsBuffer, setNewTagsBuffer] = useState(null)
 
   // get user tag by serving endpoint and having it as a query parameter
@@ -59,6 +60,10 @@ export function TagEditor({ children }) {
     )
   }, [])
 
+  useEffect(() => {
+    colorProgressBar(33)
+  }, [])
+
   // while waiting for data
   if (!loaded) {
     return (
@@ -75,21 +80,25 @@ export function TagEditor({ children }) {
   // starting value for tag max display
   let tagCount = 0
   let progress = 0
+  let progressBarLength = 10
 
   // default
   let classBasedOnMaxTags = "bg-green-400"
 
+  // classBasedOnMaxTags
+
   const innerHTML = tagsArray.map((tag) => {
     // update tag count to show if maxing out
     tagCount++
+    // setProgress((tagCount / 50) * 100)
     progress = (tagCount / 50) * 100
 
     // set color based on how many tags are used
-    if (progress >= 100) {
-      classBasedOnMaxTags = "bg-red-400"
-    } else if (progress >= 75) {
-      classBasedOnMaxTags = "bg-yellow-400"
-    }
+    // if (progress >= 100) {
+    //   classBasedOnMaxTags = "bg-red-400"
+    // } else if (progress >= 75) {
+    //   classBasedOnMaxTags = "bg-yellow-400"
+    // }
 
     return (
       <>
@@ -109,7 +118,7 @@ export function TagEditor({ children }) {
       <Progress
         id="tagsProgressBar"
         value={progress}
-        className={`w-[60%] my-4 ` + classBasedOnMaxTags}
+        className="w-[60%] my-4"
       />
 
       <h2 className="mb-2">
@@ -173,4 +182,30 @@ export function TagEditor({ children }) {
 
 function updateTagText(newTagsBuffer) {
   console.log("updateTagText => " + newTagsBuffer)
+
+  let progressBarElement = document.getElementById("tagsProgressBar")
+  // if (progressBarElement == null) {
+  //   console.log("progressBarElement is null")
+  // } else {
+  //   let progress = progressBarElement.getAttribute("value")
+  //   progressBarElement.firstChild.className =
+  //     "h-full w-full flex-1 bg-yellow-400"
+  // }
+}
+
+function colorProgressBar(progress) {
+  //   console.log(
+  //     `%c colorProgressBar => ${progress}`,
+  //     "color: cyan; font-weight: bold;"
+  //   )
+  //   let progressBarElement = document.getElementById("tagsProgressBar")
+  //   if (progressBarElement == null) {
+  //     console.log(
+  //       `%c progressBarElement is null`,
+  //       "color: red; font-weight: bold;"
+  //     )
+  //   } else {
+  //     progressBarElement.firstChild.className =
+  //       "h-full w-full flex-1 bg-yellow-400"
+  //   }
 }
