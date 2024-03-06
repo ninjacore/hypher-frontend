@@ -1,8 +1,6 @@
 "use client"
 import React, { useEffect, useState } from "react"
 
-import { ScrollArea } from "@/components/ui/scroll-area"
-import { Separator } from "@/components/ui/separator"
 import { Progress } from "@/components/ui/progress"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
@@ -73,23 +71,30 @@ export function TagEditor({ children }) {
 
   // split tags
   let tagsArray = tags.split(",")
+
+  // starting value for tag max display
   let tagCount = 0
-  let progress = 60
+  let progress = 0
 
-  // // display tags within scroll-area
-  // return (
-  //   <>
-  //     <Progress value={progress} className="w-[60%] my-4" />
-
-  //     <TagScrollArea tags={tagsArray} />
-  //   </>
-  // )
+  // default
+  let classBasedOnMaxTags = "bg-green-400"
 
   const innerHTML = tagsArray.map((tag) => {
+    // update tag count to show if maxing out
+    tagCount++
+    progress = (tagCount / 50) * 100
+
+    // set color based on how many tags are used
+    if (progress >= 100) {
+      classBasedOnMaxTags = "bg-red-400"
+    } else if (progress >= 75) {
+      classBasedOnMaxTags = "bg-yellow-400"
+    }
+
     return (
       <>
         <span
-          key={"tag-" + tagCount++}
+          key={"tag-" + tagCount}
           className="inline-flex mx-1.5 my-1 px-3 py-0.45 rounded text-sm font-medium bg-white text-black"
         >
           {tag}
@@ -98,11 +103,14 @@ export function TagEditor({ children }) {
     )
   }, [])
 
-  let tagText = ""
-
   return (
     <div className="mx-1">
-      <Progress value={progress} className="w-[60%] my-4" />
+      <span>{tagCount} out of 50</span>
+      <Progress
+        id="tagsProgressBar"
+        value={progress}
+        className={`w-[60%] my-4 ` + classBasedOnMaxTags}
+      />
 
       <h2 className="mb-2">
         <strong>Your Tags</strong>
