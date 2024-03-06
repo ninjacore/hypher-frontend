@@ -166,37 +166,3 @@ export function TagEditor({ children }) {
 function updateTagText(newTagsBuffer) {
   console.log("updateTagText => " + newTagsBuffer)
 }
-
-function TagScrollArea({ tags }) {
-  let tagCount = 0
-
-  if (tags.length === 0) {
-    return (
-      <>
-        <div>No tags found</div>
-      </>
-    )
-  }
-
-  return (
-    <ScrollArea className="h-72 w-48 rounded-md border">
-      <div className="p-4">
-        <h4 className="mb-4 text-sm font-medium leading-none">Tags</h4>
-        {tags.map((tag) => (
-          <>
-            <div key={tag} className="text-sm">
-              <span
-                key={"tag-" + tagCount++}
-                className="inline-flex mx-1.5 my-1 px-3 py-0.45 rounded text-sm font-medium bg-white text-black"
-              >
-                {tag}
-              </span>
-              {/* {tag} */}
-            </div>
-            <Separator className="my-1 " />
-          </>
-        ))}
-      </div>
-    </ScrollArea>
-  )
-}
