@@ -34,8 +34,6 @@ export function TagEditor({ children }) {
   // get user tag by serving endpoint and having it as a query parameter
   let handle = "dnt.is"
 
-  // {{SERVICE_IP}}:{{SERVICE_PORT}}/{{API_VERSION}}/profiles/dnt.is/tags
-
   const apiUrl = `http://localhost:5678/api/v1/profiles/${handle}/tags`
 
   // get all the tags for this user
@@ -82,23 +80,10 @@ export function TagEditor({ children }) {
   let progress = 0
   let progressBarLength = 10
 
-  // default
-  let classBasedOnMaxTags = "bg-green-400"
-
-  // classBasedOnMaxTags
-
   const innerHTML = tagsArray.map((tag) => {
     // update tag count to show if maxing out
     tagCount++
-    // setProgress((tagCount / 50) * 100)
     progress = (tagCount / 50) * 100
-
-    // set color based on how many tags are used
-    // if (progress >= 100) {
-    //   classBasedOnMaxTags = "bg-red-400"
-    // } else if (progress >= 75) {
-    //   classBasedOnMaxTags = "bg-yellow-400"
-    // }
 
     return (
       <>
@@ -182,30 +167,4 @@ export function TagEditor({ children }) {
 
 function updateTagText(newTagsBuffer) {
   console.log("updateTagText => " + newTagsBuffer)
-
-  let progressBarElement = document.getElementById("tagsProgressBar")
-  // if (progressBarElement == null) {
-  //   console.log("progressBarElement is null")
-  // } else {
-  //   let progress = progressBarElement.getAttribute("value")
-  //   progressBarElement.firstChild.className =
-  //     "h-full w-full flex-1 bg-yellow-400"
-  // }
-}
-
-function colorProgressBar(progress) {
-  //   console.log(
-  //     `%c colorProgressBar => ${progress}`,
-  //     "color: cyan; font-weight: bold;"
-  //   )
-  //   let progressBarElement = document.getElementById("tagsProgressBar")
-  //   if (progressBarElement == null) {
-  //     console.log(
-  //       `%c progressBarElement is null`,
-  //       "color: red; font-weight: bold;"
-  //     )
-  //   } else {
-  //     progressBarElement.firstChild.className =
-  //       "h-full w-full flex-1 bg-yellow-400"
-  //   }
 }
