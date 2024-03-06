@@ -58,10 +58,6 @@ export function TagEditor({ children }) {
     )
   }, [])
 
-  useEffect(() => {
-    colorProgressBar(33)
-  }, [])
-
   // while waiting for data
   if (!loaded) {
     return (
@@ -78,7 +74,6 @@ export function TagEditor({ children }) {
   // starting value for tag max display
   let tagCount = 0
   let progress = 0
-  let progressBarLength = 10
 
   const innerHTML = tagsArray.map((tag) => {
     // update tag count to show if maxing out
@@ -99,7 +94,7 @@ export function TagEditor({ children }) {
 
   return (
     <div className="mx-1">
-      <span>{tagCount} out of 50</span>
+      <span>Using {tagCount} tags out of 50</span>
       <Progress
         id="tagsProgressBar"
         value={progress}
