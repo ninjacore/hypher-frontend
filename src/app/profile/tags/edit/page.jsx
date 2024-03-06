@@ -144,7 +144,7 @@ export function TagEditor({ children }) {
                     <Button
                       type="submit"
                       onClick={(e) => {
-                        updateTagText(newTagsBuffer)
+                        updateTagText(newTagsBuffer, tags)
                       }}
                     >
                       Save
@@ -160,6 +160,61 @@ export function TagEditor({ children }) {
   )
 }
 
-function updateTagText(newTagsBuffer) {
+function updateTagText(newTagsBuffer, existingTags) {
   console.log("updateTagText => " + newTagsBuffer)
+
+  console.log("existing tags => ")
+  console.log("type: " + typeof existingTags)
+  console.log("data:")
+  console.table([existingTags])
+
+  let tagsToSave = ""
+
+  // existingTags.forEach((singleTag) => {
+  //   tagsToSave += singleTag + ","
+  // })
+
+  tagsToSave += existingTags
+  tagsToSave += ", " + newTagsBuffer
+  // turn string into json
+  console.log("tagsToSave => " + tagsToSave)
+
+  // sending tags as an array
+  tagsToSave = tagsToSave.split(", ")
+  console.table(tagsToSave)
+
+  // let finalTags = ""
+  // tagsToSave.forEach((element) => {
+  //   finalTags += element + ", "
+  // })
+
+  // tagsToSave = JSON.parse(tagsToSave)
+
+  // let tagsAsString = existingTags.toString() + "," + newTagsBuffer.toString()
+
+  // save new tags to server
+
+  // TODO: replace with dynamic handle
+  let handle = "dnt.is"
+
+  const apiURL = `http://localhost:5678/api/v1/profiles/${handle}/tags`
+
+  fetch(apiURL, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ tags: tagsToSave }),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log("Success:", data)
+      return data
+    })
+    .catch((error) => {
+      console.error("Error:", error)
+      return error
+    })
+
+  // re-render tags
 }
