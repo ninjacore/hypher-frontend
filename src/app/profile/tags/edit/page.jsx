@@ -161,52 +161,15 @@ export function TagEditor({ children }) {
 }
 
 function updateTagText(newTagsBuffer, existingTags) {
-  console.log("updateTagText => " + newTagsBuffer)
-
-  console.log("existing tags => ")
-  console.log("type: " + typeof existingTags)
-  console.log("data:")
-  console.table([existingTags])
-
+  // combine new tags with existing tags
   let tagsToSave = ""
-
-  // existingTags.forEach((singleTag) => {
-  //   tagsToSave += singleTag + ","
-  // })
-
   tagsToSave += existingTags
   tagsToSave += ", " + newTagsBuffer
-  // turn string into json
+  tagsToSave = tagsToSave.split(", ")
+
   console.log("tagsToSave => " + tagsToSave)
 
-  // create json object
-  let tagData = {}
-
-  // sending tags as an array
-  tagData.tags = []
-  let tagsToSaveAsArray = tagsToSave.split(", ")
-  tagsToSaveAsArray.forEach((element) => {
-    tagData.tags.push(element)
-  })
-  console.table(tagData)
-  console.log("tagData type: " + typeof tagData)
-
-  // convert to json
-  let json = JSON.stringify(tagData)
-  console.log("json type: " + typeof json)
-  console.log("json: " + json)
-
-  // let finalTags = ""
-  // tagsToSave.forEach((element) => {
-  //   finalTags += element + ", "
-  // })
-
-  // tagsToSave = JSON.parse(tagsToSave)
-
-  // let tagsAsString = existingTags.toString() + "," + newTagsBuffer.toString()
-
   // save new tags to server
-
   // TODO: replace with dynamic handle
   let handle = "dnt.is"
 
@@ -217,7 +180,9 @@ function updateTagText(newTagsBuffer, existingTags) {
     headers: {
       "Content-Type": "application/json",
     },
-    body: json,
+    body: JSON.stringify({
+      tags: tagsToSave,
+    }),
   })
     .then((response) => response.json())
     .then((data) => {
