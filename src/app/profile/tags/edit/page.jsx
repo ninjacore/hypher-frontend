@@ -179,9 +179,22 @@ function updateTagText(newTagsBuffer, existingTags) {
   // turn string into json
   console.log("tagsToSave => " + tagsToSave)
 
+  // create json object
+  let tagData = {}
+
   // sending tags as an array
-  tagsToSave = tagsToSave.split(", ")
-  console.table(tagsToSave)
+  tagData.tags = []
+  let tagsToSaveAsArray = tagsToSave.split(", ")
+  tagsToSaveAsArray.forEach((element) => {
+    tagData.tags.push(element)
+  })
+  console.table(tagData)
+  console.log("tagData type: " + typeof tagData)
+
+  // convert to json
+  let json = JSON.stringify(tagData)
+  console.log("json type: " + typeof json)
+  console.log("json: " + json)
 
   // let finalTags = ""
   // tagsToSave.forEach((element) => {
@@ -204,7 +217,7 @@ function updateTagText(newTagsBuffer, existingTags) {
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ tags: tagsToSave }),
+    body: json,
   })
     .then((response) => response.json())
     .then((data) => {
