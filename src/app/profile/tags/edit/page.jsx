@@ -28,6 +28,9 @@ export function TagEditor({ children }) {
   const [tags, setTags] = useState(null)
   const [loaded, setLoaded] = useState(false)
 
+  // to track PUT, DELETE requests to the API
+  const [reload, setReload] = useState(false)
+
   // const [progress, setProgress] = useState(0)
   const [newTagsBuffer, setNewTagsBuffer] = useState(null)
 
@@ -75,22 +78,25 @@ export function TagEditor({ children }) {
   let tagCount = 0
   let progress = 0
 
-  const innerHTML = tagsArray.map((tag) => {
-    // update tag count to show if maxing out
-    tagCount++
-    progress = (tagCount / 50) * 100
+  const innerHTML = tagsArray.map(
+    (tag) => {
+      // update tag count to show if maxing out
+      tagCount++
+      progress = (tagCount / 50) * 100
 
-    return (
-      <>
-        <span
-          key={"tag-" + tagCount}
-          className="inline-flex mx-1.5 my-1 px-3 py-0.45 rounded text-sm font-medium bg-white text-black"
-        >
-          {tag}
-        </span>
-      </>
-    )
-  }, [])
+      return (
+        <>
+          <span
+            key={"tag-" + tagCount}
+            className="inline-flex mx-1.5 my-1 px-3 py-0.45 rounded text-sm font-medium bg-white text-black"
+          >
+            {tag}
+          </span>
+        </>
+      )
+    },
+    [reload]
+  )
 
   return (
     <div className="mx-1">
@@ -158,63 +164,46 @@ export function TagEditor({ children }) {
       </h2>
     </div>
   )
-}
 
-function updateTagText(newTagsBuffer, existingTags) {
-  console.log("updateTagText => " + newTagsBuffer)
+  function updateTagText(newTagsBuffer, existingTags) {
+    // combine new tags with existing tags
+    let tagsToSave = ""
+    tagsToSave += existingTags
+    tagsToSave += ", " + newTagsBuffer
+    tagsToSave = tagsToSave.split(", ")
 
-  console.log("existing tags => ")
-  console.log("type: " + typeof existingTags)
-  console.log("data:")
-  console.table([existingTags])
+    console.log("tagsToSave => " + tagsToSave)
 
-  let tagsToSave = ""
+    // save new tags to server
+    // TODO: replace with dynamic handle
+    let handle = "dnt.is"
 
-  // existingTags.forEach((singleTag) => {
-  //   tagsToSave += singleTag + ","
-  // })
+    const apiURL = `http://localhost:5678/api/v1/profiles/${handle}/tags`
 
-  tagsToSave += existingTags
-  tagsToSave += ", " + newTagsBuffer
-  // turn string into json
-  console.log("tagsToSave => " + tagsToSave)
-
-  // sending tags as an array
-  tagsToSave = tagsToSave.split(", ")
-  console.table(tagsToSave)
-
-  // let finalTags = ""
-  // tagsToSave.forEach((element) => {
-  //   finalTags += element + ", "
-  // })
-
-  // tagsToSave = JSON.parse(tagsToSave)
-
-  // let tagsAsString = existingTags.toString() + "," + newTagsBuffer.toString()
-
-  // save new tags to server
-
-  // TODO: replace with dynamic handle
-  let handle = "dnt.is"
-
-  const apiURL = `http://localhost:5678/api/v1/profiles/${handle}/tags`
-
-  fetch(apiURL, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ tags: tagsToSave }),
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      console.log("Success:", data)
-      return data
+    fetch(apiURL, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        tags: tagsToSave,
+      }),
     })
-    .catch((error) => {
-      console.error("Error:", error)
-      return error
-    })
+      .then((response) => response.json())
+      .then((data) => {
+        console.log("Success:", data)
+        return data
+      })
+      .catch((error) => {
+        console.error("Error:", error)
+        return error
+      })
 
-  // re-render tags
+    // re-render UI
+    // set tags to new ones
+    setTags(tagsToSave.toString())
+
+    // set reload to true
+    setReload(true)
+  }
 }
