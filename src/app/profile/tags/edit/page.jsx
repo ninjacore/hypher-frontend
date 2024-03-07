@@ -36,6 +36,7 @@ export function TagEditor({ children }) {
 
   // const [progress, setProgress] = useState(0)
   const [newTagsBuffer, setNewTagsBuffer] = useState(null)
+  const [shownTags, setShownTags] = useState(null)
 
   // get user tag by serving endpoint and having it as a query parameter
   let handle = "dnt.is"
@@ -55,6 +56,20 @@ export function TagEditor({ children }) {
           console.log("decodedResponse=", res)
           // only load if there's data
           if (res.data) {
+            console.log(
+              `%c /////////////////`,
+              "color: #34D399; font-size: 20px;"
+            )
+            console.log(
+              `%c function: [ useEffect: fetch data from API ]`,
+              "color: #34D399;"
+            )
+            console.log(
+              `%c res.data type => ${typeof res.data}`,
+              "color: #34D399;"
+            )
+            console.log(`%c res.data => ${res.data}`, "color: #34D399;")
+
             console.log("res.data=")
             console.log(res.data)
             setTags(res.data)
@@ -127,6 +142,9 @@ export function TagEditor({ children }) {
               id="saveTagDeletionButton"
               variant="outline"
               className="bg-white text-black invisible"
+              onClick={(e) => {
+                deleteTagsFromServer(shownTags)
+              }}
             >
               SAVE CHANGES
             </Button>
@@ -184,11 +202,24 @@ export function TagEditor({ children }) {
   )
 
   function updateTagText(newTagsBuffer, existingTags) {
+    console.log(`%c /////////////////`, "color: #faf0be; font-size: 20px;")
+    console.log(`%c function: [ updateTagText ]`, "color: #faf0be;")
+    console.log(
+      `%c newTagsBuffer type => ${typeof newTagsBuffer}`,
+      "color: #faf0be;"
+    )
+    console.log(`%c newTagsBuffer => ${newTagsBuffer}`, "color: #faf0be;")
+    console.log(
+      `%c existingTags type => ${typeof existingTags}`,
+      "color: #faf0be;"
+    )
+    console.log(`%c existingTags => ${existingTags}`, "color: #faf0be;")
+
     // combine new tags with existing tags
     let tagsToSave = ""
     tagsToSave += existingTags
     tagsToSave += ", " + newTagsBuffer
-    tagsToSave = tagsToSave.split(", ")
+    // tagsToSave = tagsToSave.split(",")
 
     console.log("tagsToSave => " + tagsToSave)
 
@@ -228,7 +259,13 @@ export function TagEditor({ children }) {
   }
 
   function deleteTagFromUI(wasClicked, tag) {
-    console.log(`%c /////////////////`, "color: green; font-size: 20px;")
+    console.log(`%c /////////////////`, "color: cyan; font-size: 20px;")
+    console.log(`%c function: [ deleteTagFromUI ]`, "color: cyan;")
+    console.log(`%c wasClicked type => ${typeof wasClicked}`, "color: cyan;")
+    console.log(`%c wasClicked => ${wasClicked}`, "color: cyan;")
+    console.log(`%c tag type => ${typeof tag}`, "color: cyan;")
+    console.log(`%c tag => ${tag}`, "color: cyan;")
+
     console.log("wasClicked => " + wasClicked)
     console.log("classes: " + wasClicked.classList)
     console.log("deleting tag => " + tag)
@@ -239,8 +276,6 @@ export function TagEditor({ children }) {
     console.log("type of tagsArray => " + typeof tagsArray)
     console.log("as a table:")
     console.table(tagsArray)
-
-    // TODO: find out why it's not deleting the tag (not found)
 
     // used for re-rendering
     let idNumber = null
@@ -256,6 +291,9 @@ export function TagEditor({ children }) {
 
         // id number of tag to delete
         idNumber = index + 1
+
+        // set shown tags to new tags
+        setShownTags(tagsArray)
       } else {
         console.log("tag not found")
         console.log("tagsArray => " + tagsArray)
@@ -267,7 +305,7 @@ export function TagEditor({ children }) {
     }
 
     // re-render UI without deleted tag
-    console.log(`%c /////////////////`, "color: blue; font-size: 20px;")
+    // console.log(`%c /////////////////`, "color: blue; font-size: 20px;")
     if (wasClicked.classList.contains("deletableTag")) {
       // remove tag from UI
       wasClicked.remove()
@@ -295,10 +333,28 @@ export function TagEditor({ children }) {
 
   // used when user clicks on 'save' button after tag deletion
   function deleteTagsFromServer(shownTags) {
+    console.log(`%c /////////////////`, "color: red; font-size: 20px;")
+    console.log(`%c function: [ deleteTagsFromServer ]`, "color: red;")
+    console.log(`%c shownTags type => ${typeof shownTags}`, "color: red;")
+    console.log(`%c shownTags => ${shownTags}`, "color: red;")
+
+    // console.log("shownTags => " + shownTags)
+    // console.log("type of shownTags => " + typeof shownTags)
+    // console.log("as a table:")
+    // console.table(shownTags)
+
+    shownTags = shownTags.toString()
+
+    // requires String
     updateTagsOnServer(shownTags)
   }
 
   function updateTagsOnServer(newTags) {
+    console.log(`%c /////////////////`, "color: #89cff0; font-size: 20px;")
+    console.log(`%c function: [ updateTagsOnServer ]`, "color: #89cff0;")
+    console.log(`%c newTags type => ${typeof newTags}`, "color: #89cff0;")
+    console.log(`%c newTags => ${newTags}`, "color: #89cff0;")
+
     // TODO: replace with dynamic handle
     let handle = "dnt.is"
 
@@ -309,9 +365,13 @@ export function TagEditor({ children }) {
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
-        tags: newTags,
-      }),
+      body: JSON.stringify(
+        JSON.parse(
+          JSON.stringify({
+            tags: newTags,
+          })
+        )
+      ),
     })
       .then((response) => response.json())
       .then((data) => {
