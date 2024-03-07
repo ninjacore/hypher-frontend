@@ -90,13 +90,15 @@ export function TagEditor({ children }) {
       return (
         <>
           <span
+            id={"tag-" + tagCount}
             key={"tag-" + tagCount}
-            className="inline-flex mx-1.5 my-1 px-3 py-0.45 rounded text-sm font-medium bg-white text-black"
+            className="deletableTag inline-flex mx-1.5 my-1 px-3 py-0.45 rounded text-sm font-medium bg-white text-black"
             onClick={(e) => deleteTagFromUI(e.target, tag)}
           >
             {tag}
             {/* delete icon to indicate functionality */}
             <FontAwesomeIcon
+              id={"deleteTagIcon-" + tagCount}
               icon={faXmark}
               className="fas fa-angle-right text-xs my-auto my-2.45 ml-1 py-0.45"
             ></FontAwesomeIcon>
@@ -121,6 +123,13 @@ export function TagEditor({ children }) {
         <div>{innerHTML}</div>
         <div className="mt-5 flex justify-end">
           <div className="w-2/4 mt-2 mr-6 flex justify-end gap-5">
+            <Button
+              id="saveTagDeletionButton"
+              variant="outline"
+              className="bg-white text-black invisible"
+            >
+              SAVE CHANGES
+            </Button>
             <Button variant="outline" className="bg-white text-black">
               REORDER
             </Button>
@@ -221,6 +230,7 @@ export function TagEditor({ children }) {
   function deleteTagFromUI(wasClicked, tag) {
     console.log(`%c /////////////////`, "color: green; font-size: 20px;")
     console.log("wasClicked => " + wasClicked)
+    console.log("classes: " + wasClicked.classList)
     console.log("deleting tag => " + tag)
 
     // get all tags as array
@@ -231,6 +241,10 @@ export function TagEditor({ children }) {
     console.table(tagsArray)
 
     // TODO: find out why it's not deleting the tag (not found)
+
+    // used for re-rendering
+    let idNumber = null
+
     // remove tag from array
     try {
       let index = tagsArray.indexOf(tag) // get index of tag
@@ -239,6 +253,9 @@ export function TagEditor({ children }) {
         tagsArray.splice(index, 1)
         console.log("removed tag => " + tag)
         console.log("tagsArray after deletion => " + tagsArray)
+
+        // id number of tag to delete
+        idNumber = index + 1
       } else {
         console.log("tag not found")
         console.log("tagsArray => " + tagsArray)
@@ -249,8 +266,31 @@ export function TagEditor({ children }) {
       throw new Error(`Tag "${tag}" not found`)
     }
 
-    // re-render UI without deleted tag & show save button
-    deleteTagsFromServer(tagsArray)
+    // re-render UI without deleted tag
+    console.log(`%c /////////////////`, "color: blue; font-size: 20px;")
+    if (wasClicked.classList.contains("deletableTag")) {
+      // remove tag from UI
+      wasClicked.remove()
+    } else {
+      console.log("user clicked on icon instead of tag")
+      // user clicked on icon instead of tag
+
+      console.log("with id => deleteTagIcon-" + idNumber)
+      let tagElement = document.getElementById("tag-" + idNumber)
+      console.log("tagElement id => " + tagElement.id)
+      tagElement.remove()
+
+      // remove the svg icon
+      wasClicked.remove()
+    }
+
+    // & show save button
+    document
+      .getElementById("saveTagDeletionButton")
+      .classList.remove("invisible")
+
+    // former auto-save functionality
+    // deleteTagsFromServer(tagsArray)
   }
 
   // used when user clicks on 'save' button after tag deletion
