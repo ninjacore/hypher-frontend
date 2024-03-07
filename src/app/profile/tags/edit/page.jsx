@@ -16,6 +16,9 @@ import {
   DialogClose,
 } from "@/components/ui/dialog"
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faXmark } from "@fortawesome/free-solid-svg-icons"
+
 export default function Page() {
   return (
     <div>
@@ -91,6 +94,11 @@ export function TagEditor({ children }) {
             className="inline-flex mx-1.5 my-1 px-3 py-0.45 rounded text-sm font-medium bg-white text-black"
           >
             {tag}
+            {/* delete icon to indicate functionality */}
+            <FontAwesomeIcon
+              icon={faXmark}
+              className="fas fa-angle-right text-xs my-auto my-2.45 ml-1 py-0.45"
+            ></FontAwesomeIcon>
           </span>
         </>
       )
