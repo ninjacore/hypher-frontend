@@ -92,6 +92,7 @@ export function TagEditor({ children }) {
           <span
             key={"tag-" + tagCount}
             className="inline-flex mx-1.5 my-1 px-3 py-0.45 rounded text-sm font-medium bg-white text-black"
+            onClick={(e) => deleteTagFromUI(e.target, tag)}
           >
             {tag}
             {/* delete icon to indicate functionality */}
@@ -183,6 +184,81 @@ export function TagEditor({ children }) {
     console.log("tagsToSave => " + tagsToSave)
 
     // save new tags to server
+    updateTagsOnServer(tagsToSave)
+
+    // // TODO: replace with dynamic handle
+    // let handle = "dnt.is"
+
+    // const apiURL = `http://localhost:5678/api/v1/profiles/${handle}/tags`
+
+    // fetch(apiURL, {
+    //   method: "PUT",
+    //   headers: {
+    //     "Content-Type": "application/json",
+    //   },
+    //   body: JSON.stringify({
+    //     tags: tagsToSave,
+    //   }),
+    // })
+    //   .then((response) => response.json())
+    //   .then((data) => {
+    //     console.log("Success:", data)
+    //     return data
+    //   })
+    //   .catch((error) => {
+    //     console.error("Error:", error)
+    //     return error
+    //   })
+
+    // // re-render UI
+    // // set tags to new ones
+    // setTags(tagsToSave.toString())
+
+    // // set reload to true
+    // setReload(true)
+  }
+
+  function deleteTagFromUI(wasClicked, tag) {
+    console.log(`%c /////////////////`, "color: green; font-size: 20px;")
+    console.log("wasClicked => " + wasClicked)
+    console.log("deleting tag => " + tag)
+
+    // get all tags as array
+    let tagsArray = tags.split(",")
+    console.log("all tags atm => " + tagsArray)
+    console.log("type of tagsArray => " + typeof tagsArray)
+    console.log("as a table:")
+    console.table(tagsArray)
+
+    // TODO: find out why it's not deleting the tag (not found)
+    // remove tag from array
+    try {
+      let index = tagsArray.indexOf(tag) // get index of tag
+      if (index > -1) {
+        // remove tag if it exists
+        tagsArray.splice(index, 1)
+        console.log("removed tag => " + tag)
+        console.log("tagsArray after deletion => " + tagsArray)
+      } else {
+        console.log("tag not found")
+        console.log("tagsArray => " + tagsArray)
+        console.log("as a table:")
+        console.table(tagsArray)
+      }
+    } catch (error) {
+      throw new Error(`Tag "${tag}" not found`)
+    }
+
+    // re-render UI without deleted tag & show save button
+    deleteTagsFromServer(tagsArray)
+  }
+
+  // used when user clicks on 'save' button after tag deletion
+  function deleteTagsFromServer(shownTags) {
+    updateTagsOnServer(shownTags)
+  }
+
+  function updateTagsOnServer(newTags) {
     // TODO: replace with dynamic handle
     let handle = "dnt.is"
 
@@ -194,7 +270,7 @@ export function TagEditor({ children }) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        tags: tagsToSave,
+        tags: newTags,
       }),
     })
       .then((response) => response.json())
@@ -209,7 +285,7 @@ export function TagEditor({ children }) {
 
     // re-render UI
     // set tags to new ones
-    setTags(tagsToSave.toString())
+    setTags(newTags.toString())
 
     // set reload to true
     setReload(true)
