@@ -103,12 +103,13 @@ export function TagEditor({ children }) {
       progress = (tagCount / 50) * 100
 
       return (
-        <span key={"tag-" + tagCount}>
-          <span
-            id={"tag-" + tagCount}
-            className="deletableTag inline-flex mx-1.5 my-1 px-3 py-0.45 rounded text-sm font-medium bg-white text-black"
-            onClick={(e) => deleteTagFromUI(e.target, tag)}
-          >
+        <div
+          key={"tag-" + tagCount}
+          id={"tag-" + tagCount}
+          className="deletableTag inline-flex mx-1.5 my-1 px-3 py-0.45 rounded text-sm font-medium bg-white text-black"
+          onClick={(e) => deleteTagFromUI(e.target, tag)}
+        >
+          <span>
             {tag}
             {/* delete icon to indicate functionality */}
             <FontAwesomeIcon
@@ -117,7 +118,7 @@ export function TagEditor({ children }) {
               className="fas fa-angle-right text-xs my-auto my-2.45 ml-1 py-0.45"
             ></FontAwesomeIcon>
           </span>
-        </span>
+        </div>
       )
     },
     [reload]
