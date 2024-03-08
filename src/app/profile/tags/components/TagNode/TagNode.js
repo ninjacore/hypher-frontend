@@ -26,7 +26,9 @@
 // - get first tag
 // - get last tag
 
-class TagNode {
+import { uuidv4 } from "@/lib/utils"
+
+export class TagNode {
   // if next or previous is null, then there is
   // no other node in that directin of the chain
 
