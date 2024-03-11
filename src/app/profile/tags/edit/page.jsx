@@ -106,12 +106,14 @@ function loadTagsFromAPI() {
 function turnTagsIntoTagNodes(tags) {
   // split tags into array
   let tagsArray = tags.split(",")
+  let tagPosition = 0
 
   // create TagNodes
   let tagNodes = []
   tagsArray.forEach((tag) => {
     // create TagNode
     let tagNode = new TagNode(tag)
+    tagNode.position = tagPosition
 
     // connect nodes
     if (tagNodes.length > 0) {
@@ -120,6 +122,7 @@ function turnTagsIntoTagNodes(tags) {
 
     // add to tracking list
     tagNodes.push(tagNode)
+    tagPosition++
   })
 
   return tagNodes
