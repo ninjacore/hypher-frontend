@@ -140,12 +140,16 @@ function renderTags(knownTagsList) {
         return (
           <div
             key={tagNode.id}
-            id={tagNode.id}
+            id={tagNode.id + "-div"}
+            data-tag-id={tagNode.id}
             className="deletableTag inline-flex mx-1.5 my-1 px-3 py-0.45 rounded text-sm font-medium bg-white text-black"
+            onClick={(e) => popTag(e, tagNode)}
           >
-            <span>
+            <span id={tagNode.id + "-span"} data-tag-id={tagNode.id}>
               {tagNode.text}
               <FontAwesomeIcon
+                id={tagNode.id + "-icon"}
+                data-tag-id={tagNode.id}
                 icon={faXmark}
                 className="fas fa-angle-right text-xs my-auto my-2.45 ml-1 py-0.45"
               ></FontAwesomeIcon>
@@ -165,6 +169,25 @@ function renderTags(knownTagsList) {
   }
 }
 
+function popTag(event, tagNode) {
+  let tagNodeId = event.target.getAttribute("data-tag-id")
+
+  announce("user popped tag with id =>", tagNodeId)
+
+  hideTag(tagNode)
+  markTagForDeletion(tagNode)
+  // TODO: show 'save' and 'cancel' buttons
+}
+
+function hideTag(tagNode) {
+  tagNode.isVisible = false
+  document.getElementById(tagNode.id + "-div").style.display = "none"
+}
+
+function markTagForDeletion(tagNode) {
+  tagNode.isMarkedForDeletion = true
+}
+
 // for testing
 function announce(announcement, objectToLog) {
   let colorCode = ""
@@ -180,6 +203,10 @@ function announce(announcement, objectToLog) {
 
     case "string of tags got some values":
       colorCode = "#00ff00" // lime
+      break
+
+    case "user popped tag with id =>":
+      colorCode = "#da70d6" // orchid
       break
 
     default:
