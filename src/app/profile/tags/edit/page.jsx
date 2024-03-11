@@ -135,24 +135,24 @@ function turnTagsIntoTagNodes(tags) {
 
 function renderTags(knownTagsList) {
   if (knownTagsList.length > 0) {
-    let headTag = knownTagsList[0]
-
     const renderedHTML = knownTagsList.map((tagNode) => {
-      return (
-        <div
-          key={tagNode.id}
-          id={tagNode.id}
-          className="deletableTag inline-flex mx-1.5 my-1 px-3 py-0.45 rounded text-sm font-medium bg-white text-black"
-        >
-          <span>
-            {tagNode.text}
-            <FontAwesomeIcon
-              icon={faXmark}
-              className="fas fa-angle-right text-xs my-auto my-2.45 ml-1 py-0.45"
-            ></FontAwesomeIcon>
-          </span>
-        </div>
-      )
+      if (tagNode.isVisible === true) {
+        return (
+          <div
+            key={tagNode.id}
+            id={tagNode.id}
+            className="deletableTag inline-flex mx-1.5 my-1 px-3 py-0.45 rounded text-sm font-medium bg-white text-black"
+          >
+            <span>
+              {tagNode.text}
+              <FontAwesomeIcon
+                icon={faXmark}
+                className="fas fa-angle-right text-xs my-auto my-2.45 ml-1 py-0.45"
+              ></FontAwesomeIcon>
+            </span>
+          </div>
+        )
+      }
     })
 
     return <>{renderedHTML}</>
