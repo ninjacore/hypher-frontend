@@ -176,7 +176,7 @@ export function TagEditor({ children }) {
     hideTag(tagNode)
     markTagForDeletion(tagNode)
     // TODO: show 'save' and 'cancel' buttons
-    saveTagState()
+    saveTagState() // TODO: only do this if user clicks 'save'
   }
 
   function hideTag(tagNode) {
@@ -190,6 +190,23 @@ export function TagEditor({ children }) {
 
   function saveTagState() {
     console.table(knownTags)
+
+    let tagsToKeep = []
+    let numberOfTags = 0
+    // go through all tags and remove if marked for deletion
+    knownTags.forEach((tagNode) => {
+      if (tagNode.isMarkedForDeletion === false) {
+        // is clear
+        tagNode.position = numberOfTags
+        tagsToKeep.push(tagNode)
+        numberOfTags++
+      }
+    })
+    setKnownTags(tagsToKeep)
+
+    console.table(knownTags)
+
+    // TODO: commit change to the database
   }
 }
 
