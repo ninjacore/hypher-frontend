@@ -17,7 +17,7 @@ export function TagEditor({ children }) {
 
   // TOOD: verify/falsify -> perhaps will be omitted due to TagNodes being available
   const [knownTags, setKnownTags] = useState([])
-  const htmlWithTags = ""
+  const [htmlWithTags, setHtmlWithTags] = useState("")
 
   // load tags from API
   useEffect(() => {
@@ -46,21 +46,15 @@ export function TagEditor({ children }) {
     // for testing
     if (knownTags.length > 0) {
       announce("populated tag nodes", knownTags)
+      let html = renderTags(knownTags)
+      setHtmlWithTags(html)
     } else {
       announce("knownTags is empty", knownTags)
     }
 
-    // do something with those known tags lke rendering the innerHTML
-    const htmlWithTags = renderTags(knownTags)
+    // do something with those known tags like rendering the innerHTML
+    // const htmlWithTags = renderTags(knownTags)
   }, [knownTags])
-
-  // render page with tags
-  return (
-    <>
-      <h2>Your Favorite Tags</h2>
-      <div>TODO: render tags here</div>
-    </>
-  )
 
   // default while waiting for data
   if (!tagsLoadedFromSource) {
@@ -71,6 +65,14 @@ export function TagEditor({ children }) {
       </>
     )
   }
+
+  // render page with tags
+  return (
+    <>
+      <h2>Your Favorite Tags</h2>
+      <div>{htmlWithTags}</div>
+    </>
+  )
 }
 
 function loadTagsFromAPI() {
@@ -129,11 +131,19 @@ function turnTagsIntoTagNodes(tags) {
 }
 
 function renderTags(knownTagsList) {
-  return (
-    <div>
-      <p>rendered Tags lol</p>
-    </div>
-  )
+  if (knownTagsList.length > 0) {
+    return (
+      <div>
+        <p>rendered Tags lol</p>
+      </div>
+    )
+  } else {
+    return (
+      <div>
+        <p>no tags to render</p>
+      </div>
+    )
+  }
 }
 
 // for testing
