@@ -105,7 +105,7 @@ function loadTagsFromAPI() {
 
 function turnTagsIntoTagNodes(tags) {
   // split tags into array
-  let tagsArray = tags.split(",")
+  let tagsArray = tags.split(", ")
   let tagPosition = 0
 
   // create TagNodes
