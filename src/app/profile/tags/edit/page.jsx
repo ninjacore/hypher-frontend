@@ -3,6 +3,9 @@ import React, { use, useEffect, useState } from "react"
 
 import { TagNode } from "@/app/profile/tags/components/TagNode/TagNode"
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faXmark } from "@fortawesome/free-solid-svg-icons"
+
 export default function Page() {
   return (
     <div>
@@ -132,11 +135,27 @@ function turnTagsIntoTagNodes(tags) {
 
 function renderTags(knownTagsList) {
   if (knownTagsList.length > 0) {
-    return (
-      <div>
-        <p>rendered Tags lol</p>
-      </div>
-    )
+    let headTag = knownTagsList[0]
+
+    const renderedHTML = knownTagsList.map((tagNode) => {
+      return (
+        <div
+          key={tagNode.id}
+          id={tagNode.id}
+          className="deletableTag inline-flex mx-1.5 my-1 px-3 py-0.45 rounded text-sm font-medium bg-white text-black"
+        >
+          <span>
+            {tagNode.text}
+            <FontAwesomeIcon
+              icon={faXmark}
+              className="fas fa-angle-right text-xs my-auto my-2.45 ml-1 py-0.45"
+            ></FontAwesomeIcon>
+          </span>
+        </div>
+      )
+    })
+
+    return <>{renderedHTML}</>
   } else {
     return (
       <div>
