@@ -76,116 +76,121 @@ export function TagEditor({ children }) {
       <div>{htmlWithTags}</div>
     </>
   )
-}
 
-function loadTagsFromAPI() {
-  // get user tag by serving endpoint and having it as a query parameter
-  let handle = "dnt.is"
+  function loadTagsFromAPI() {
+    // get user tag by serving endpoint and having it as a query parameter
+    let handle = "dnt.is"
 
-  const apiUrl = `http://localhost:5678/api/v1/profiles/${handle}/tags`
+    const apiUrl = `http://localhost:5678/api/v1/profiles/${handle}/tags`
 
-  let knownTagsAsString = ""
-  let tagsCouldBeLoaded = false
+    let knownTagsAsString = ""
+    let tagsCouldBeLoaded = false
 
-  // get all the tags for this user
-  return fetch(apiUrl).then((response) =>
-    response
-      .json()
-      .then((data) => ({
-        data: data,
-        status: response.status,
-      }))
-      .then((res) => {
-        console.log("decodedResponse=", res)
-        // only load if there's data
-        if (res.data) {
-          // for testing
-          announce("got tags from API", res.data)
+    // get all the tags for this user
+    return fetch(apiUrl).then((response) =>
+      response
+        .json()
+        .then((data) => ({
+          data: data,
+          status: response.status,
+        }))
+        .then((res) => {
+          console.log("decodedResponse=", res)
+          // only load if there's data
+          if (res.data) {
+            // for testing
+            announce("got tags from API", res.data)
 
-          return res.data
-        }
-      })
-  )
-}
-
-function turnTagsIntoTagNodes(tags) {
-  // split tags into array
-  let tagsArray = tags.split(", ")
-  let tagPosition = 0
-
-  // create TagNodes
-  let tagNodes = []
-  tagsArray.forEach((tag) => {
-    // create TagNode
-    let tagNode = new TagNode(tag)
-    tagNode.position = tagPosition
-
-    // connect nodes
-    if (tagNodes.length > 0) {
-      tagNodes[tagNodes.length - 1].insertAfter(tagNode)
-    }
-
-    // add to tracking list
-    tagNodes.push(tagNode)
-    tagPosition++
-  })
-
-  return tagNodes
-}
-
-function renderTags(knownTagsList) {
-  if (knownTagsList.length > 0) {
-    const renderedHTML = knownTagsList.map((tagNode) => {
-      if (tagNode.isVisible === true) {
-        return (
-          <div
-            key={tagNode.id}
-            id={tagNode.id + "-div"}
-            data-tag-id={tagNode.id}
-            className="deletableTag inline-flex mx-1.5 my-1 px-3 py-0.45 rounded text-sm font-medium bg-white text-black"
-            onClick={(e) => popTag(e, tagNode)}
-          >
-            <span id={tagNode.id + "-span"} data-tag-id={tagNode.id}>
-              {tagNode.text}
-              <FontAwesomeIcon
-                id={tagNode.id + "-icon"}
-                data-tag-id={tagNode.id}
-                icon={faXmark}
-                className="fas fa-angle-right text-xs my-auto my-2.45 ml-1 py-0.45"
-              ></FontAwesomeIcon>
-            </span>
-          </div>
-        )
-      }
-    })
-
-    return <>{renderedHTML}</>
-  } else {
-    return (
-      <div>
-        <p>no tags to render</p>
-      </div>
+            return res.data
+          }
+        })
     )
   }
-}
 
-function popTag(event, tagNode) {
-  let tagNodeId = event.target.getAttribute("data-tag-id")
+  function turnTagsIntoTagNodes(tags) {
+    // split tags into array
+    let tagsArray = tags.split(", ")
+    let tagPosition = 0
 
-  announce("user popped tag with id =>", tagNodeId)
+    // create TagNodes
+    let tagNodes = []
+    tagsArray.forEach((tag) => {
+      // create TagNode
+      let tagNode = new TagNode(tag)
+      tagNode.position = tagPosition
 
-  hideTag(tagNode)
-  markTagForDeletion(tagNode)
-  // TODO: show 'save' and 'cancel' buttons
-}
+      // connect nodes
+      if (tagNodes.length > 0) {
+        tagNodes[tagNodes.length - 1].insertAfter(tagNode)
+      }
 
-function hideTag(tagNode) {
-  tagNode.isVisible = false
-  document.getElementById(tagNode.id + "-div").style.display = "none"
-}
+      // add to tracking list
+      tagNodes.push(tagNode)
+      tagPosition++
+    })
 
-function markTagForDeletion(tagNode) {
-  tagNode.isMarkedForDeletion = true
+    return tagNodes
+  }
+
+  function renderTags(knownTagsList) {
+    if (knownTagsList.length > 0) {
+      const renderedHTML = knownTagsList.map((tagNode) => {
+        if (tagNode.isVisible === true) {
+          return (
+            <div
+              key={tagNode.id}
+              id={tagNode.id + "-div"}
+              data-tag-id={tagNode.id}
+              className="deletableTag inline-flex mx-1.5 my-1 px-3 py-0.45 rounded text-sm font-medium bg-white text-black"
+              onClick={(e) => popTag(e, tagNode, knownTagsList)}
+            >
+              <span id={tagNode.id + "-span"} data-tag-id={tagNode.id}>
+                {tagNode.text}
+                <FontAwesomeIcon
+                  id={tagNode.id + "-icon"}
+                  data-tag-id={tagNode.id}
+                  icon={faXmark}
+                  className="fas fa-angle-right text-xs my-auto my-2.45 ml-1 py-0.45"
+                ></FontAwesomeIcon>
+              </span>
+            </div>
+          )
+        }
+      })
+
+      return <>{renderedHTML}</>
+    } else {
+      return (
+        <div>
+          <p>no tags to render</p>
+        </div>
+      )
+    }
+  }
+
+  function popTag(event, tagNode) {
+    let tagNodeId = event.target.getAttribute("data-tag-id")
+
+    announce("user popped tag with id =>", tagNodeId)
+
+    hideTag(tagNode)
+    markTagForDeletion(tagNode)
+    // TODO: show 'save' and 'cancel' buttons
+    saveTagState()
+  }
+
+  function hideTag(tagNode) {
+    tagNode.isVisible = false
+    document.getElementById(tagNode.id + "-div").style.display = "none"
+  }
+
+  function markTagForDeletion(tagNode) {
+    tagNode.isMarkedForDeletion = true
+  }
+
+  function saveTagState() {
+    console.table(knownTags)
+  }
 }
 
 // for testing
