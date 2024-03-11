@@ -21,32 +21,34 @@ export function TagEditor({ children }) {
 
   // load tags from API
   useEffect(() => {
-    setKnownTagsAsString(loadTagsFromAPI())
+    loadTagsFromAPI().then((tags) => {
+      setKnownTagsAsString(tags)
+      setTagsLoadedFromSource(true)
+    })
   }, [])
-
-  //   // OBOSLETE
-  //   // track loading state
-  //   useEffect(() => {
-  //     if (knownTagsAsString > 0) {
-  //       setTagsLoadedFromSource(true)
-  //     }
-  //   }, [knownTagsAsString])
 
   // turn tags into TagNodes
   useEffect(() => {
-    if (tagsLoadedFromSource) {
+    if (tagsLoadedFromSource && knownTagsAsString.length > 0) {
       // for testing
-      announce("got tags from API", knownTagsAsString)
+      announce("string of tags got some values", knownTagsAsString)
 
       let tagNodesListed = turnTagsIntoTagNodes(knownTagsAsString)
       setKnownTags(tagNodesListed)
+      setTagsLoadedFromSource(true)
+    } else {
+      announce("string of tags is empty", knownTagsAsString)
     }
   }, [tagsLoadedFromSource])
 
   // render tags
   useEffect(() => {
     // for testing
-    announce("populated tag nodes", knownTags)
+    if (knownTags.length > 0) {
+      announce("populated tag nodes", knownTags)
+    } else {
+      announce("knownTags is empty", knownTags)
+    }
 
     // do something with those known tags lke rendering the innerHTML
     const htmlWithTags = renderTags(knownTags)
@@ -144,6 +146,10 @@ function announce(announcement, objectToLog) {
       colorCode = "#ffe4c4" // bisque
       break
 
+    case "string of tags got some values":
+      colorCode = "#00ff00" // lime
+      break
+
     default:
       colorCode = "#eee600" // titanium yellow
       break
@@ -152,7 +158,7 @@ function announce(announcement, objectToLog) {
   console.log(`%c /////////////////`, `color: ${colorCode}; font-size: 20px;`)
   console.log(`%c ${announcement}`, `color: ${colorCode};`)
 
-  if (objectToLog) {
+  if (objectToLog != null) {
     console.log(
       `%c objectToLog type => ${typeof objectToLog}`,
       `color: ${colorCode};`
