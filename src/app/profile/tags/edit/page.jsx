@@ -6,6 +6,21 @@ import { TagNode } from "@/app/profile/tags/components/TagNode/TagNode"
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faXmark } from "@fortawesome/free-solid-svg-icons"
 
+import { Progress } from "@/components/ui/progress"
+import { Button } from "@/components/ui/button"
+import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogTrigger,
+  DialogClose,
+} from "@/components/ui/dialog"
+
 export default function Page() {
   return (
     <div>
@@ -83,9 +98,6 @@ export function TagEditor({ children }) {
 
     const apiUrl = `http://localhost:5678/api/v1/profiles/${handle}/tags`
 
-    let knownTagsAsString = ""
-    let tagsCouldBeLoaded = false
-
     // get all the tags for this user
     return fetch(apiUrl).then((response) =>
       response
@@ -132,6 +144,25 @@ export function TagEditor({ children }) {
     return tagNodes
   }
 
+  // TODO: write function (this is just a draft)
+  // - check parameters and return
+  function renderFullInnerPage(setHtmlWithTags, htmlProgressBar, htmlButtons) {
+    return (
+      <div className="mx-1">
+        <>{htmlProgressBar}</>
+        <h2 className="mb-2">
+          <strong>Your Tags</strong>
+          <div>{htmlWithTags}</div>
+          <div className="mt-5 flex justify-end">
+            <div className="w-2/4 mt-2 mr-6 flex justify-end gap-5">
+              <>{htmlButtons}</>
+            </div>
+          </div>
+        </h2>
+      </div>
+    )
+  }
+
   function renderTags(knownTagsList) {
     if (knownTagsList.length > 0) {
       const renderedHTML = knownTagsList.map((tagNode) => {
@@ -166,6 +197,96 @@ export function TagEditor({ children }) {
         </div>
       )
     }
+  }
+
+  // TODO: write function (this is just a draft)
+  function renderProgressBar(knownTags) {
+    progress = (knownTags.length / 50) * 100
+
+    return (
+      <>
+        <span>Using {knownTags.length} tags out of 50</span>
+        <Progress
+          id="tagsProgressBar"
+          value={progress}
+          className="w-[60%] my-4"
+        />
+      </>
+    )
+  }
+
+  // TODO: write function (this is just a draft)
+  function renderButtons() {
+    return (
+      <>
+        <Button
+          id="saveTagDeletionButton"
+          variant="outline"
+          className="bg-white text-black invisible"
+          onClick={(e) => {
+            deleteTagsFromServer(displayedTags)
+          }}
+        >
+          SAVE CHANGES
+        </Button>
+        <Button
+          id="reorderTagsButton"
+          variant="outline"
+          className="bg-white text-black"
+        >
+          REORDER
+        </Button>
+
+        <Dialog>
+          <DialogTrigger asChild>
+            <div className="group/edit">
+              <Button
+                id="addTagsButton"
+                variant="outline"
+                className="bg-white text-black"
+              >
+                ADD
+              </Button>
+            </div>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Edit Content</DialogTitle>
+              <DialogDescription>
+                Tags will help you find other people with similar interests.
+                Click save when you're done.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="featuredTitle" className="text-right">
+                  Title
+                </Label>
+                <Input
+                  id="tagsInput"
+                  type="text"
+                  className="col-span-3"
+                  onChange={(e) => setNewTagsBuffer(e.target.value)}
+                  //value={tagText}
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <DialogClose>
+                <Button
+                  type="submit"
+                  onClick={(e) => {
+                    updateTagText(newTagsBuffer, knownTagsAsString)
+                  }}
+                >
+                  Save
+                </Button>
+              </DialogClose>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </>
+    )
   }
 
   function popTag(event, tagNode) {
