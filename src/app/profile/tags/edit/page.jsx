@@ -35,7 +35,11 @@ export function TagEditor({ children }) {
 
   // TOOD: verify/falsify -> perhaps will be omitted due to TagNodes being available
   const [knownTags, setKnownTags] = useState([])
+
+  // html variables to be used for rendering
   const [htmlWithTags, setHtmlWithTags] = useState("")
+  const [htmlProgressBar, setHtmlProgressBar] = useState("")
+  const [htmlButtons, setHtmlButtons] = useState("")
 
   // load tags from API
   useEffect(() => {
@@ -61,11 +65,22 @@ export function TagEditor({ children }) {
 
   // render tags
   useEffect(() => {
-    // for testing
     if (knownTags.length > 0) {
+      // for testing
       announce("populated tag nodes", knownTags)
-      let html = renderTags(knownTags)
-      setHtmlWithTags(html)
+
+      let htmlBuffer = ""
+
+      htmlBuffer = renderTags(knownTags)
+      setHtmlWithTags(htmlBuffer)
+
+      // renderProgressBar(knownTags)
+      htmlBuffer = renderProgressBar(knownTags)
+      setHtmlProgressBar(htmlBuffer)
+
+      // renderButtons()
+
+      // renderFullInnerPage(htmlWithTags, htmlProgressBar, htmlButtons)
     } else {
       announce("knownTags is empty", knownTags)
     }
@@ -84,6 +99,7 @@ export function TagEditor({ children }) {
     )
   }
 
+  // TODO: render full inner page instead
   // render page with tags
   return (
     <>
@@ -92,6 +108,7 @@ export function TagEditor({ children }) {
     </>
   )
 
+  /** data functions **/
   function loadTagsFromAPI() {
     // get user tag by serving endpoint and having it as a query parameter
     let handle = "dnt.is"
@@ -144,6 +161,8 @@ export function TagEditor({ children }) {
     return tagNodes
   }
 
+  /** rendering functions **/
+
   // TODO: write function (this is just a draft)
   // - check parameters and return
   function renderFullInnerPage(setHtmlWithTags, htmlProgressBar, htmlButtons) {
@@ -173,7 +192,7 @@ export function TagEditor({ children }) {
               id={tagNode.id + "-div"}
               data-tag-id={tagNode.id}
               className="deletableTag inline-flex mx-1.5 my-1 px-3 py-0.45 rounded text-sm font-medium bg-white text-black"
-              onClick={(e) => popTag(e, tagNode, knownTagsList)}
+              onClick={(e) => popVisbileTag(e, tagNode, knownTagsList)}
             >
               <span id={tagNode.id + "-span"} data-tag-id={tagNode.id}>
                 {tagNode.text}
@@ -199,9 +218,8 @@ export function TagEditor({ children }) {
     }
   }
 
-  // TODO: write function (this is just a draft)
   function renderProgressBar(knownTags) {
-    progress = (knownTags.length / 50) * 100
+    let progress = (knownTags.length / 50) * 100
 
     return (
       <>
@@ -220,14 +238,24 @@ export function TagEditor({ children }) {
     return (
       <>
         <Button
-          id="saveTagDeletionButton"
+          id="saveTagStateButton"
           variant="outline"
           className="bg-white text-black invisible"
-          onClick={(e) => {
-            deleteTagsFromServer(displayedTags)
+          onClick={() => {
+            setKnownTags(saveTagState())
           }}
         >
           SAVE CHANGES
+        </Button>
+        <Button
+          id="cancelStateUpdateButton"
+          variant="outline"
+          className="bg-white text-black invisible"
+          onClick={() => {
+            cancelStateUpdate()
+          }}
+        >
+          CANCEL
         </Button>
         <Button
           id="reorderTagsButton"
@@ -289,15 +317,29 @@ export function TagEditor({ children }) {
     )
   }
 
-  function popTag(event, tagNode) {
+  /** mixed functions (data + rendering) **/
+  function addTag(textForTag, listOfKnownTags) {
+    let tagNode = new TagNode(textForTag)
+
+    tagNode.position = listOfKnownTags.length
+    let tailingTag = listOfKnownTags[listOfKnownTags.length]
+    tailingTag.insertAfter(tagNode)
+
+    listOfKnownTags.push(tagNode)
+    setKnownTags(listOfKnownTags)
+  }
+
+  function popVisbileTag(event, tagNode) {
     let tagNodeId = event.target.getAttribute("data-tag-id")
 
     announce("user popped tag with id =>", tagNodeId)
 
     hideTag(tagNode)
     markTagForDeletion(tagNode)
+
     // TODO: show 'save' and 'cancel' buttons
-    saveTagState() // TODO: only do this if user clicks 'save'
+    showSaveButton()
+    showCancelButton()
   }
 
   function hideTag(tagNode) {
@@ -305,11 +347,29 @@ export function TagEditor({ children }) {
     document.getElementById(tagNode.id + "-div").style.display = "none"
   }
 
+  function showSaveButton() {
+    // TODO: check if display style is same as other buttons
+    document.getElementById("saveTagStateButton").style.display = "block"
+  }
+
+  function hideSaveButton() {
+    document.getElementById("saveTagStateButton").style.display = "none"
+  }
+
+  function showCancelButton() {
+    document.getElementById("cancelStateUpdateButton").style.display = "block"
+  }
+
+  function hideCancelButton() {
+    document.getElementById("cancelStateUpdateButton").style.display = "none"
+  }
+
   function markTagForDeletion(tagNode) {
     tagNode.isMarkedForDeletion = true
   }
 
   function saveTagState() {
+    // commits the tags as they are visible to the user
     console.table(knownTags)
 
     let tagsToKeep = []
@@ -323,15 +383,23 @@ export function TagEditor({ children }) {
         numberOfTags++
       }
     })
-    setKnownTags(tagsToKeep)
-
-    console.table(knownTags)
 
     // TODO: commit change to the database
+    console.table(tagsToKeep)
+    return tagsToKeep
+  }
+
+  function cancelStateUpdate() {
+    // render knownTags as they were before the user started editing
+    renderTags(knownTags)
+
+    // hide 'save' and 'cancel' buttons
+    hideSaveButton()
+    hideCancelButton()
   }
 }
 
-// for testing
+/** support functions (debug) **/
 function announce(announcement, objectToLog) {
   let colorCode = ""
 
