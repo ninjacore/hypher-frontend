@@ -35,7 +35,14 @@ export function TagEditor({ children }) {
 
   // TOOD: verify/falsify -> perhaps will be omitted due to TagNodes being available
   const [knownTags, setKnownTags] = useState([])
-  const [tagBuffer, setTagBuffer] = useState("def.")
+  const [tagBuffer, setTagBuffer] = useState("")
+  // const onChangeHandler = (event) => {
+  //   announce("value for buffer: ", event.target.value)
+  //   announce("value of variable 'newTagBuffer': ", tagBuffer)
+
+  //   setTagBuffer(event.target.value)
+  //   setTagBuffer("lol")
+  // }
 
   // html variables to be used for rendering
   const [htmlWithTags, setHtmlWithTags] = useState("")
@@ -99,6 +106,11 @@ export function TagEditor({ children }) {
       renderFullInnerPage(htmlWithTags, htmlProgressBar, htmlButtons)
     )
   }, [htmlWithTags, htmlProgressBar, htmlButtons])
+
+  // temporary for debugging
+  useEffect(() => {
+    announce("tagBuffer after 'setTagBuffer(tagBufferData)': ", tagBuffer)
+  }, [tagBuffer])
 
   // default while waiting for data
   if (!tagsLoadedFromSource) {
@@ -305,9 +317,7 @@ export function TagEditor({ children }) {
                   id="tagsInput"
                   type="text"
                   className="col-span-3"
-                  onChange={(e) => showBuffer(e.target)}
-                  // onChange={(e) => setNewTagBuffer(e.target.value)}
-                  //value={tagText}
+                  onChange={(e) => setTagBuffer(e.target.value)}
                 />
               </div>
             </div>
@@ -316,7 +326,7 @@ export function TagEditor({ children }) {
                 <Button
                   type="submit"
                   onClick={(e) => {
-                    addTag(tagBuffer)
+                    addTag()
                   }}
                 >
                   Save
@@ -330,13 +340,13 @@ export function TagEditor({ children }) {
   }
 
   /** mixed functions (data + rendering) **/
-  function addTag(textForTag) {
-    announce("user is saving tag with text: ", textForTag)
-    console.log("newTagBuffer: " + tagBuffer)
+  function addTag() {
+    announce("user is saving tag with text: ", tagBuffer)
+    // console.log("tag buffer: " + tagBuffer)
 
     let listOfKnownTags = knownTags
 
-    let tagNode = new TagNode(textForTag)
+    let tagNode = new TagNode(tagBuffer)
     tagNode.position = listOfKnownTags.length
     let tailingTag = listOfKnownTags[listOfKnownTags.length - 1]
     tailingTag.insertAfter(tagNode)
@@ -412,19 +422,6 @@ export function TagEditor({ children }) {
     // hide 'save' and 'cancel' buttons
     hideSaveButton()
     hideCancelButton()
-  }
-
-  // temp for debugging
-  function showBuffer(eventTarget) {
-    let textForTag = ""
-    textForTag = eventTarget.value
-
-    setTagBuffer(textForTag)
-
-    announce("value for buffer: ", eventTarget.value)
-    announce("textForTag (eventTarget.value): ", textForTag)
-    announce("value of variable 'newTagBuffer': ", tagBuffer)
-    // announce("event-target: ", eventTarget)
   }
 }
 
