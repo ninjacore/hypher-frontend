@@ -286,7 +286,7 @@ export function TagEditor({ children }) {
           variant="outline"
           className="bg-white text-black invisible"
           onClick={() => {
-            cancelStateUpdate()
+            setHtmlWithTags(renderTags(cancelStateUpdate()))
           }}
         >
           CANCEL
@@ -466,14 +466,30 @@ export function TagEditor({ children }) {
   }
 
   function cancelStateUpdate() {
+    let allTagsToKeep = []
+    let numberOfTags = 0
+
+    // reset status attributes of tagNodes
+    knownTags.forEach((tagNode) => {
+      tagNode.isMarkedForDeletion = false
+      tagNode.isVisible = true
+      tagNode.position = numberOfTags
+
+      allTagsToKeep.push(tagNode)
+      numberOfTags++
+    })
+
     // render knownTags as they were before the user started editing
-    renderTags(knownTags)
+    // renderTags(knownTags)
+    // setHtmlWithTags(renderTags(allTagsToKeep))
 
     // hide 'save' and 'cancel' buttons
     hideSaveButton()
     hideCancelButton()
     showReorderButton()
     showAddTagButton()
+
+    return allTagsToKeep
   }
 }
 
