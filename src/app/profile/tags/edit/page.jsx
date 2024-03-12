@@ -36,6 +36,8 @@ export function TagEditor({ children }) {
   // TOOD: verify/falsify -> perhaps will be omitted due to TagNodes being available
   const [knownTags, setKnownTags] = useState([])
   const [tagBuffer, setTagBuffer] = useState("")
+  let tagToSaveText = ""
+
   // const onChangeHandler = (event) => {
   //   announce("value for buffer: ", event.target.value)
   //   announce("value of variable 'newTagBuffer': ", tagBuffer)
@@ -107,10 +109,12 @@ export function TagEditor({ children }) {
     )
   }, [htmlWithTags, htmlProgressBar, htmlButtons])
 
-  // temporary for debugging
-  useEffect(() => {
-    announce("tagBuffer after 'setTagBuffer(tagBufferData)': ", tagBuffer)
-  }, [tagBuffer])
+  // // temporary for debugging
+  // useEffect(() => {
+  //   announce("tagBuffer after 'setTagBuffer(tagBufferData)': ", tagBuffer)
+  //   tagToSaveText = tagBuffer
+  //   announce("saving tag with text: ", tagToSaveText)
+  // }, [tagBuffer])
 
   // default while waiting for data
   if (!tagsLoadedFromSource) {
@@ -317,7 +321,10 @@ export function TagEditor({ children }) {
                   id="tagsInput"
                   type="text"
                   className="col-span-3"
-                  onChange={(e) => setTagBuffer(e.target.value)}
+                  // onChange={(e) => setTagBuffer(e.target.value)}
+                  onChange={(e) => {
+                    tagToSaveText = e.target.value
+                  }}
                 />
               </div>
             </div>
@@ -326,7 +333,7 @@ export function TagEditor({ children }) {
                 <Button
                   type="submit"
                   onClick={(e) => {
-                    addTag()
+                    addTag(tagBuffer, knownTags)
                   }}
                 >
                   Save
@@ -340,19 +347,25 @@ export function TagEditor({ children }) {
   }
 
   /** mixed functions (data + rendering) **/
-  function addTag() {
-    announce("user is saving tag with text: ", tagBuffer)
+  function addTag(buffer, tagArray) {
+    announce("user is saving tag with text [parameter]: ", buffer)
+    announce("user is saving tag with text [state variable]: ", tagBuffer)
+    announce("knownTags are [parameter]: ", tagArray)
+    announce("knownTags are [state variable]: ", knownTags)
+
+    announce("tag text [function-scope variable]: ", tagToSaveText)
+
     // console.log("tag buffer: " + tagBuffer)
 
-    let listOfKnownTags = knownTags
+    // let listOfKnownTags = knownTags
 
-    let tagNode = new TagNode(tagBuffer)
-    tagNode.position = listOfKnownTags.length
-    let tailingTag = listOfKnownTags[listOfKnownTags.length - 1]
-    tailingTag.insertAfter(tagNode)
+    // let tagNode = new TagNode(tagBuffer)
+    // tagNode.position = listOfKnownTags.length
+    // let tailingTag = listOfKnownTags[listOfKnownTags.length - 1]
+    // tailingTag.insertAfter(tagNode)
 
-    listOfKnownTags.push(tagNode)
-    setKnownTags(listOfKnownTags)
+    // listOfKnownTags.push(tagNode)
+    // setKnownTags(listOfKnownTags)
   }
 
   function popVisbileTag(event, tagNode) {
@@ -446,7 +459,8 @@ function announce(announcement, objectToLog) {
       colorCode = "#da70d6" // orchid
       break
 
-    case "user is saving tag with text: ":
+    case "user is saving tag with text [parameter]: ":
+    case "user is saving tag with text [state variable]: ":
       colorCode = "#00ffff" // cyan
       break
 
