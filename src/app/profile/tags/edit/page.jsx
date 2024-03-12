@@ -394,6 +394,8 @@ export function TagEditor({ children }) {
     // TODO: show 'save' and 'cancel' buttons
     showSaveButton()
     showCancelButton()
+    hideReorderButton()
+    hideAddTagButton()
   }
 
   function hideTag(tagNode) {
@@ -402,20 +404,39 @@ export function TagEditor({ children }) {
   }
 
   function showSaveButton() {
-    // TODO: check if display style is same as other buttons
-    document.getElementById("saveTagStateButton").style.display = "block"
+    document.getElementById("saveTagStateButton").classList.remove("invisible")
   }
 
   function hideSaveButton() {
-    document.getElementById("saveTagStateButton").style.display = "none"
+    document.getElementById("saveTagStateButton").classList.add("invisible")
   }
 
   function showCancelButton() {
-    document.getElementById("cancelStateUpdateButton").style.display = "block"
+    document
+      .getElementById("cancelStateUpdateButton")
+      .classList.remove("invisible")
   }
 
   function hideCancelButton() {
-    document.getElementById("cancelStateUpdateButton").style.display = "none"
+    document
+      .getElementById("cancelStateUpdateButton")
+      .classList.add("invisible")
+  }
+
+  function showReorderButton() {
+    document.getElementById("reorderTagsButton").classList.remove("invisible")
+  }
+
+  function hideReorderButton() {
+    document.getElementById("reorderTagsButton").classList.add("invisible")
+  }
+
+  function showAddTagButton() {
+    document.getElementById("addTagsButton").classList.remove("invisible")
+  }
+
+  function hideAddTagButton() {
+    document.getElementById("addTagsButton").classList.add("invisible")
   }
 
   function markTagForDeletion(tagNode) {
@@ -451,6 +472,8 @@ export function TagEditor({ children }) {
     // hide 'save' and 'cancel' buttons
     hideSaveButton()
     hideCancelButton()
+    showReorderButton()
+    showAddTagButton()
   }
 }
 
