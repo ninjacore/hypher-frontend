@@ -35,6 +35,7 @@ export function TagEditor({ children }) {
 
   // TOOD: verify/falsify -> perhaps will be omitted due to TagNodes being available
   const [knownTags, setKnownTags] = useState([])
+  const [tagBuffer, setTagBuffer] = useState("def.")
 
   // html variables to be used for rendering
   const [htmlWithTags, setHtmlWithTags] = useState("")
@@ -304,7 +305,8 @@ export function TagEditor({ children }) {
                   id="tagsInput"
                   type="text"
                   className="col-span-3"
-                  onChange={(e) => setNewTagsBuffer(e.target.value)}
+                  onChange={(e) => showBuffer(e.target)}
+                  // onChange={(e) => setNewTagBuffer(e.target.value)}
                   //value={tagText}
                 />
               </div>
@@ -314,7 +316,7 @@ export function TagEditor({ children }) {
                 <Button
                   type="submit"
                   onClick={(e) => {
-                    updateTagText(newTagsBuffer, knownTagsAsString)
+                    addTag(tagBuffer)
                   }}
                 >
                   Save
@@ -328,11 +330,15 @@ export function TagEditor({ children }) {
   }
 
   /** mixed functions (data + rendering) **/
-  function addTag(textForTag, listOfKnownTags) {
-    let tagNode = new TagNode(textForTag)
+  function addTag(textForTag) {
+    announce("user is saving tag with text: ", textForTag)
+    console.log("newTagBuffer: " + tagBuffer)
 
+    let listOfKnownTags = knownTags
+
+    let tagNode = new TagNode(textForTag)
     tagNode.position = listOfKnownTags.length
-    let tailingTag = listOfKnownTags[listOfKnownTags.length]
+    let tailingTag = listOfKnownTags[listOfKnownTags.length - 1]
     tailingTag.insertAfter(tagNode)
 
     listOfKnownTags.push(tagNode)
@@ -407,6 +413,19 @@ export function TagEditor({ children }) {
     hideSaveButton()
     hideCancelButton()
   }
+
+  // temp for debugging
+  function showBuffer(eventTarget) {
+    let textForTag = ""
+    textForTag = eventTarget.value
+
+    setTagBuffer(textForTag)
+
+    announce("value for buffer: ", eventTarget.value)
+    announce("textForTag (eventTarget.value): ", textForTag)
+    announce("value of variable 'newTagBuffer': ", tagBuffer)
+    // announce("event-target: ", eventTarget)
+  }
 }
 
 /** support functions (debug) **/
@@ -428,6 +447,10 @@ function announce(announcement, objectToLog) {
 
     case "user popped tag with id =>":
       colorCode = "#da70d6" // orchid
+      break
+
+    case "user is saving tag with text: ":
+      colorCode = "#00ffff" // cyan
       break
 
     default:
