@@ -111,6 +111,11 @@ export function TagEditor({ children }) {
 
   // // temporary for debugging
   // useEffect(() => {
+  //   announce("knownTags after 'setKnownTags(listOfKnownTags)': ", knownTags)
+  // }, [knownTags])
+
+  // // temporary for debugging
+  // useEffect(() => {
   //   announce("tagBuffer after 'setTagBuffer(tagBufferData)': ", tagBuffer)
   //   tagToSaveText = tagBuffer
   //   announce("saving tag with text: ", tagToSaveText)
@@ -210,6 +215,8 @@ export function TagEditor({ children }) {
   }
 
   function renderTags(knownTagsList) {
+    announce("rendering tags", knownTagsList)
+
     if (knownTagsList.length > 0) {
       const renderedHTML = knownTagsList.map((tagNode) => {
         if (tagNode.isVisible === true) {
@@ -269,7 +276,7 @@ export function TagEditor({ children }) {
           variant="outline"
           className="bg-white text-black invisible"
           onClick={() => {
-            setKnownTags(saveTagState())
+            setKnownTags(saveVisibleTags())
           }}
         >
           SAVE CHANGES
@@ -333,7 +340,7 @@ export function TagEditor({ children }) {
                 <Button
                   type="submit"
                   onClick={(e) => {
-                    addTag(tagBuffer, knownTags)
+                    addTag(tagToSaveText)
                   }}
                 >
                   Save
@@ -347,25 +354,33 @@ export function TagEditor({ children }) {
   }
 
   /** mixed functions (data + rendering) **/
-  function addTag(buffer, tagArray) {
-    announce("user is saving tag with text [parameter]: ", buffer)
-    announce("user is saving tag with text [state variable]: ", tagBuffer)
-    announce("knownTags are [parameter]: ", tagArray)
-    announce("knownTags are [state variable]: ", knownTags)
+  function addTag(bufferText) {
+    announce("user is saving tag with text [parameter]: ", bufferText)
+    // announce("user is saving tag with text [state variable]: ", tagBuffer)
+    // announce("knownTags are [parameter]: ", tagArray)
+    // announce("knownTags are [state variable]: ", knownTags)
 
     announce("tag text [function-scope variable]: ", tagToSaveText)
 
     // console.log("tag buffer: " + tagBuffer)
 
-    // let listOfKnownTags = knownTags
+    let listOfKnownTags = knownTags
 
-    // let tagNode = new TagNode(tagBuffer)
-    // tagNode.position = listOfKnownTags.length
-    // let tailingTag = listOfKnownTags[listOfKnownTags.length - 1]
-    // tailingTag.insertAfter(tagNode)
+    let tagNode = new TagNode(bufferText)
+    tagNode.position = listOfKnownTags.length
+    let tailingTag = listOfKnownTags[listOfKnownTags.length - 1]
+    tailingTag.insertAfter(tagNode)
 
-    // listOfKnownTags.push(tagNode)
-    // setKnownTags(listOfKnownTags)
+    // save new list of known tags
+    listOfKnownTags.push(tagNode)
+    setKnownTags(listOfKnownTags)
+
+    // re-render as needed
+    setHtmlWithTags(renderTags(knownTags))
+    setHtmlProgressBar(renderProgressBar(knownTags))
+
+    // save tag state to the database
+    saveVisibleTags()
   }
 
   function popVisbileTag(event, tagNode) {
@@ -407,8 +422,9 @@ export function TagEditor({ children }) {
     tagNode.isMarkedForDeletion = true
   }
 
-  function saveTagState() {
-    // commits the tags as they are visible to the user
+  // TODO: rewrite so it only saves what is and doesn't update FE (including dependencies)
+  // commits the tags to the databse if they are visible to the user
+  function saveVisibleTags() {
     console.table(knownTags)
 
     let tagsToKeep = []
