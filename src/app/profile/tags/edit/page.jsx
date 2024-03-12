@@ -40,6 +40,7 @@ export function TagEditor({ children }) {
   const [htmlWithTags, setHtmlWithTags] = useState("")
   const [htmlProgressBar, setHtmlProgressBar] = useState("")
   const [htmlButtons, setHtmlButtons] = useState("")
+  const [htmlFullInnerPage, setHtmlFullInnerPage] = useState("")
 
   // load tags from API
   useEffect(() => {
@@ -63,22 +64,21 @@ export function TagEditor({ children }) {
     }
   }, [tagsLoadedFromSource])
 
-  // render tags
+  // render html components with data
   useEffect(() => {
     if (knownTags.length > 0) {
       // for testing
       announce("populated tag nodes", knownTags)
 
-      let htmlBuffer = ""
-
-      htmlBuffer = renderTags(knownTags)
-      setHtmlWithTags(htmlBuffer)
-
-      // renderProgressBar(knownTags)
-      htmlBuffer = renderProgressBar(knownTags)
-      setHtmlProgressBar(htmlBuffer)
-
       // renderButtons()
+      setHtmlWithTags(renderTags(knownTags))
+      setHtmlProgressBar(renderProgressBar(knownTags))
+      setHtmlButtons(renderButtons())
+
+      // TODO: check if obsolete
+      setHtmlFullInnerPage(
+        renderFullInnerPage(htmlWithTags, htmlProgressBar, htmlButtons)
+      )
 
       // renderFullInnerPage(htmlWithTags, htmlProgressBar, htmlButtons)
     } else {
@@ -88,6 +88,16 @@ export function TagEditor({ children }) {
     // do something with those known tags like rendering the innerHTML
     // const htmlWithTags = renderTags(knownTags)
   }, [knownTags])
+
+  // on user interactions
+  useEffect(() => {
+    // TODO: check if progress bar updates, otherwise:
+    //       setHtmlProgressBar(renderProgressBar(knownTags))
+
+    setHtmlFullInnerPage(
+      renderFullInnerPage(htmlWithTags, htmlProgressBar, htmlButtons)
+    )
+  }, [htmlWithTags, htmlProgressBar, htmlButtons])
 
   // default while waiting for data
   if (!tagsLoadedFromSource) {
@@ -104,7 +114,7 @@ export function TagEditor({ children }) {
   return (
     <>
       <h2>Your Favorite Tags</h2>
-      <div>{htmlWithTags}</div>
+      <div>{htmlFullInnerPage}</div>
     </>
   )
 
@@ -165,7 +175,7 @@ export function TagEditor({ children }) {
 
   // TODO: write function (this is just a draft)
   // - check parameters and return
-  function renderFullInnerPage(setHtmlWithTags, htmlProgressBar, htmlButtons) {
+  function renderFullInnerPage() {
     return (
       <div className="mx-1">
         <>{htmlProgressBar}</>
