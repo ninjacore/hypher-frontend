@@ -348,7 +348,7 @@ function hideAddTagButton() {
 // Data functions /.
 // TODO: check (just copied from v2)
 function loadTagsFromAPI() {
-  // get user tag by serving endpoint and having it as a query parameter
+  // TODO: get user tag by serving endpoint and having it as a query parameter
   let handle = "dnt.is"
 
   const apiUrl = `http://localhost:5678/api/v1/profiles/${handle}/tags`
@@ -372,6 +372,36 @@ function loadTagsFromAPI() {
         }
       })
   )
+}
+
+function saveTagsToAPI(newTagsAsString) {
+  // TODO: get user tag by serving endpoint and having it as a query parameter
+  let handle = "dnt.is"
+
+  const apiUrl = `http://localhost:5678/api/v1/profiles/${handle}/tags`
+
+  fetch(apiUrl, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(
+      JSON.parse(
+        JSON.stringify({
+          tags: newTagsAsString,
+        })
+      )
+    ),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log("Success:", data)
+      return data
+    })
+    .catch((error) => {
+      console.error("Error:", error)
+      return error
+    })
 }
 
 // TODO: check (just copied from v2)
@@ -430,19 +460,31 @@ function saveVisibleTags(knownTags, setKnownTags) {
 
   let tagsToKeep = []
   let numberOfTags = 0
+  let tagsToKeepAsString = ""
+
   // go through all tags and remove if marked for deletion
   knownTags.forEach((tagNode) => {
     if (tagNode.isMarkedForDeletion === false) {
       // is clear
+
+      if (numberOfTags > 0) {
+        tagsToKeepAsString += ", "
+        tagsToKeepAsString += tagNode.text
+      } else {
+        // first one
+        tagsToKeepAsString += tagNode.text
+      }
+
       tagNode.position = numberOfTags
       tagsToKeep.push(tagNode)
       numberOfTags++
     }
   })
 
-  // TODO: commit change to the database
   console.table(tagsToKeep)
-  // return tagsToKeep
+
+  // commit change to the database
+  saveTagsToAPI(tagsToKeepAsString)
 
   setKnownTags(tagsToKeep)
 }
