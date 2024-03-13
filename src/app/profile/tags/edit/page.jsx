@@ -24,10 +24,214 @@ import {
 export default function Page() {
   return (
     <div>
-      <TagEditor />
+      <BetterTagEditor />
     </div>
   )
 }
+
+// TODO: make main component
+export function BetterTagEditor() {
+  const [knownTagsAsString, setKnownTagsAsString] = useState("")
+  const [tagsLoadedFromSource, setTagsLoadedFromSource] = useState(false)
+
+  const [knownTags, setKnownTags] = useState([])
+  const [tagBuffer, setTagBuffer] = useState("")
+  let tagToSaveText = ""
+
+  return (
+    <div className="mx-1">
+      <ProgressBarComponent knownTags={knownTags} />
+      <h2 className="mb-2">
+        <strong>Your Tags</strong>
+        <div>
+          <TagsComponent knownTagsList={knownTags} />
+        </div>
+        <div className="mt-5 flex justify-end">
+          <div className="w-2/4 mt-2 mr-6 flex justify-end gap-5">
+            {/* passing an event handler down as a prop */}
+            <ButtonsComponent onAddTagClick={() => addTag(knownTags)} />
+          </div>
+        </div>
+      </h2>
+    </div>
+  )
+}
+
+export function ProgressBarComponent(knownTags) {
+  let progress = (knownTags.length / 50) * 100
+
+  return (
+    <>
+      <span>Using {knownTags.length} tags out of 50</span>
+      <Progress
+        id="tagsProgressBar"
+        value={progress}
+        className="w-[60%] my-4"
+      />
+    </>
+  )
+}
+
+export function TagsComponent(knownTagsList) {
+  announce("rendering tags", knownTagsList)
+
+  if (knownTagsList.length > 0) {
+    const renderedHTML = knownTagsList.map((tagNode) => {
+      if (tagNode.isVisible === true) {
+        return (
+          <div
+            key={tagNode.id}
+            id={tagNode.id + "-div"}
+            data-tag-id={tagNode.id}
+            className="deletableTag inline-flex mx-1.5 my-1 px-3 py-0.45 rounded text-sm font-medium bg-white text-black"
+            onClick={(e) => popVisbileTag(e, tagNode, knownTagsList)}
+          >
+            <span id={tagNode.id + "-span"} data-tag-id={tagNode.id}>
+              {tagNode.text}
+              <FontAwesomeIcon
+                id={tagNode.id + "-icon"}
+                data-tag-id={tagNode.id}
+                icon={faXmark}
+                className="fas fa-angle-right text-xs my-auto my-2.45 ml-1 py-0.45"
+              ></FontAwesomeIcon>
+            </span>
+          </div>
+        )
+      }
+    })
+
+    return <>{renderedHTML}</>
+  } else {
+    return (
+      <div>
+        <p>no tags to render</p>
+      </div>
+    )
+  }
+}
+
+export function ButtonsComponent({ onAddTagClick }) {
+  return (
+    <>
+      <Button
+        id="saveTagStateButton"
+        variant="outline"
+        className="bg-white text-black invisible"
+        onClick={() => {
+          saveVisibleTags()
+        }}
+      >
+        SAVE CHANGES
+      </Button>
+      <Button
+        id="cancelStateUpdateButton"
+        variant="outline"
+        className="bg-white text-black invisible"
+        onClick={() => {
+          cancelStateUpdate()
+        }}
+      >
+        CANCEL
+      </Button>
+      <Button
+        id="reorderTagsButton"
+        variant="outline"
+        className="bg-white text-black"
+      >
+        REORDER
+      </Button>
+
+      <Dialog>
+        <DialogTrigger asChild>
+          <div className="group/edit">
+            <Button
+              id="addTagsButton"
+              variant="outline"
+              className="bg-white text-black"
+            >
+              ADD
+            </Button>
+          </div>
+        </DialogTrigger>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Edit Content</DialogTitle>
+            <DialogDescription>
+              Tags will help you find other people with similar interests. Click
+              save when you're done.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <Label htmlFor="featuredTitle" className="text-right">
+                Title
+              </Label>
+              <Input
+                id="tagsInput"
+                type="text"
+                className="col-span-3"
+                // onChange={(e) => setTagBuffer(e.target.value)}
+                onChange={(e) => {
+                  tagToSaveText = e.target.value
+                }}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <DialogClose>
+              <Button
+                type="submit"
+                // onClick={(e) => {
+                //   addTag(tagToSaveText)
+                // }}
+                onClick={onAddTagClick}
+              >
+                Save
+              </Button>
+            </DialogClose>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </>
+  )
+}
+
+function addTag(knownTags) {
+  let bufferText = document.getElementById("tagsInput").value
+
+  announce("user is saving tag with text [getById]: ", bufferText)
+  // announce("user is saving tag with text [state variable]: ", tagBuffer)
+  // announce("knownTags are [parameter]: ", tagArray)
+  // announce("knownTags are [state variable]: ", knownTags)
+
+  // announce("tag text [function-scope variable]: ", tagToSaveText)
+
+  // console.log("tag buffer: " + tagBuffer)
+
+  let listOfKnownTags = knownTags
+
+  let tagNode = new TagNode(bufferText)
+  tagNode.position = listOfKnownTags.length
+  let tailingTag = listOfKnownTags[listOfKnownTags.length - 1]
+  tailingTag.insertAfter(tagNode)
+
+  // save new list of known tags
+  listOfKnownTags.push(tagNode)
+  setKnownTags(listOfKnownTags)
+
+  // re-render as needed
+  setHtmlWithTags(renderTags(knownTags))
+  setHtmlProgressBar(renderProgressBar(knownTags))
+
+  // save tag state to the database
+  saveVisibleTags()
+}
+
+/////////////////////////////////////////////////
+/** 2nd but old approach below
+ *  // TODO: delete after refactoring
+ */
+/////////////////////////////////////////////////
 
 export function TagEditor({ children }) {
   const [knownTagsAsString, setKnownTagsAsString] = useState("")
@@ -516,6 +720,7 @@ function announce(announcement, objectToLog) {
 
     case "user is saving tag with text [parameter]: ":
     case "user is saving tag with text [state variable]: ":
+    case "user is saving tag with text [getById]: ":
       colorCode = "#00ffff" // cyan
       break
 
