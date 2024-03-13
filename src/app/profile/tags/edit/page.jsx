@@ -271,32 +271,24 @@ function addTag(knownTags, setKnownTags) {
   let bufferText = document.getElementById("tagsInput").value
 
   announce("user is saving tag with text [getById]: ", bufferText)
-  // announce("user is saving tag with text [state variable]: ", tagBuffer)
-  // announce("knownTags are [parameter]: ", tagArray)
-  // announce("knownTags are [state variable]: ", knownTags)
 
-  // announce("tag text [function-scope variable]: ", tagToSaveText)
+  // only save tag if there's actual text in the buffer
+  let textWithoutSpaces = bufferText.replace(/\s/g, "")
+  if (textWithoutSpaces.length > 0) {
+    let listOfKnownTags = knownTags
 
-  // console.log("tag buffer: " + tagBuffer)
+    let tagNode = new TagNode(bufferText)
+    tagNode.position = listOfKnownTags.length
+    let tailingTag = listOfKnownTags[listOfKnownTags.length - 1]
+    tailingTag.insertAfter(tagNode)
 
-  let listOfKnownTags = knownTags
+    // save new list of known tags
+    listOfKnownTags.push(tagNode)
+    setKnownTags(listOfKnownTags)
 
-  let tagNode = new TagNode(bufferText)
-  tagNode.position = listOfKnownTags.length
-  let tailingTag = listOfKnownTags[listOfKnownTags.length - 1]
-  tailingTag.insertAfter(tagNode)
-
-  // save new list of known tags
-  listOfKnownTags.push(tagNode)
-  setKnownTags(listOfKnownTags)
-
-  // Note: think is obsolete now that we use components
-  // // re-render as needed
-  // setHtmlWithTags(renderTags(knownTags))
-  // setHtmlProgressBar(renderProgressBar(knownTags))
-
-  // save tag state to the database
-  saveVisibleTags(knownTags, setKnownTags)
+    // save tag state to the database
+    saveVisibleTags(knownTags, setKnownTags)
+  }
 }
 
 function showTag(tagNode) {
