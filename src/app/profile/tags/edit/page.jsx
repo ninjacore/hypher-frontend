@@ -299,7 +299,11 @@ function addTag(knownTags, setKnownTags) {
   saveVisibleTags(knownTags, setKnownTags)
 }
 
-// TODO: check (just copied from v2)
+function showTag(tagNode) {
+  tagNode.isVisible = true
+  document.getElementById(tagNode.id + "-div").style.display = "inline-flex"
+}
+
 function hideTag(tagNode) {
   tagNode.isVisible = false
   document.getElementById(tagNode.id + "-div").style.display = "none"
@@ -461,7 +465,7 @@ function commitTagDeletion(knownTags, setKnownTags) {
   showAddTagButton()
 }
 
-// TODO: check (just copied from v2)
+// TODO: make it work so the tags re-appear
 function cancelStateUpdate(knownTags, setKnownTags) {
   let allTagsToKeep = []
   let numberOfTags = 0
@@ -471,9 +475,11 @@ function cancelStateUpdate(knownTags, setKnownTags) {
     tagNode.isMarkedForDeletion = false
     tagNode.isVisible = true
     tagNode.position = numberOfTags
-
     allTagsToKeep.push(tagNode)
     numberOfTags++
+
+    // DOM manipulation
+    showTag(tagNode)
   })
 
   // render knownTags as they were before the user started editing
