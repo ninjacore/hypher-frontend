@@ -115,7 +115,9 @@ export function BetterTagEditor() {
         <div className="mt-5 flex justify-end">
           <div className="w-2/4 mt-2 mr-6 flex justify-end gap-5">
             {/* passing an event handler down as a prop */}
-            <ButtonsComponent onAddTagClick={() => addTag(knownTags)} />
+            <ButtonsComponent
+              onAddTagClick={() => addTag(knownTags, setKnownTags)}
+            />
           </div>
         </div>
       </h2>
@@ -237,9 +239,9 @@ export function ButtonsComponent({ onAddTagClick }) {
                 type="text"
                 className="col-span-3"
                 // onChange={(e) => setTagBuffer(e.target.value)}
-                onChange={(e) => {
-                  tagToSaveText = e.target.value
-                }}
+                // onChange={(e) => {
+                //   tagToSaveText = e.target.value
+                // }}
               />
             </div>
           </div>
@@ -263,7 +265,7 @@ export function ButtonsComponent({ onAddTagClick }) {
 }
 
 // V-DOM manipulations /.
-function addTag(knownTags) {
+function addTag(knownTags, setKnownTags) {
   let bufferText = document.getElementById("tagsInput").value
 
   announce("user is saving tag with text [getById]: ", bufferText)
@@ -286,12 +288,13 @@ function addTag(knownTags) {
   listOfKnownTags.push(tagNode)
   setKnownTags(listOfKnownTags)
 
-  // re-render as needed
-  setHtmlWithTags(renderTags(knownTags))
-  setHtmlProgressBar(renderProgressBar(knownTags))
+  // Note: think is obsolete now that we use components
+  // // re-render as needed
+  // setHtmlWithTags(renderTags(knownTags))
+  // setHtmlProgressBar(renderProgressBar(knownTags))
 
   // save tag state to the database
-  saveVisibleTags()
+  saveVisibleTags(knownTags, setKnownTags)
 }
 
 // TODO: check (just copied from v2)
@@ -420,7 +423,7 @@ function popVisbileTag(event, tagNode) {
 // TODO: check (just copied from v2)
 // TODO: rewrite so it only saves what is and doesn't update FE (including dependencies)
 // commits the tags to the databse if they are visible to the user
-function saveVisibleTags() {
+function saveVisibleTags(knownTags, setKnownTags) {
   console.table(knownTags)
 
   let tagsToKeep = []
@@ -437,7 +440,9 @@ function saveVisibleTags() {
 
   // TODO: commit change to the database
   console.table(tagsToKeep)
-  return tagsToKeep
+  // return tagsToKeep
+
+  setKnownTags(tagsToKeep)
 }
 
 // TODO: check (just copied from v2)
