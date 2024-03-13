@@ -117,6 +117,8 @@ export function BetterTagEditor() {
             {/* passing an event handler down as a prop */}
             <ButtonsComponent
               onAddTagClick={() => addTag(knownTags, setKnownTags)}
+              knownTags={knownTags}
+              setKnownTags={setKnownTags}
             />
           </div>
         </div>
@@ -178,7 +180,7 @@ export function TagsComponent({ knownTagsList }) {
   }
 }
 
-export function ButtonsComponent({ onAddTagClick }) {
+export function ButtonsComponent({ onAddTagClick, knownTags, setKnownTags }) {
   return (
     <>
       <Button
@@ -186,7 +188,7 @@ export function ButtonsComponent({ onAddTagClick }) {
         variant="outline"
         className="bg-white text-black invisible"
         onClick={() => {
-          saveVisibleTags()
+          saveVisibleTags(knownTags, setKnownTags)
         }}
       >
         SAVE CHANGES
@@ -418,6 +420,10 @@ function popVisbileTag(event, tagNode) {
   showCancelButton()
   hideReorderButton()
   hideAddTagButton()
+}
+
+function markTagForDeletion(tagNode) {
+  tagNode.isMarkedForDeletion = true
 }
 
 // TODO: check (just copied from v2)
