@@ -188,7 +188,7 @@ export function ButtonsComponent({ onAddTagClick, knownTags, setKnownTags }) {
         variant="outline"
         className="bg-white text-black invisible"
         onClick={() => {
-          saveVisibleTags(knownTags, setKnownTags)
+          commitTagDeletion(knownTags, setKnownTags)
         }}
       >
         SAVE CHANGES
@@ -198,7 +198,7 @@ export function ButtonsComponent({ onAddTagClick, knownTags, setKnownTags }) {
         variant="outline"
         className="bg-white text-black invisible"
         onClick={() => {
-          cancelStateUpdate()
+          cancelStateUpdate(knownTags, setKnownTags)
         }}
       >
         CANCEL
@@ -306,12 +306,12 @@ function hideTag(tagNode) {
 }
 
 // TODO: check (just copied from v2)
-function showSaveButton() {
+function showSaveTageStateButton() {
   document.getElementById("saveTagStateButton").classList.remove("invisible")
 }
 
 // TODO: check (just copied from v2)
-function hideSaveButton() {
+function hideSaveTagStateButton() {
   document.getElementById("saveTagStateButton").classList.add("invisible")
 }
 
@@ -416,7 +416,7 @@ function popVisbileTag(event, tagNode) {
   markTagForDeletion(tagNode)
 
   // TODO: show 'save' and 'cancel' buttons
-  showSaveButton()
+  showSaveTageStateButton()
   showCancelButton()
   hideReorderButton()
   hideAddTagButton()
@@ -451,8 +451,18 @@ function saveVisibleTags(knownTags, setKnownTags) {
   setKnownTags(tagsToKeep)
 }
 
+function commitTagDeletion(knownTags, setKnownTags) {
+  saveVisibleTags(knownTags, setKnownTags)
+
+  // reset view to default
+  hideSaveTagStateButton()
+  hideCancelButton()
+  showReorderButton()
+  showAddTagButton()
+}
+
 // TODO: check (just copied from v2)
-function cancelStateUpdate() {
+function cancelStateUpdate(knownTags, setKnownTags) {
   let allTagsToKeep = []
   let numberOfTags = 0
 
@@ -471,12 +481,16 @@ function cancelStateUpdate() {
   // setHtmlWithTags(renderTags(allTagsToKeep))
 
   // hide 'save' and 'cancel' buttons
-  hideSaveButton()
+  hideSaveTagStateButton()
   hideCancelButton()
   showReorderButton()
   showAddTagButton()
 
-  return allTagsToKeep
+  announce("keeping all tags: ", allTagsToKeep)
+  console.table(allTagsToKeep)
+
+  // return allTagsToKeep
+  setKnownTags(allTagsToKeep)
 }
 // Mixed V-DOM & data manipulations ./
 
