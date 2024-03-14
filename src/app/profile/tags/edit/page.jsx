@@ -24,24 +24,20 @@ import {
 export default function Page() {
   return (
     <div>
-      <BetterTagEditor />
+      <TagEditor />
     </div>
   )
 }
 
-// TODO: make main component
-export function BetterTagEditor() {
+export function TagEditor() {
   // state variables
   const [knownTagsAsString, setKnownTagsAsString] = useState("")
   const [tagsLoadedFromSource, setTagsLoadedFromSource] = useState(false)
 
   const [knownTags, setKnownTags] = useState([])
-  const [tagBuffer, setTagBuffer] = useState("") // TODO: check if obsolete
-  let tagToSaveText = "" // TODO: check if obsolete
 
   // Effect hooks /.
 
-  // TODO: check (just copied from v2)
   // load tags from API
   useEffect(() => {
     loadTagsFromAPI().then((tags) => {
@@ -50,11 +46,9 @@ export function BetterTagEditor() {
     })
   }, [])
 
-  // TODO: check (just copied from v2)
   // turn tags into TagNodes
   useEffect(() => {
     if (tagsLoadedFromSource && knownTagsAsString.length > 0) {
-      // for testing
       announce("string of tags got some values", knownTagsAsString)
 
       let tagNodesListed = turnTagsIntoTagNodes(knownTagsAsString)
@@ -65,43 +59,15 @@ export function BetterTagEditor() {
     }
   }, [tagsLoadedFromSource])
 
-  // TODO: check (just copied from v2)
-  // render html components with data
+  // for debugging
   useEffect(() => {
     if (knownTags.length > 0) {
       // for testing
       announce("populated tag nodes", knownTags)
-
-      // // renderButtons()
-      // setHtmlWithTags(renderTags(knownTags))
-      // setHtmlProgressBar(renderProgressBar(knownTags))
-      // setHtmlButtons(renderButtons())
-
-      // // TODO: check if obsolete
-      // setHtmlFullInnerPage(
-      //   renderFullInnerPage(htmlWithTags, htmlProgressBar, htmlButtons)
-      // )
-
-      // renderFullInnerPage(htmlWithTags, htmlProgressBar, htmlButtons)
     } else {
       announce("knownTags is empty", knownTags)
     }
-
-    // do something with those known tags like rendering the innerHTML
-    // const htmlWithTags = renderTags(knownTags)
   }, [knownTags])
-
-  // TODO: check (just copied from v2)
-  // // on user interactions
-  // useEffect(() => {
-  //   // TODO: check if progress bar updates, otherwise:
-  //   //       setHtmlProgressBar(renderProgressBar(knownTags))
-
-  //   setHtmlFullInnerPage(
-  //     renderFullInnerPage(htmlWithTags, htmlProgressBar, htmlButtons)
-  //   )
-  // }, [htmlWithTags, htmlProgressBar, htmlButtons])
-
   // Effect hooks ./
 
   return (
@@ -236,26 +202,12 @@ export function ButtonsComponent({ onAddTagClick, knownTags, setKnownTags }) {
               <Label htmlFor="featuredTitle" className="text-right">
                 Title
               </Label>
-              <Input
-                id="tagsInput"
-                type="text"
-                className="col-span-3"
-                // onChange={(e) => setTagBuffer(e.target.value)}
-                // onChange={(e) => {
-                //   tagToSaveText = e.target.value
-                // }}
-              />
+              <Input id="tagsInput" type="text" className="col-span-3" />
             </div>
           </div>
           <DialogFooter>
             <DialogClose>
-              <Button
-                type="submit"
-                // onClick={(e) => {
-                //   addTag(tagToSaveText)
-                // }}
-                onClick={onAddTagClick}
-              >
+              <Button type="submit" onClick={onAddTagClick}>
                 Save
               </Button>
             </DialogClose>
@@ -270,6 +222,7 @@ export function ButtonsComponent({ onAddTagClick, knownTags, setKnownTags }) {
 function addTag(knownTags, setKnownTags) {
   let bufferText = document.getElementById("tagsInput").value
 
+  // for debugginc
   announce("user is saving tag with text [getById]: ", bufferText)
 
   // only save tag if there's actual text in the buffer
@@ -301,44 +254,36 @@ function hideTag(tagNode) {
   document.getElementById(tagNode.id + "-div").style.display = "none"
 }
 
-// TODO: check (just copied from v2)
 function showSaveTageStateButton() {
   document.getElementById("saveTagStateButton").classList.remove("invisible")
 }
 
-// TODO: check (just copied from v2)
 function hideSaveTagStateButton() {
   document.getElementById("saveTagStateButton").classList.add("invisible")
 }
 
-// TODO: check (just copied from v2)
 function showCancelButton() {
   document
     .getElementById("cancelStateUpdateButton")
     .classList.remove("invisible")
 }
 
-// TODO: check (just copied from v2)
 function hideCancelButton() {
   document.getElementById("cancelStateUpdateButton").classList.add("invisible")
 }
 
-// TODO: check (just copied from v2)
 function showReorderButton() {
   document.getElementById("reorderTagsButton").classList.remove("invisible")
 }
 
-// TODO: check (just copied from v2)
 function hideReorderButton() {
   document.getElementById("reorderTagsButton").classList.add("invisible")
 }
 
-// TODO: check (just copied from v2)
 function showAddTagButton() {
   document.getElementById("addTagsButton").classList.remove("invisible")
 }
 
-// TODO: check (just copied from v2)
 function hideAddTagButton() {
   document.getElementById("addTagsButton").classList.add("invisible")
 }
@@ -346,7 +291,6 @@ function hideAddTagButton() {
 // V-DOM manipulations ./
 
 // Data functions /.
-// TODO: check (just copied from v2)
 function loadTagsFromAPI() {
   // TODO: get user tag by serving endpoint and having it as a query parameter
   let handle = "dnt.is"
@@ -404,7 +348,6 @@ function saveTagsToAPI(newTagsAsString) {
     })
 }
 
-// TODO: check (just copied from v2)
 function turnTagsIntoTagNodes(tags) {
   // split tags into array
   let tagsArray = tags.split(", ")
@@ -432,7 +375,6 @@ function turnTagsIntoTagNodes(tags) {
 // Data functions ./
 
 // Mixed V-DOM & data manipulations /.
-// TODO: check (just copied from v2)
 function popVisbileTag(event, tagNode) {
   let tagNodeId = event.target.getAttribute("data-tag-id")
 
@@ -452,8 +394,6 @@ function markTagForDeletion(tagNode) {
   tagNode.isMarkedForDeletion = true
 }
 
-// TODO: check (just copied from v2)
-// TODO: rewrite so it only saves what is and doesn't update FE (including dependencies)
 // commits the tags to the databse if they are visible to the user
 function saveVisibleTags(knownTags, setKnownTags) {
   console.table(knownTags)
@@ -499,7 +439,6 @@ function commitTagDeletion(knownTags, setKnownTags) {
   showAddTagButton()
 }
 
-// TODO: make it work so the tags re-appear
 function cancelStateUpdate(knownTags, setKnownTags) {
   let allTagsToKeep = []
   let numberOfTags = 0
@@ -516,10 +455,6 @@ function cancelStateUpdate(knownTags, setKnownTags) {
     showTag(tagNode)
   })
 
-  // render knownTags as they were before the user started editing
-  // renderTags(knownTags)
-  // setHtmlWithTags(renderTags(allTagsToKeep))
-
   // hide 'save' and 'cancel' buttons
   hideSaveTagStateButton()
   hideCancelButton()
@@ -529,7 +464,6 @@ function cancelStateUpdate(knownTags, setKnownTags) {
   announce("keeping all tags: ", allTagsToKeep)
   console.table(allTagsToKeep)
 
-  // return allTagsToKeep
   setKnownTags(allTagsToKeep)
 }
 // Mixed V-DOM & data manipulations ./
