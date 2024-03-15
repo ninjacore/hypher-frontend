@@ -17,11 +17,30 @@ import {
 
 import { SortableItem } from "./SortableItem"
 
+import { Button } from "@/components/ui/button"
+
 export default function Page() {
   return (
     <>
       <h2 className="text-xl font-bold mx-1 mt-2 mb-4">Sort Your Tags</h2>
       <DnD />
+      <a href="/profile/tags/edit">
+        <Button
+          id="cancelReorderButton"
+          variant="outline"
+          className="bg-white text-black"
+        >
+          CANCEL
+        </Button>
+      </a>
+
+      <Button
+        id="saveReorderedTagsButton"
+        variant="outline"
+        className="bg-white text-black"
+      >
+        SAVE
+      </Button>
     </>
   )
 }
