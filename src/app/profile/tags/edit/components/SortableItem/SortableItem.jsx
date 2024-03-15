@@ -15,8 +15,14 @@ function SortableItem(props) {
   }
 
   return (
-    <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      <span>{props.text}</span>
+    <div
+      ref={setNodeRef}
+      style={style}
+      {...attributes}
+      {...listeners}
+      className="flex mx-1.5 my-1 px-3 py-0.45 rounded text-sm font-medium bg-white text-black w-fit my-2"
+    >
+      <span className="">{props.text}</span>
     </div>
   )
 }
