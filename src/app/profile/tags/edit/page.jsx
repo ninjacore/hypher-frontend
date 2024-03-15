@@ -93,9 +93,19 @@ export function TagEditor() {
   // 'reorder tags' mode
   if (tagsAreSortable) {
     return (
-      <>
-        <SortableTags setTagsAreSortable={setTagsAreSortable} />
-      </>
+      <div className="mx-1">
+        <ProgressBarComponent knownTags={knownTags} />
+        <h2 className="mb-2">
+          <strong>Your Tags</strong>
+        </h2>
+
+        <SortableTags />
+        <div className="mt-5 flex justify-end">
+          <div className="w-2/4 mt-2 mr-6 flex justify-end gap-5">
+            <TagsSortModeButons setTagsAreSortable={setTagsAreSortable} />
+          </div>
+        </div>
+      </div>
     )
   } else {
     return (
@@ -103,21 +113,22 @@ export function TagEditor() {
         <ProgressBarComponent knownTags={knownTags} />
         <h2 className="mb-2">
           <strong>Your Tags</strong>
-          <div>
-            <TagsComponent knownTagsList={knownTags} />
-          </div>
-          <div className="mt-5 flex justify-end">
-            <div className="w-2/4 mt-2 mr-6 flex justify-end gap-5">
-              {/* passing an event handler down as a prop */}
-              <ButtonsComponent
-                onAddTagClick={() => addTag(knownTags, setKnownTags)}
-                knownTags={knownTags}
-                setKnownTags={setKnownTags}
-                setTagsAreSortable={setTagsAreSortable}
-              />
-            </div>
-          </div>
         </h2>
+
+        <div>
+          <TagsComponent knownTagsList={knownTags} />
+        </div>
+        <div className="mt-5 flex justify-end">
+          <div className="w-2/4 mt-2 mr-6 flex justify-end gap-5">
+            {/* passing an event handler down as a prop */}
+            <TagEditModeButtons
+              onAddTagClick={() => addTag(knownTags, setKnownTags)}
+              knownTags={knownTags}
+              setKnownTags={setKnownTags}
+              setTagsAreSortable={setTagsAreSortable}
+            />
+          </div>
+        </div>
       </div>
     )
   }
@@ -176,7 +187,7 @@ export function TagsComponent({ knownTagsList }) {
   }
 }
 
-export function ButtonsComponent({
+export function TagEditModeButtons({
   onAddTagClick,
   knownTags,
   setKnownTags,
@@ -256,29 +267,11 @@ export function ButtonsComponent({
   )
 }
 
-export function SortableTags({ knownTagsList, setTagsAreSortable }) {
+export function SortableTags() {
   return (
     <>
-      <h2 className="text-xl font-bold mx-1 mt-2 mb-4">Sort Your Tags</h2>
+      {/* <h2 className="text-xl font-bold mx-1 mt-2 mb-4">Sort Your Tags</h2> */}
       <DnD />
-      <Button
-        id="cancelReorderButton"
-        variant="outline"
-        className="bg-white text-black"
-        onClick={() => {
-          setTagsAreSortable(false)
-        }}
-      >
-        CANCEL
-      </Button>
-
-      <Button
-        id="saveReorderedTagsButton"
-        variant="outline"
-        className="bg-white text-black"
-      >
-        SAVE
-      </Button>
     </>
   )
 }
@@ -328,6 +321,31 @@ export function DnD() {
       })
     }
   }
+}
+
+export function TagsSortModeButons({ knownTagsList, setTagsAreSortable }) {
+  return (
+    <>
+      <Button
+        id="cancelReorderButton"
+        variant="outline"
+        className="bg-white text-black"
+        onClick={() => {
+          setTagsAreSortable(false)
+        }}
+      >
+        CANCEL
+      </Button>
+
+      <Button
+        id="saveReorderedTagsButton"
+        variant="outline"
+        className="bg-white text-black"
+      >
+        SAVE
+      </Button>
+    </>
+  )
 }
 
 // V-DOM manipulations /.
