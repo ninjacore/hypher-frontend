@@ -96,8 +96,9 @@ export function TagEditor() {
       <div className="mx-1">
         <ProgressBarComponent knownTags={knownTags} />
         <h2 className="mb-2">
-          <strong>Your Tags</strong>
+          <strong>Your Tag Order</strong>
         </h2>
+        <p>Pick up a tag to change its position in the order.</p>
 
         <SortableTags knownTags={knownTags} />
         <div className="mt-5 flex justify-end">
@@ -279,6 +280,8 @@ export function SortableTags({ knownTags }) {
 
 export function DnD({ knownTags }) {
   // const [items, setItems] = useState([1, 2, 3, 4])
+
+  // TODO: fully understand this mapping, maybe change it
   const [items, setItems] = useState(knownTags.map((tagNode) => tagNode.text))
   // const [items, setItems] = useState(knownTags.map((tagNode) => tagNode.text))
 
@@ -293,6 +296,7 @@ export function DnD({ knownTags }) {
 
   let counter = 0
 
+  // TODO: better variable(-names)
   return (
     <DndContext
       sensors={sensors}
@@ -311,6 +315,7 @@ export function DnD({ knownTags }) {
     </DndContext>
   )
 
+  // TODO: do something with the knownTags array here
   function handleDragEnd(event) {
     const { active, over } = event
 
