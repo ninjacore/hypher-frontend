@@ -99,7 +99,7 @@ export function TagEditor() {
           <strong>Your Tags</strong>
         </h2>
 
-        <SortableTags />
+        <SortableTags knownTags={knownTags} />
         <div className="mt-5 flex justify-end">
           <div className="w-2/4 mt-2 mr-6 flex justify-end gap-5">
             <TagsSortModeButons setTagsAreSortable={setTagsAreSortable} />
@@ -267,17 +267,21 @@ export function TagEditModeButtons({
   )
 }
 
-export function SortableTags() {
+export function SortableTags({ knownTags }) {
+  announce("rendering sortable tags", knownTags)
   return (
     <>
       {/* <h2 className="text-xl font-bold mx-1 mt-2 mb-4">Sort Your Tags</h2> */}
-      <DnD />
+      <DnD knownTags={knownTags} />
     </>
   )
 }
 
-export function DnD() {
-  const [items, setItems] = useState([1, 2, 3, 4])
+export function DnD({ knownTags }) {
+  // const [items, setItems] = useState([1, 2, 3, 4])
+  const [items, setItems] = useState(knownTags.map((tagNode) => tagNode.text))
+  // const [items, setItems] = useState(knownTags.map((tagNode) => tagNode.text))
+
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -297,13 +301,11 @@ export function DnD() {
       id={uniqueId}
     >
       <SortableContext items={items} strategy={verticalListSortingStrategy}>
-        {items.map((id) => {
-          // id = useId()
-          console.log("round #" + counter + " id is: " + id)
-          // let betterId = "DndDescribedBy-" + counter
+        {items.map((tagNode) => {
+          console.log("round #" + counter + " id is: " + tagNode)
           counter++
 
-          return <SortableItem key={id} id={id} />
+          return <SortableItem key={tagNode} id={tagNode} text={tagNode} />
         })}
       </SortableContext>
     </DndContext>
