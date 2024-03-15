@@ -1,5 +1,5 @@
 "use client"
-import React, { use, useEffect, useState } from "react"
+import React, { useId, useEffect, useState } from "react"
 
 import { TagNode } from "@/app/profile/tags/components/TagNode/TagNode"
 
@@ -21,6 +21,25 @@ import {
   DialogClose,
 } from "@/components/ui/dialog"
 
+// imports for sorting functionality /.
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core"
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable"
+
+import { SortableItem } from "./components/SortableItem/SortableItem"
+// imports for sorting functionality ./
+
 export default function Page() {
   return (
     <div>
@@ -33,8 +52,9 @@ export function TagEditor() {
   // state variables
   const [knownTagsAsString, setKnownTagsAsString] = useState("")
   const [tagsLoadedFromSource, setTagsLoadedFromSource] = useState(false)
-
   const [knownTags, setKnownTags] = useState([])
+
+  const [tagsAreSortable, setTagsAreSortable] = useState(false)
 
   // Effect hooks /.
 
@@ -70,27 +90,48 @@ export function TagEditor() {
   }, [knownTags])
   // Effect hooks ./
 
-  return (
-    <div className="mx-1">
-      <ProgressBarComponent knownTags={knownTags} />
-      <h2 className="mb-2">
-        <strong>Your Tags</strong>
+  // 'reorder tags' mode
+  if (tagsAreSortable) {
+    return (
+      <div className="mx-1">
+        <ProgressBarComponent knownTags={knownTags} />
+        <h2 className="mb-2">
+          <strong>Your Tags</strong>
+        </h2>
+
+        <SortableTags knownTags={knownTags} />
+        <div className="mt-5 flex justify-end">
+          <div className="w-2/4 mt-2 mr-6 flex justify-end gap-5">
+            <TagsSortModeButons setTagsAreSortable={setTagsAreSortable} />
+          </div>
+        </div>
+      </div>
+    )
+  } else {
+    return (
+      <div className="mx-1">
+        <ProgressBarComponent knownTags={knownTags} />
+        <h2 className="mb-2">
+          <strong>Your Tags</strong>
+        </h2>
+
         <div>
           <TagsComponent knownTagsList={knownTags} />
         </div>
         <div className="mt-5 flex justify-end">
           <div className="w-2/4 mt-2 mr-6 flex justify-end gap-5">
             {/* passing an event handler down as a prop */}
-            <ButtonsComponent
+            <TagEditModeButtons
               onAddTagClick={() => addTag(knownTags, setKnownTags)}
               knownTags={knownTags}
               setKnownTags={setKnownTags}
+              setTagsAreSortable={setTagsAreSortable}
             />
           </div>
         </div>
-      </h2>
-    </div>
-  )
+      </div>
+    )
+  }
 }
 
 export function ProgressBarComponent({ knownTags }) {
@@ -146,7 +187,12 @@ export function TagsComponent({ knownTagsList }) {
   }
 }
 
-export function ButtonsComponent({ onAddTagClick, knownTags, setKnownTags }) {
+export function TagEditModeButtons({
+  onAddTagClick,
+  knownTags,
+  setKnownTags,
+  setTagsAreSortable,
+}) {
   return (
     <>
       <Button
@@ -173,6 +219,9 @@ export function ButtonsComponent({ onAddTagClick, knownTags, setKnownTags }) {
         id="reorderTagsButton"
         variant="outline"
         className="bg-white text-black"
+        onClick={() => {
+          setTagsAreSortable(true)
+        }}
       >
         REORDER
       </Button>
@@ -214,6 +263,89 @@ export function ButtonsComponent({ onAddTagClick, knownTags, setKnownTags }) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+    </>
+  )
+}
+
+export function SortableTags({ knownTags }) {
+  announce("rendering sortable tags", knownTags)
+  return (
+    <>
+      {/* <h2 className="text-xl font-bold mx-1 mt-2 mb-4">Sort Your Tags</h2> */}
+      <DnD knownTags={knownTags} />
+    </>
+  )
+}
+
+export function DnD({ knownTags }) {
+  // const [items, setItems] = useState([1, 2, 3, 4])
+  const [items, setItems] = useState(knownTags.map((tagNode) => tagNode.text))
+  // const [items, setItems] = useState(knownTags.map((tagNode) => tagNode.text))
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
+
+  const uniqueId = useId()
+
+  let counter = 0
+
+  return (
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragEnd={handleDragEnd}
+      id={uniqueId}
+    >
+      <SortableContext items={items} strategy={verticalListSortingStrategy}>
+        {items.map((tagNode) => {
+          console.log("round #" + counter + " id is: " + tagNode)
+          counter++
+
+          return <SortableItem key={tagNode} id={tagNode} text={tagNode} />
+        })}
+      </SortableContext>
+    </DndContext>
+  )
+
+  function handleDragEnd(event) {
+    const { active, over } = event
+
+    if (active.id !== over.id) {
+      setItems((items) => {
+        const oldIndex = items.indexOf(active.id)
+        const newIndex = items.indexOf(over.id)
+
+        return arrayMove(items, oldIndex, newIndex)
+      })
+    }
+  }
+}
+
+export function TagsSortModeButons({ knownTagsList, setTagsAreSortable }) {
+  return (
+    <>
+      <Button
+        id="cancelReorderButton"
+        variant="outline"
+        className="bg-white text-black"
+        onClick={() => {
+          setTagsAreSortable(false)
+        }}
+      >
+        CANCEL
+      </Button>
+
+      <Button
+        id="saveReorderedTagsButton"
+        variant="outline"
+        className="bg-white text-black"
+      >
+        SAVE
+      </Button>
     </>
   )
 }
