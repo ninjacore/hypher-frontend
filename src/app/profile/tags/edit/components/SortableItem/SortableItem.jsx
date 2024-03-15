@@ -16,7 +16,6 @@ function SortableItem(props) {
 
   return (
     <div ref={setNodeRef} style={style} {...attributes} {...listeners}>
-      {/* ... */}
       <span>Item {props.id}</span>
     </div>
   )
