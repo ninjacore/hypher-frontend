@@ -101,20 +101,13 @@ export function TagEditor() {
         </h2>
         <p>Pick up a tag to change its position in the order.</p>
 
-        <SortableTags
-          knownTags={knownTags}
-          setKnownTags={setKnownTags}
-          sortedTags={sortedTags}
-          setSortedTags={setSortedTags}
-        />
+        <SortableTags knownTags={knownTags} setSortedTags={setSortedTags} />
         <div className="mt-5 flex justify-end">
           <div className="w-2/4 mt-2 mr-6 flex justify-end gap-5">
             <TagsSortModeButons
-              knownTags={knownTags}
               setKnownTags={setKnownTags}
               setTagsAreSortable={setTagsAreSortable}
               sortedTags={sortedTags}
-              setSortedTags={setSortedTags}
             />
           </div>
         </div>
@@ -280,30 +273,18 @@ export function TagEditModeButtons({
   )
 }
 
-export function SortableTags({
-  knownTags,
-  setKnownTags,
-  sortedTags,
-  setSortedTags,
-}) {
+export function SortableTags({ knownTags, setSortedTags }) {
   announce("rendering sortable tags", knownTags)
   return (
     <>
       {/* <h2 className="text-xl font-bold mx-1 mt-2 mb-4">Sort Your Tags</h2> */}
-      <DnD
-        knownTags={knownTags}
-        setKnownTags={setKnownTags}
-        sortedTags={sortedTags}
-        setSortedTags={setSortedTags}
-      />
+      <DnD knownTags={knownTags} setSortedTags={setSortedTags} />
     </>
   )
 }
 
-export function DnD({ knownTags, setKnownTags, sortedTags, setSortedTags }) {
-  // const [items, setItems] = useState([1, 2, 3, 4])
-
-  // abstraction of knownTags - perhaps should be
+export function DnD({ knownTags, setSortedTags }) {
+  // abstraction of knownTags - perhaps should use context API instead
   const [tagNodes, setTagNodes] = useState(knownTags.map((tagNode) => tagNode))
 
   const sensors = useSensors(
@@ -327,7 +308,6 @@ export function DnD({ knownTags, setKnownTags, sortedTags, setSortedTags }) {
       sensors={sensors}
       collisionDetection={closestCenter}
       onDragEnd={handleDragEnd}
-      // onDragEnd={(e) => handleDragEnd(e, tagNodes)}
       id={uniqueId}
     >
       <SortableContext items={tagNodes} strategy={verticalListSortingStrategy}>
@@ -358,26 +338,20 @@ export function DnD({ knownTags, setKnownTags, sortedTags, setSortedTags }) {
 
     if (active.id !== over.id) {
       setTagNodes((items) => {
-        // const oldIndex = items.indexOf(active.id)
         const oldIndex = items.map((tagNode) => tagNode.id).indexOf(active.id)
 
-        // const newIndex = items.indexOf(over.id)
         const newIndex = items.map((tagNode) => tagNode.id).indexOf(over.id)
 
-        let newlyOrderedArray = arrayMove(items, oldIndex, newIndex)
-        announce("newlyOrderedArray", newlyOrderedArray)
-        return newlyOrderedArray
+        return arrayMove(items, oldIndex, newIndex)
       })
     }
   }
 }
 
 export function TagsSortModeButons({
-  knownTags,
   setKnownTags,
   setTagsAreSortable,
   sortedTags,
-  setSortedTags,
 }) {
   return (
     <>
@@ -397,13 +371,7 @@ export function TagsSortModeButons({
         variant="outline"
         className="bg-white text-black"
         onClick={() => {
-          commitTagReordering(
-            knownTags,
-            setKnownTags,
-            sortedTags,
-            setSortedTags,
-            setTagsAreSortable
-          )
+          commitTagReordering(setKnownTags, sortedTags, setTagsAreSortable)
         }}
       >
         SAVE
@@ -577,7 +545,7 @@ function popVisbileTag(event, tagNode) {
   hideTag(tagNode)
   markTagForDeletion(tagNode)
 
-  // TODO: show 'save' and 'cancel' buttons
+  // only show actions that make sense
   showSaveTageStateButton()
   showCancelButton()
   hideReorderButton()
@@ -633,17 +601,13 @@ function commitTagDeletion(knownTags, setKnownTags) {
   showAddTagButton()
 }
 
-function commitTagReordering(
-  knownTags,
-  setKnownTags,
-  sortedTags,
-  setSortedTags,
-  setTagsAreSortable
-) {
+function commitTagReordering(setKnownTags, sortedTags, setTagsAreSortable) {
   setKnownTags(sortedTags)
 
-  // TODO: commit change to the database
+  // reset view
   setTagsAreSortable(false)
+
+  // commit change to the database
   saveVisibleTags(sortedTags, setKnownTags)
 }
 
