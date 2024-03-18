@@ -281,9 +281,8 @@ export function SortableTags({ knownTags }) {
 export function DnD({ knownTags }) {
   // const [items, setItems] = useState([1, 2, 3, 4])
 
-  // TODO: fully understand this mapping, maybe change it
-  const [items, setItems] = useState(knownTags.map((tagNode) => tagNode.text))
-  // const [items, setItems] = useState(knownTags.map((tagNode) => tagNode.text))
+  // abstraction of knownTags - perhaps should be
+  const [tagNodes, setTagNodes] = useState(knownTags.map((tagNode) => tagNode))
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -296,35 +295,51 @@ export function DnD({ knownTags }) {
 
   let counter = 0
 
-  // TODO: better variable(-names)
   return (
     <DndContext
       sensors={sensors}
       collisionDetection={closestCenter}
       onDragEnd={handleDragEnd}
+      // onDragEnd={(e) => handleDragEnd(e, tagNodes)}
       id={uniqueId}
     >
-      <SortableContext items={items} strategy={verticalListSortingStrategy}>
-        {items.map((tagNode) => {
-          console.log("round #" + counter + " id is: " + tagNode)
+      <SortableContext items={tagNodes} strategy={verticalListSortingStrategy}>
+        {tagNodes.map((tagNode) => {
+          console.log("round #" + counter + " id is: " + tagNode.id)
           counter++
 
-          return <SortableItem key={tagNode} id={tagNode} text={tagNode} />
+          return (
+            <SortableItem
+              key={tagNode.id}
+              id={tagNode.id}
+              text={tagNode.text}
+            />
+          )
         })}
       </SortableContext>
     </DndContext>
   )
 
-  // TODO: do something with the knownTags array here
   function handleDragEnd(event) {
+    announce("handleDragEnd", event)
+    announce("known Tags:", knownTags)
+
     const { active, over } = event
 
-    if (active.id !== over.id) {
-      setItems((items) => {
-        const oldIndex = items.indexOf(active.id)
-        const newIndex = items.indexOf(over.id)
+    console.log(`%c active.id => ${active.id}`, `color: green;`)
+    console.log(`%c over.id => ${over.id}`, `color: green;`)
 
-        return arrayMove(items, oldIndex, newIndex)
+    if (active.id !== over.id) {
+      setTagNodes((items) => {
+        // const oldIndex = items.indexOf(active.id)
+        const oldIndex = items.map((tagNode) => tagNode.id).indexOf(active.id)
+
+        // const newIndex = items.indexOf(over.id)
+        const newIndex = items.map((tagNode) => tagNode.id).indexOf(over.id)
+
+        let newlyOrderedArray = arrayMove(items, oldIndex, newIndex)
+        announce("newlyOrderedArray", newlyOrderedArray)
+        return newlyOrderedArray
       })
     }
   }

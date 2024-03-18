@@ -8,6 +8,8 @@ import { CSS } from "@dnd-kit/utilities"
 function SortableItem(props) {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: props.id })
+  // The argument passed to the id argument of useSortable should match
+  // the id passed in the items array of the parent SortableContext provider.
 
   const style = {
     transform: CSS.Transform.toString(transform),
