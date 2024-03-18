@@ -84,7 +84,7 @@ export default function Layout({
             <div className="mt-2 px-1">
               <hr className="border-gray-400 border-t-2" />
             </div>
-            <a href="/profile/tags/edit">
+            <a href={"/profile/" + getProfileHandle() + "/tags/edit"}>
               <div className="mt-2 group/edit">
                 {tags}
                 <EditButton />
@@ -126,4 +126,12 @@ export default function Layout({
       </Card>
     </>
   )
+}
+
+function getProfileHandle() {
+  // get handle from url of this page
+  const url = window.location.href
+  const profileHandle = url.split("/").pop()
+
+  return profileHandle
 }
