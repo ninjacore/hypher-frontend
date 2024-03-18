@@ -84,10 +84,12 @@ export default function Layout({
             <div className="mt-2 px-1">
               <hr className="border-gray-400 border-t-2" />
             </div>
-            <div className="mt-2 group/edit">
-              {tags}
-              <EditButton />
-            </div>
+            <a href="/profile/tags/edit">
+              <div className="mt-2 group/edit">
+                {tags}
+                <EditButton />
+              </div>
+            </a>
           </CardContent>
         </Card>
         <Card className="mb-6">

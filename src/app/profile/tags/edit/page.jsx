@@ -55,6 +55,7 @@ export function TagEditor() {
   const [knownTags, setKnownTags] = useState([])
 
   const [tagsAreSortable, setTagsAreSortable] = useState(false)
+  const [sortedTags, setSortedTags] = useState([])
 
   // Effect hooks /.
 
@@ -100,10 +101,14 @@ export function TagEditor() {
         </h2>
         <p>Pick up a tag to change its position in the order.</p>
 
-        <SortableTags knownTags={knownTags} />
+        <SortableTags knownTags={knownTags} setSortedTags={setSortedTags} />
         <div className="mt-5 flex justify-end">
           <div className="w-2/4 mt-2 mr-6 flex justify-end gap-5">
-            <TagsSortModeButons setTagsAreSortable={setTagsAreSortable} />
+            <TagsSortModeButons
+              setKnownTags={setKnownTags}
+              setTagsAreSortable={setTagsAreSortable}
+              sortedTags={sortedTags}
+            />
           </div>
         </div>
       </div>
@@ -268,22 +273,19 @@ export function TagEditModeButtons({
   )
 }
 
-export function SortableTags({ knownTags }) {
+export function SortableTags({ knownTags, setSortedTags }) {
   announce("rendering sortable tags", knownTags)
   return (
     <>
       {/* <h2 className="text-xl font-bold mx-1 mt-2 mb-4">Sort Your Tags</h2> */}
-      <DnD knownTags={knownTags} />
+      <DnD knownTags={knownTags} setSortedTags={setSortedTags} />
     </>
   )
 }
 
-export function DnD({ knownTags }) {
-  // const [items, setItems] = useState([1, 2, 3, 4])
-
-  // TODO: fully understand this mapping, maybe change it
-  const [items, setItems] = useState(knownTags.map((tagNode) => tagNode.text))
-  // const [items, setItems] = useState(knownTags.map((tagNode) => tagNode.text))
+export function DnD({ knownTags, setSortedTags }) {
+  // abstraction of knownTags - perhaps should use context API instead
+  const [tagNodes, setTagNodes] = useState(knownTags.map((tagNode) => tagNode))
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -292,11 +294,15 @@ export function DnD({ knownTags }) {
     })
   )
 
+  // up-drill every time reorder happens
+  useEffect(() => {
+    setSortedTags(tagNodes)
+  }, [tagNodes])
+
   const uniqueId = useId()
 
   let counter = 0
 
-  // TODO: better variable(-names)
   return (
     <DndContext
       sensors={sensors}
@@ -304,25 +310,37 @@ export function DnD({ knownTags }) {
       onDragEnd={handleDragEnd}
       id={uniqueId}
     >
-      <SortableContext items={items} strategy={verticalListSortingStrategy}>
-        {items.map((tagNode) => {
-          console.log("round #" + counter + " id is: " + tagNode)
+      <SortableContext items={tagNodes} strategy={verticalListSortingStrategy}>
+        {tagNodes.map((tagNode) => {
+          console.log("round #" + counter + " id is: " + tagNode.id)
           counter++
 
-          return <SortableItem key={tagNode} id={tagNode} text={tagNode} />
+          return (
+            <SortableItem
+              key={tagNode.id}
+              id={tagNode.id}
+              text={tagNode.text}
+            />
+          )
         })}
       </SortableContext>
     </DndContext>
   )
 
-  // TODO: do something with the knownTags array here
   function handleDragEnd(event) {
+    announce("handleDragEnd", event)
+    announce("known Tags:", knownTags)
+
     const { active, over } = event
 
+    console.log(`%c active.id => ${active.id}`, `color: green;`)
+    console.log(`%c over.id => ${over.id}`, `color: green;`)
+
     if (active.id !== over.id) {
-      setItems((items) => {
-        const oldIndex = items.indexOf(active.id)
-        const newIndex = items.indexOf(over.id)
+      setTagNodes((items) => {
+        const oldIndex = items.map((tagNode) => tagNode.id).indexOf(active.id)
+
+        const newIndex = items.map((tagNode) => tagNode.id).indexOf(over.id)
 
         return arrayMove(items, oldIndex, newIndex)
       })
@@ -330,7 +348,11 @@ export function DnD({ knownTags }) {
   }
 }
 
-export function TagsSortModeButons({ knownTagsList, setTagsAreSortable }) {
+export function TagsSortModeButons({
+  setKnownTags,
+  setTagsAreSortable,
+  sortedTags,
+}) {
   return (
     <>
       <Button
@@ -348,6 +370,9 @@ export function TagsSortModeButons({ knownTagsList, setTagsAreSortable }) {
         id="saveReorderedTagsButton"
         variant="outline"
         className="bg-white text-black"
+        onClick={() => {
+          commitTagReordering(setKnownTags, sortedTags, setTagsAreSortable)
+        }}
       >
         SAVE
       </Button>
@@ -520,7 +545,7 @@ function popVisbileTag(event, tagNode) {
   hideTag(tagNode)
   markTagForDeletion(tagNode)
 
-  // TODO: show 'save' and 'cancel' buttons
+  // only show actions that make sense
   showSaveTageStateButton()
   showCancelButton()
   hideReorderButton()
@@ -574,6 +599,16 @@ function commitTagDeletion(knownTags, setKnownTags) {
   hideCancelButton()
   showReorderButton()
   showAddTagButton()
+}
+
+function commitTagReordering(setKnownTags, sortedTags, setTagsAreSortable) {
+  setKnownTags(sortedTags)
+
+  // reset view
+  setTagsAreSortable(false)
+
+  // commit change to the database
+  saveVisibleTags(sortedTags, setKnownTags)
 }
 
 function cancelStateUpdate(knownTags, setKnownTags) {
