@@ -23,12 +23,12 @@ import { Card } from "@/components/ui/card"
 export default function Page() {
   return (
     <Profile>
-      <EditableLinkCollection />
+      <EditableLinkCollectionWithContext />
     </Profile>
   )
 }
 
-function EditableLinkCollection() {
+function EditableLinkCollectionWithContext() {
   const sectionTitle = "LET'S CONNECT"
 
   const profile = useContext(ProfileContext)
@@ -43,6 +43,35 @@ function EditableLinkCollection() {
   console.log("linkedCollection.contentBox=")
   console.table(linkedCollection.contentBox)
 
+  // new state variables
+  // const [linkCollectionIsSortable, setLinkCollectionIsSortable] =
+  //   useState(false)
+  // new list - will be used to populate data and V-DOM
+  const [listOfLinkCollectionEntries, setListOfLinkCollectionEntries] =
+    useState(linkedCollection.contentBox.map((link) => link))
+  announce("populated link collection list", listOfLinkCollectionEntries)
+
+  // default HTML
+  return (
+    <>
+      <b>{sectionTitle}</b>
+      <EditableLinkCollection
+        linkCollection={listOfLinkCollectionEntries}
+        setLinkCollection={setListOfLinkCollectionEntries}
+      />
+      <div className="flex justify-end">
+        <Button
+          id="activateReorderLinkCollectionButton"
+          variant="outline"
+          className="bg-white text-black"
+        >
+          change order
+        </Button>
+      </div>
+    </>
+  )
+
+  // OLD CODE BELOW - to be removed
   const innerHTML = linkedCollection.contentBox.map((link) => {
     // pre-load from context if available
     let defaultLinkText = ""
@@ -58,24 +87,6 @@ function EditableLinkCollection() {
     // for the input fields
     const [linkText, setLinkText] = useState(defaultLinkText)
     const [linkURL, setLinkURL] = useState(defaultLinkURL)
-
-    //   return (
-    //     <>
-    //       <div
-    //         key={"pos-" + link.position + "-editable"}
-    //         className="my-4 mx-2 py-2 px-3 bg-konkikyou-blue group/edit"
-    //       >
-    //         <a>
-    //           <IconMapper url={link.url} />
-    //           <span className="mx-2">
-    //             {link.text.length > 0 ? link.text : link.url}
-    //           </span>
-    //         </a>
-    //         <EditButton />
-    //       </div>
-    //     </>
-    //   )
-    // }, [])
 
     return (
       <div key={"linkItem-" + link.position}>
@@ -146,6 +157,8 @@ function EditableLinkCollection() {
       </div>
     )
   }, [])
+  // end of innerHTML mapping
+
   return (
     <>
       <b>{sectionTitle}</b>
@@ -169,6 +182,79 @@ function EditableLinkCollection() {
       </div>
     </>
   )
+}
+
+export function EditableLinkCollection({ linkCollection, setLinkCollection }) {
+  return linkCollection.map((link) => {
+    return (
+      <div key={"linkItem-" + link.position}>
+        <Dialog>
+          <DialogTrigger asChild>
+            <div className="group/edit">
+              <div
+                key={"pos-" + link.position + "-editable"}
+                className="my-4 mx-2 py-0.5 px-3 bg-konkikyou-blue group/edit"
+              >
+                <a>
+                  <IconMapper url={link.url} />
+                  <span id={"linkText-" + link.position} className="mx-2">
+                    {link.text.length > 0 ? link.text : link.url}
+                  </span>
+                </a>
+                <EditButton />
+              </div>
+            </div>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Edit Link</DialogTitle>
+              <DialogDescription>
+                Make changes to your link here. Click save when you're done.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="linkText" className="text-right">
+                  Text
+                </Label>
+                <Input
+                  id="linkText"
+                  type="text"
+                  className="col-span-3"
+                  // onChange={(e) => setLinkText(e.target.value)}
+                  // value={linkText}
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="linkURL" className="text-right">
+                  Link
+                </Label>
+                <Input
+                  id="linkURL"
+                  type="text"
+                  className="col-span-3"
+                  // onChange={(e) => setLinkURL(e.target.value)}
+                  // value={linkURL}
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <DialogClose>
+                <Button
+                  type="submit"
+                  // onClick={(e) => {
+                  //   updateLinkCollection(linkText, linkURL, link.position)
+                  // }}
+                >
+                  Save changes
+                </Button>
+              </DialogClose>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
+    )
+  })
 }
 
 function updateLinkCollection(linkText, linkURL, linkPosition) {
@@ -227,3 +313,52 @@ function handleDataUpdate(linkText, linkURL, linkPosition) {
       return error
     })
 }
+
+// Support functions (debug) /.
+function announce(announcement, objectToLog) {
+  let colorCode = ""
+
+  switch (announcement) {
+    case "got tags from API":
+      colorCode = "#eee600" // titanium yellow
+      break
+
+    case "populated link collection list":
+      colorCode = "#ffe4c4" // bisque
+      break
+
+    case "string of tags got some values":
+      colorCode = "#00ff00" // lime
+      break
+
+    case "user popped tag with id =>":
+      colorCode = "#da70d6" // orchid
+      break
+
+    case "user is saving tag with text [parameter]: ":
+    case "user is saving tag with text [state variable]: ":
+    case "user is saving tag with text [getById]: ":
+      colorCode = "#00ffff" // cyan
+      break
+
+    default:
+      colorCode = "#7fffd4" // green
+      break
+  }
+
+  console.log(`%c /////////////////`, `color: ${colorCode}; font-size: 20px;`)
+  console.log(`%c ${announcement}`, `color: ${colorCode};`)
+
+  if (objectToLog != null) {
+    console.log(
+      `%c objectToLog type => ${typeof objectToLog}`,
+      `color: ${colorCode};`
+    )
+    console.log(`%c objectToLog => ${objectToLog}`, `color: ${colorCode};`)
+    console.log(`%c as a table:`, `color: ${colorCode};`)
+    console.table(objectToLog)
+  } else {
+    console.log(`%c alert: no object to log!!`, `color: ${colorCode};`)
+  }
+}
+// Support functions (debug) ./
