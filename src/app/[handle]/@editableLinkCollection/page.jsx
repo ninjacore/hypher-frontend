@@ -149,7 +149,24 @@ function EditableLinkCollection() {
   return (
     <>
       <b>{sectionTitle}</b>
+
+      {/* <div className="flex justify-between">
+        <b>{sectionTitle}</b>
+        <Button variant="outline" className="bg-white text-black">
+          change order
+        </Button>
+      </div> */}
+
       <>{innerHTML}</>
+      <div className="flex justify-end">
+        <Button
+          id="activateReorderLinkCollectionButton"
+          variant="outline"
+          className="bg-white text-black"
+        >
+          change order
+        </Button>
+      </div>
     </>
   )
 }
