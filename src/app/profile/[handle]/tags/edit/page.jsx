@@ -1,7 +1,7 @@
 "use client"
 import React, { useId, useEffect, useState } from "react"
 
-import { TagNode } from "@/app/profile/tags/components/TagNode/TagNode"
+import { TagNode } from "../components/TagNode/TagNode"
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faXmark } from "@fortawesome/free-solid-svg-icons"
@@ -454,8 +454,20 @@ function hideAddTagButton() {
 
 // Data functions /.
 function loadTagsFromAPI() {
-  // TODO: get user tag by serving endpoint and having it as a query parameter
-  let handle = "dnt.is"
+  // let handle = "dnt.is"
+
+  // const apiUrl = `http://localhost:5678/api/v1/profiles/${handle}/tags`
+
+  // get handle from url of this page
+  const url = window.location.href
+  announce("url: ", url)
+  const handleWithExtra = url.split("/profile/").pop()
+  console.log("handle=")
+  console.log(handleWithExtra)
+  console.log("with split ():" + handleWithExtra.split("/tags/edit"))
+  let array = handleWithExtra.split("/tags/edit")
+  console.log("so, handle is -> " + array[0])
+  let handle = array[0]
 
   const apiUrl = `http://localhost:5678/api/v1/profiles/${handle}/tags`
 
@@ -481,8 +493,20 @@ function loadTagsFromAPI() {
 }
 
 function saveTagsToAPI(newTagsAsString) {
-  // TODO: get user tag by serving endpoint and having it as a query parameter
-  let handle = "dnt.is"
+  // let handle = "dnt.is"
+
+  // const apiUrl = `http://localhost:5678/api/v1/profiles/${handle}/tags`
+
+  // get handle from url of this page
+  const url = window.location.href
+  announce("url: ", url)
+  const handleWithExtra = url.split("/profile/").pop()
+  console.log("handle=")
+  console.log(handleWithExtra)
+  console.log("with split ():" + handleWithExtra.split("/tags/edit"))
+  let array = handleWithExtra.split("/tags/edit")
+  console.log("so, handle is -> " + array[0])
+  let handle = array[0]
 
   const apiUrl = `http://localhost:5678/api/v1/profiles/${handle}/tags`
 
