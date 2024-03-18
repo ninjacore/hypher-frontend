@@ -255,7 +255,7 @@ export function TagEditModeButtons({
           <div className="grid gap-4 py-4">
             <div className="grid grid-cols-4 items-center gap-4">
               <Label htmlFor="featuredTitle" className="text-right">
-                Title
+                Tag
               </Label>
               <Input id="tagsInput" type="text" className="col-span-3" />
             </div>
