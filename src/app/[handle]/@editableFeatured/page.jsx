@@ -42,12 +42,12 @@ import { SortableFeaturedContentNode } from "./SortableFeaturedContentNode/Sorta
 export default function Page() {
   return (
     <Profile>
-      <EditableFeatured />
+      <EditableFeaturedContentWithContext />
     </Profile>
   )
 }
 
-function EditableFeatured() {
+function EditableFeaturedContentWithContext() {
   const profile = useContext(ProfileContext)
   // Check if profile or mainProfileData is not yet defined and return null or a loading state
   if (!profile || !profile.mainProfileData) {
@@ -55,15 +55,46 @@ function EditableFeatured() {
     return <div>Loading...</div> // or return null;
   }
   const { featuredContentData } = profile
-  const featuredContent = featuredContentData
+  // const featuredContentData = featuredContentData
 
   console.log("featuredContent.contentBox=")
-  console.table(featuredContent.contentBox)
+  console.table(featuredContentData.contentBox)
   console.log("featuredContent")
-  console.log(featuredContent)
+  console.log(featuredContentData)
 
-  let title = featuredContent.shortTitle
-  const innerHTML = featuredContent.contentBox.map((contentBox) => {
+  // new state variables
+  const [featuredContentIsSortable, setFeaturedContentIsSortable] =
+    useState(false)
+  const [featuredContentEntries, setFeaturedContentEntries] = useState(
+    featuredContentData.contentBox.map((featuredContent) => featuredContent)
+  )
+  announce("populated featured content list", featuredContentEntries)
+
+  let title = featuredContentData.shortTitle
+
+  if (featuredContentIsSortable) {
+    // do some
+    return (
+      <>
+        <b>{title}</b>
+
+        <InEditableFeaturedContent />
+      </>
+    )
+  } else {
+    return (
+      <>
+        <b>{title}</b>
+
+        <EditableFeaturedContent
+          featuredContentEntries={featuredContentEntries}
+        />
+      </>
+    )
+  }
+
+  // OLD CODE BELOW - to be deleted
+  const innerHTML = featuredContentData.contentBox.map((contentBox) => {
     // pre-load from context if available
     let defaultFeaturedTitle = ""
     let defaultFeaturedLink = ""
@@ -185,6 +216,126 @@ function EditableFeatured() {
   )
 }
 
+function InEditableFeaturedContent() {
+  return <></>
+}
+
+function EditableFeaturedContent({ featuredContentEntries }) {
+  return featuredContentEntries.map((featuredContent) => {
+    // pre-load from context if available
+    let defaultFeaturedTitle = ""
+    let defaultFeaturedLink = ""
+    let defaultFeaturedDescription = ""
+
+    if (featuredContent.title.length > 0) {
+      defaultFeaturedTitle = featuredContent.title
+    }
+    if (featuredContent.url.length > 0) {
+      defaultFeaturedLink = featuredContent.url
+    }
+    if (featuredContent.description.length > 0) {
+      defaultFeaturedDescription = featuredContent.description
+    }
+
+    // for the input fields
+    const [featuredTitle, setFeaturedTitle] = useState(defaultFeaturedTitle)
+    const [featuredLink, setFeaturedLink] = useState(defaultFeaturedLink)
+    const [featuredDescription, setFeaturedDescription] = useState(
+      defaultFeaturedDescription
+    )
+
+    return (
+      <Card
+        key={featuredContent.category + featuredContent.position}
+        className="my-4"
+      >
+        {/* <a onClick={(e) => editLink(e, 2)} id={contentBox.position + "x"}> */}
+        <Dialog>
+          <DialogTrigger asChild>
+            <div className="flex group/edit">
+              <div className="text-5xl py-4 px-2">
+                <IconMapper url={featuredContent.category + ":"} />
+              </div>
+              <div className="grow p-2">
+                <span id={"featuredTitle-" + featuredContent.position}>
+                  {/* {contentBox.title.length > 0 ? contentBox.title : ""} */}
+                  {defaultFeaturedTitle}
+                </span>
+                <EditButton />
+                <br />
+                <span id={"featuredDescription-" + featuredContent.position}>
+                  {featuredContent.description.length > 0
+                    ? featuredContent.description
+                    : featuredContent.url}
+                </span>
+              </div>
+            </div>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Edit Content</DialogTitle>
+              <DialogDescription>
+                Make changes to your content here. Click save when you're done.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="featuredTitle" className="text-right">
+                  Title
+                </Label>
+                <Input
+                  id={"featuredTitleInput-" + featuredContent.position}
+                  type="text"
+                  className="col-span-3"
+                  onChange={(e) => setFeaturedTitle(e.target.value)}
+                  value={featuredTitle}
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="featuredLink" className="text-right">
+                  Link
+                </Label>
+                <Input
+                  id={"featuredLinkInput-" + featuredContent.position}
+                  type="text"
+                  className="col-span-3"
+                  onChange={(e) => setFeaturedLink(e.target.value)}
+                  value={featuredLink}
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="featuredDescription" className="text-right">
+                  Description
+                </Label>
+                <Input
+                  id={"featuredDescriptionInput-" + featuredContent.position}
+                  type="text"
+                  className="col-span-3"
+                  onChange={(e) => setFeaturedDescription(e.target.value)}
+                  value={featuredDescription}
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <DialogClose>
+                <Button
+                  type="submit"
+                  onClick={() =>
+                    sendFeaturedContentToUpdate(featuredContent.position)
+                  }
+                >
+                  Save changes
+                </Button>
+              </DialogClose>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </Card>
+    )
+  })
+}
+
+// OLD FUNCTIONS BELOW - to be checked and updated
 function updateFeaturedContent(
   featuredTitle,
   featuredLink,
@@ -267,3 +418,85 @@ function handleDataUpdate(
       return error
     })
 }
+/// end of old code
+
+// Mixed V-DOM & data manipulations /.
+function sendFeaturedContentToUpdate(featuredContentPosition) {
+  // featuredTitleInput
+  let bufferTitle = document.getElementById(
+    "featuredTitleInput-" + featuredContentPosition
+  ).value
+  console.log("bufferTitle=" + bufferTitle)
+
+  // featuredLinkInput
+  let bufferLink = document.getElementById(
+    "featuredLinkInput-" + featuredContentPosition
+  ).value
+  console.log("bufferLink=" + bufferLink)
+
+  // featuredDescriptionInput
+  let bufferDescription = document.getElementById(
+    "featuredDescriptionInput-" + featuredContentPosition
+  ).value
+  console.log("bufferDescription=" + bufferDescription)
+
+  // commit change to database
+  handleDataUpdate(
+    bufferTitle,
+    bufferLink,
+    bufferDescription,
+    featuredContentPosition
+  )
+}
+// Mixed V-DOM & data manipulations ./
+
+// Support functions (debug) /.
+function announce(announcement, objectToLog, colorName) {
+  let colorCode = ""
+
+  switch (colorName) {
+    case "titanium yellow":
+      colorCode = "#eee600" // titanium yellow
+      break
+
+    case "bisque":
+      colorCode = "#ffe4c4" // bisque
+      break
+
+    case "lime":
+      colorCode = "#00ff00" // lime
+      break
+
+    case "orchid":
+      colorCode = "#da70d6" // orchid
+      break
+
+    case "cyan":
+      colorCode = "#00ffff" // cyan
+      break
+
+    case "green":
+      colorCode = "#7fffd4" // green
+      break
+
+    default:
+      colorCode = "#7fffd4" // green
+      break
+  }
+
+  console.log(`%c /////////////////`, `color: ${colorCode}; font-size: 20px;`)
+  console.log(`%c ${announcement}`, `color: ${colorCode};`)
+
+  if (objectToLog != null) {
+    console.log(
+      `%c objectToLog type => ${typeof objectToLog}`,
+      `color: ${colorCode};`
+    )
+    console.log(`%c objectToLog => ${objectToLog}`, `color: ${colorCode};`)
+    console.log(`%c as a table:`, `color: ${colorCode};`)
+    console.table(objectToLog)
+  } else {
+    console.log(`%c alert: no object to log!!`, `color: ${colorCode};`)
+  }
+}
+// Support functions (debug) ./
