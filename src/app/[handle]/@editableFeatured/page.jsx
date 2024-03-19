@@ -382,6 +382,9 @@ function editLink(event, contentBoxPosition) {
   )
 }
 
+/// end of old code
+
+// Network interactions /.
 function handleDataUpdate(
   featuredTitle,
   featuredLink,
@@ -394,7 +397,6 @@ function handleDataUpdate(
   console.log("handle=")
   console.log(handle)
 
-  // {{SERVICE_IP}}:{{SERVICE_PORT}}/{{API_VERSION}}/featuredContents/dnt.is/update?position=3
   const apiURL = `http://localhost:5678/api/v1/featuredContents/${handle}/update?position=${contentBoxPosition}`
 
   fetch(apiURL, {
@@ -418,7 +420,7 @@ function handleDataUpdate(
       return error
     })
 }
-/// end of old code
+// Network interactions ./
 
 // Mixed V-DOM & data manipulations /.
 function sendFeaturedContentToUpdate(featuredContentPosition) {
@@ -447,6 +449,19 @@ function sendFeaturedContentToUpdate(featuredContentPosition) {
     bufferDescription,
     featuredContentPosition
   )
+
+  // show change in UI
+  document.getElementById(
+    "featuredTitle-" + featuredContentPosition
+  ).innerHTML = bufferTitle
+  let displayedDescription = document.getElementById(
+    "featuredDescription-" + featuredContentPosition
+  )
+  if (bufferDescription.length > 0) {
+    displayedDescription.innerHTML = bufferDescription
+  } else {
+    displayedDescription.innerHTML = bufferLink
+  }
 }
 // Mixed V-DOM & data manipulations ./
 
