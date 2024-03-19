@@ -186,6 +186,9 @@ function EditableLinkCollectionWithContext() {
 
 export function EditableLinkCollection({ linkCollection, setLinkCollection }) {
   return linkCollection.map((link) => {
+    const [linkText, setLinkText] = useState(link.text)
+    const [linkUrl, setLinkUrl] = useState(link.url)
+
     return (
       <div key={"linkItem-" + link.position}>
         <Dialog>
@@ -218,23 +221,23 @@ export function EditableLinkCollection({ linkCollection, setLinkCollection }) {
                   Text
                 </Label>
                 <Input
-                  id="linkText"
+                  id={"linkTextInput-" + link.position}
                   type="text"
                   className="col-span-3"
-                  // onChange={(e) => setLinkText(e.target.value)}
-                  // value={linkText}
+                  value={linkText}
+                  onChange={(e) => setLinkText(e.target.value)}
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="linkURL" className="text-right">
+                <Label htmlFor="linkUrl" className="text-right">
                   Link
                 </Label>
                 <Input
-                  id="linkURL"
+                  id={"linkUrlInput-" + link.position}
                   type="text"
                   className="col-span-3"
-                  // onChange={(e) => setLinkURL(e.target.value)}
-                  // value={linkURL}
+                  value={linkUrl}
+                  onChange={(e) => setLinkUrl(e.target.value)}
                 />
               </div>
             </div>
@@ -242,9 +245,7 @@ export function EditableLinkCollection({ linkCollection, setLinkCollection }) {
               <DialogClose>
                 <Button
                   type="submit"
-                  // onClick={(e) => {
-                  //   updateLinkCollection(linkText, linkURL, link.position)
-                  // }}
+                  onClick={() => sendLinkInputToUpdate(link.position)}
                 >
                   Save changes
                 </Button>
@@ -257,33 +258,7 @@ export function EditableLinkCollection({ linkCollection, setLinkCollection }) {
   })
 }
 
-function updateLinkCollection(linkText, linkURL, linkPosition) {
-  // save to backend
-  handleDataUpdate(linkText, linkURL, linkPosition)
-
-  // TODO: only continue on successful save!
-  console.log(
-    `%c linkText=${linkText}, linkURL=${linkURL}, linkPosition=${linkPosition}`,
-    "color: cyan; background-color: black; font-size: 16px; padding: 4px; border-radius: 4px;"
-  )
-
-  // re-render featured content (show changes)
-  document.getElementById("linkText-" + linkPosition).innerHTML =
-    linkText.length > 0 ? linkText : linkURL
-}
-
-function editLink(event, linkPosition) {
-  console.log(
-    `%c ${event.target}`,
-    "color: cyan; background-color: black; font-size: 16px; padding: 4px; border-radius: 4px;"
-  )
-
-  console.log(
-    `%c link at position ${linkPosition} is getting edited!!`,
-    "color: cyan; background-color: black; font-size: 16px; padding: 4px; border-radius: 4px;"
-  )
-}
-
+// Network interactions /.
 function handleDataUpdate(linkText, linkURL, linkPosition) {
   // get handle from url of this page
   const url = window.location.href
@@ -313,6 +288,38 @@ function handleDataUpdate(linkText, linkURL, linkPosition) {
       return error
     })
 }
+// Network interactions ./
+
+// Data manipulations /.
+function updateLinkCollection(linkText, linkUrl, linkPosition) {
+  // save to backend
+  handleDataUpdate(linkText, linkUrl, linkPosition)
+
+  // TODO: only continue on successful save!
+  console.log(
+    `%c linkText=${linkText}, linkURL=${linkUrl}, linkPosition=${linkPosition}`,
+    "color: cyan; background-color: black; font-size: 16px; padding: 4px; border-radius: 4px;"
+  )
+
+  // re-render featured content (show changes)
+  document.getElementById("linkText-" + linkPosition).innerHTML =
+    linkText.length > 0 ? linkText : linkUrl
+}
+// Data manipulations ./
+
+// Mixed V-DOM & data manipulations /.
+function sendLinkInputToUpdate(linkPosition) {
+  let bufferText = document.getElementById(
+    "linkTextInput-" + linkPosition
+  ).value
+  console.log("bufferText= " + bufferText)
+
+  let bufferUrl = document.getElementById("linkUrlInput-" + linkPosition).value
+  console.log("bufferURL= " + bufferUrl)
+
+  updateLinkCollection(bufferText, bufferUrl, linkPosition)
+}
+// Mixed V-DOM & data manipulations ./
 
 // Support functions (debug) /.
 function announce(announcement, objectToLog) {
