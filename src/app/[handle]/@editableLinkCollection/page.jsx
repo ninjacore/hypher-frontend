@@ -351,7 +351,6 @@ export function DnD({ linkCollection, setReorderedLinkCollection }) {
     }
   }
 }
-
 // V-DOM manipulations ./
 
 // Mixed V-DOM & data manipulations /.
