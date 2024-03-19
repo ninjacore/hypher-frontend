@@ -44,144 +44,66 @@ function EditableLinkCollectionWithContext() {
   console.table(linkedCollection.contentBox)
 
   // new state variables
-  // const [linkCollectionIsSortable, setLinkCollectionIsSortable] =
-  //   useState(false)
+  const [linkCollectionIsSortable, setLinkCollectionIsSortable] =
+    useState(false)
   // new list - will be used to populate data and V-DOM
   const [listOfLinkCollectionEntries, setListOfLinkCollectionEntries] =
     useState(linkedCollection.contentBox.map((link) => link))
   announce("populated link collection list", listOfLinkCollectionEntries)
 
-  // default HTML
-  return (
-    <>
-      <b>{sectionTitle}</b>
-      <EditableLinkCollection
-        linkCollection={listOfLinkCollectionEntries}
-        setLinkCollection={setListOfLinkCollectionEntries}
-      />
-      <div className="flex justify-end">
-        <Button
-          id="activateReorderLinkCollectionButton"
-          variant="outline"
-          className="bg-white text-black"
-        >
-          change order
-        </Button>
-      </div>
-    </>
-  )
-
-  // OLD CODE BELOW - to be removed
-  const innerHTML = linkedCollection.contentBox.map((link) => {
-    // pre-load from context if available
-    let defaultLinkText = ""
-    let defaultLinkURL = ""
-
-    if (link.text.length > 0) {
-      defaultLinkText = link.text
-    }
-    if (link.url.length > 0) {
-      defaultLinkURL = link.url
-    }
-
-    // for the input fields
-    const [linkText, setLinkText] = useState(defaultLinkText)
-    const [linkURL, setLinkURL] = useState(defaultLinkURL)
-
+  if (linkCollectionIsSortable) {
     return (
-      <div key={"linkItem-" + link.position}>
-        <Dialog>
-          <DialogTrigger asChild>
-            <div className="group/edit">
-              <div
-                key={"pos-" + link.position + "-editable"}
-                className="my-4 mx-2 py-0.5 px-3 bg-konkikyou-blue group/edit"
-              >
-                <a>
-                  <IconMapper url={link.url} />
-                  <span id={"linkText-" + link.position} className="mx-2">
-                    {link.text.length > 0 ? link.text : link.url}
-                  </span>
-                </a>
-                <EditButton />
-              </div>
-            </div>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>Edit Link</DialogTitle>
-              <DialogDescription>
-                Make changes to your link here. Click save when you're done.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="linkText" className="text-right">
-                  Text
-                </Label>
-                <Input
-                  id="linkText"
-                  type="text"
-                  className="col-span-3"
-                  onChange={(e) => setLinkText(e.target.value)}
-                  value={linkText}
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="linkURL" className="text-right">
-                  Link
-                </Label>
-                <Input
-                  id="linkURL"
-                  type="text"
-                  className="col-span-3"
-                  onChange={(e) => setLinkURL(e.target.value)}
-                  value={linkURL}
-                />
-              </div>
-            </div>
-            <DialogFooter>
-              <DialogClose>
-                <Button
-                  type="submit"
-                  onClick={(e) => {
-                    updateLinkCollection(linkText, linkURL, link.position)
-                  }}
-                >
-                  Save changes
-                </Button>
-              </DialogClose>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
+      <>
+        <b>{sectionTitle}</b>
+        <InEditableLinkCollection
+          linkCollection={listOfLinkCollectionEntries}
+          setLinkCollection={setListOfLinkCollectionEntries}
+        />
+      </>
+    )
+  } else {
+    // default HTML
+    return (
+      <>
+        <b>{sectionTitle}</b>
+        <EditableLinkCollection
+          linkCollection={listOfLinkCollectionEntries}
+          setLinkCollection={setListOfLinkCollectionEntries}
+        />
+        <div className="flex justify-end">
+          <Button
+            id="activateReorderLinkCollectionButton"
+            variant="outline"
+            className="bg-white text-black"
+            onClick={() => setLinkCollectionIsSortable(true)}
+          >
+            change order
+          </Button>
+        </div>
+      </>
+    )
+  }
+
+  return null
+}
+
+export function InEditableLinkCollection({
+  linkCollection,
+  setLinkCollection,
+}) {
+  return linkCollection.map((link) => {
+    return (
+      <div
+        key={"pos-" + link.position}
+        className="my-4 mx-2 py-2 px-3 bg-konkikyou-blue"
+      >
+        <IconMapper url={link.url} />
+        <span className="mx-2">
+          {link.text.length > 0 ? link.text : link.url}
+        </span>
       </div>
     )
-  }, [])
-  // end of innerHTML mapping
-
-  return (
-    <>
-      <b>{sectionTitle}</b>
-
-      {/* <div className="flex justify-between">
-        <b>{sectionTitle}</b>
-        <Button variant="outline" className="bg-white text-black">
-          change order
-        </Button>
-      </div> */}
-
-      <>{innerHTML}</>
-      <div className="flex justify-end">
-        <Button
-          id="activateReorderLinkCollectionButton"
-          variant="outline"
-          className="bg-white text-black"
-        >
-          change order
-        </Button>
-      </div>
-    </>
-  )
+  })
 }
 
 export function EditableLinkCollection({ linkCollection, setLinkCollection }) {
