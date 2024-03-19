@@ -1,6 +1,6 @@
 "use client"
 
-import { useContext, useState, useEffect, use } from "react"
+import { useId, useContext, useState, useEffect, use } from "react"
 // import { ProfileContext, Profile } from "../ProfileProvider"
 import { ProfileContext, Profile } from "../page.jsx"
 import { IconMapper } from "../../../components/iconMapper"
@@ -19,6 +19,25 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
+
+// imports for sorting functionality /.
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core"
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable"
+
+import { SortableFeaturedContentNode } from "./SortableFeaturedContentNode/SortableFeaturedContentNode"
+// imports for sorting functionality ./
 
 export default function Page() {
   return (
