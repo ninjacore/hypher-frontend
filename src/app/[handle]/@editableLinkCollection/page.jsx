@@ -109,23 +109,29 @@ function EditableLinkCollectionWithContext() {
 }
 
 export function InEditableLinkCollection({ linkCollection }) {
-  // return linkCollection.map((link) => {
-  //   return (
-  //     <div
-  //       key={"pos-" + link.position}
-  //       className="my-4 mx-2 py-2 px-3 bg-konkikyou-blue"
-  //     >
-  //       <IconMapper url={link.url} />
-  //       <span className="mx-2">
-  //         {link.text.length > 0 ? link.text : link.url}
-  //       </span>
-  //     </div>
-  //   )
-  // })
+  const [reorderedLinkCollection, setReorderedLinkCollection] = useState([
+    linkCollection,
+  ])
 
   return (
     <>
-      <DnD linkCollection={linkCollection} />
+      <DnD
+        linkCollection={linkCollection}
+        setReorderedLinkCollection={setReorderedLinkCollection}
+      />
+      <div className="flex justify-end">
+        <Button
+          id="saveReorderedLinkCollectionButton"
+          variant="outline"
+          className="bg-white text-black"
+          onClick={() => {
+            updateFullLinkCollection(reorderedLinkCollection)
+          }}
+          // onClick={() => setLinkCollectionIsSortable(true)}
+        >
+          save
+        </Button>
+      </div>
     </>
   )
 }
@@ -237,7 +243,7 @@ function handleDataUpdate(linkText, linkURL, linkPosition) {
 // Network interactions ./
 
 // Data manipulations /.
-function updateLinkCollection(linkText, linkUrl, linkPosition) {
+function updateLinkCollectionEntry(linkText, linkUrl, linkPosition) {
   // save to backend
   handleDataUpdate(linkText, linkUrl, linkPosition)
 
@@ -251,10 +257,26 @@ function updateLinkCollection(linkText, linkUrl, linkPosition) {
   document.getElementById("linkText-" + linkPosition).innerHTML =
     linkText.length > 0 ? linkText : linkUrl
 }
+
+function updateFullLinkCollection(reorderedLinkCollection) {
+  // make sure 'position' matches the order desired by the user
+  reorderedLinkCollection.forEach((linkNode, index) => {
+    console.log(
+      `%c changing linkNode.position from ${linkNode.position} => ${index}`,
+      `color: green;`
+    )
+    linkNode.position = index
+
+    // commit to database
+    handleDataUpdate(linkNode.text, linkNode.url, linkNode.position)
+  })
+
+  announce("reordered LinkCollection: ", reorderedLinkCollection)
+}
 // Data manipulations ./
 
 // V-DOM manipulations /.
-export function DnD({ linkCollection }) {
+export function DnD({ linkCollection, setReorderedLinkCollection }) {
   // abstraction of linkCollection - perhaps obsolete
   const [linkNodes, setLinkNodes] = useState(
     linkCollection.map((linkNode) => {
@@ -273,7 +295,8 @@ export function DnD({ linkCollection }) {
 
   // up-drill every time reorder happens
   useEffect(() => {
-    setSortedLinkCollection(linkNodes)
+    // setSortedLinkCollection(linkNodes)
+    setReorderedLinkCollection(linkNodes)
   }, [linkNodes])
 
   const uniqueId = useId()
@@ -338,7 +361,7 @@ function sendLinkInputToUpdate(linkPosition) {
   let bufferUrl = document.getElementById("linkUrlInput-" + linkPosition).value
   console.log("bufferURL= " + bufferUrl)
 
-  updateLinkCollection(bufferText, bufferUrl, linkPosition)
+  updateLinkCollectionEntry(bufferText, bufferUrl, linkPosition)
 }
 // Mixed V-DOM & data manipulations ./
 
