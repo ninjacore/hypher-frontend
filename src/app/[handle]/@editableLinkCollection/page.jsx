@@ -1,6 +1,6 @@
 "use client"
 
-import { useContext, useState, useEffect, use } from "react"
+import { useId, useContext, useState, useEffect, use } from "react"
 
 import { ProfileContext, Profile } from "../page.jsx"
 import { IconMapper } from "../../../components/iconMapper"
@@ -20,15 +20,34 @@ import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 
+// imports for sorting functionality /.
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core"
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable"
+
+import { SortableLinkNode } from "./SortableLinkNode/SortableLinkNode"
+// imports for sorting functionality ./
+
 export default function Page() {
   return (
     <Profile>
-      <EditableLinkCollection />
+      <EditableLinkCollectionWithContext />
     </Profile>
   )
 }
 
-function EditableLinkCollection() {
+function EditableLinkCollectionWithContext() {
   const sectionTitle = "LET'S CONNECT"
 
   const profile = useContext(ProfileContext)
@@ -43,39 +62,103 @@ function EditableLinkCollection() {
   console.log("linkedCollection.contentBox=")
   console.table(linkedCollection.contentBox)
 
-  const innerHTML = linkedCollection.contentBox.map((link) => {
-    // pre-load from context if available
-    let defaultLinkText = ""
-    let defaultLinkURL = ""
+  // new state variables
+  const [linkCollectionIsSortable, setLinkCollectionIsSortable] =
+    useState(false)
 
-    if (link.text.length > 0) {
-      defaultLinkText = link.text
-    }
-    if (link.url.length > 0) {
-      defaultLinkURL = link.url
-    }
+  // new list - will be used to populate data and V-DOM
+  const [listOfLinkCollectionEntries, setListOfLinkCollectionEntries] =
+    useState(linkedCollection.contentBox.map((link) => link))
+  announce("populated link collection list", listOfLinkCollectionEntries)
 
-    // for the input fields
-    const [linkText, setLinkText] = useState(defaultLinkText)
-    const [linkURL, setLinkURL] = useState(defaultLinkURL)
+  if (linkCollectionIsSortable) {
+    return (
+      <>
+        <b>{sectionTitle}</b>
+        <p>Pick up a link to change its position in the collection.</p>
 
-    //   return (
-    //     <>
-    //       <div
-    //         key={"pos-" + link.position + "-editable"}
-    //         className="my-4 mx-2 py-2 px-3 bg-konkikyou-blue group/edit"
-    //       >
-    //         <a>
-    //           <IconMapper url={link.url} />
-    //           <span className="mx-2">
-    //             {link.text.length > 0 ? link.text : link.url}
-    //           </span>
-    //         </a>
-    //         <EditButton />
-    //       </div>
-    //     </>
-    //   )
-    // }, [])
+        <InEditableLinkCollection
+          linkCollection={listOfLinkCollectionEntries}
+          setLinkCollection={setListOfLinkCollectionEntries}
+          setLinkCollectionIsSortable={setLinkCollectionIsSortable}
+        />
+      </>
+    )
+  } else {
+    // default HTML
+    return (
+      <>
+        <b>{sectionTitle}</b>
+        <EditableLinkCollection
+          linkCollection={listOfLinkCollectionEntries}
+          setLinkCollection={setListOfLinkCollectionEntries}
+        />
+        <div className="flex justify-end">
+          <Button
+            id="activateReorderLinkCollectionButton"
+            variant="outline"
+            className="bg-white text-black"
+            onClick={() => setLinkCollectionIsSortable(true)}
+          >
+            change order
+          </Button>
+        </div>
+      </>
+    )
+  }
+}
+
+export function InEditableLinkCollection({
+  linkCollection,
+  setLinkCollectionIsSortable,
+}) {
+  const [reorderedLinkCollection, setReorderedLinkCollection] = useState([
+    linkCollection,
+  ])
+
+  return (
+    <>
+      <DnD
+        linkCollection={linkCollection}
+        setReorderedLinkCollection={setReorderedLinkCollection}
+      />
+      <div className="flex justify-end gap-5">
+        <div>
+          <Button
+            id="cancelReorderedLinkCollectionButton"
+            variant="outline"
+            className="bg-white text-black"
+            onClick={() => {
+              cancelLinkCollectionUpdate(setLinkCollectionIsSortable)
+            }}
+          >
+            cancel
+          </Button>
+        </div>
+        <div>
+          <Button
+            id="saveReorderedLinkCollectionButton"
+            variant="outline"
+            className="bg-white text-black"
+            onClick={() => {
+              updateFullLinkCollection(
+                reorderedLinkCollection,
+                setLinkCollectionIsSortable
+              )
+            }}
+          >
+            save
+          </Button>
+        </div>
+      </div>
+    </>
+  )
+}
+
+export function EditableLinkCollection({ linkCollection, setLinkCollection }) {
+  return linkCollection.map((link) => {
+    const [linkText, setLinkText] = useState(link.text)
+    const [linkUrl, setLinkUrl] = useState(link.url)
 
     return (
       <div key={"linkItem-" + link.position}>
@@ -109,23 +192,23 @@ function EditableLinkCollection() {
                   Text
                 </Label>
                 <Input
-                  id="linkText"
+                  id={"linkTextInput-" + link.position}
                   type="text"
                   className="col-span-3"
-                  onChange={(e) => setLinkText(e.target.value)}
                   value={linkText}
+                  onChange={(e) => setLinkText(e.target.value)}
                 />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="linkURL" className="text-right">
+                <Label htmlFor="linkUrl" className="text-right">
                   Link
                 </Label>
                 <Input
-                  id="linkURL"
+                  id={"linkUrlInput-" + link.position}
                   type="text"
                   className="col-span-3"
-                  onChange={(e) => setLinkURL(e.target.value)}
-                  value={linkURL}
+                  value={linkUrl}
+                  onChange={(e) => setLinkUrl(e.target.value)}
                 />
               </div>
             </div>
@@ -133,9 +216,7 @@ function EditableLinkCollection() {
               <DialogClose>
                 <Button
                   type="submit"
-                  onClick={(e) => {
-                    updateLinkCollection(linkText, linkURL, link.position)
-                  }}
+                  onClick={() => sendLinkInputToUpdate(link.position)}
                 >
                   Save changes
                 </Button>
@@ -145,42 +226,10 @@ function EditableLinkCollection() {
         </Dialog>
       </div>
     )
-  }, [])
-  return (
-    <>
-      <b>{sectionTitle}</b>
-      <>{innerHTML}</>
-    </>
-  )
+  })
 }
 
-function updateLinkCollection(linkText, linkURL, linkPosition) {
-  // save to backend
-  handleDataUpdate(linkText, linkURL, linkPosition)
-
-  // TODO: only continue on successful save!
-  console.log(
-    `%c linkText=${linkText}, linkURL=${linkURL}, linkPosition=${linkPosition}`,
-    "color: cyan; background-color: black; font-size: 16px; padding: 4px; border-radius: 4px;"
-  )
-
-  // re-render featured content (show changes)
-  document.getElementById("linkText-" + linkPosition).innerHTML =
-    linkText.length > 0 ? linkText : linkURL
-}
-
-function editLink(event, linkPosition) {
-  console.log(
-    `%c ${event.target}`,
-    "color: cyan; background-color: black; font-size: 16px; padding: 4px; border-radius: 4px;"
-  )
-
-  console.log(
-    `%c link at position ${linkPosition} is getting edited!!`,
-    "color: cyan; background-color: black; font-size: 16px; padding: 4px; border-radius: 4px;"
-  )
-}
-
+// Network interactions /.
 function handleDataUpdate(linkText, linkURL, linkPosition) {
   // get handle from url of this page
   const url = window.location.href
@@ -210,3 +259,188 @@ function handleDataUpdate(linkText, linkURL, linkPosition) {
       return error
     })
 }
+// Network interactions ./
+
+// Data manipulations /.
+function updateLinkCollectionEntry(linkText, linkUrl, linkPosition) {
+  // save to backend
+  handleDataUpdate(linkText, linkUrl, linkPosition)
+
+  // TODO: only continue on successful save!
+  console.log(
+    `%c linkText=${linkText}, linkURL=${linkUrl}, linkPosition=${linkPosition}`,
+    "color: cyan; background-color: black; font-size: 16px; padding: 4px; border-radius: 4px;"
+  )
+
+  // re-render featured content (show changes)
+  document.getElementById("linkText-" + linkPosition).innerHTML =
+    linkText.length > 0 ? linkText : linkUrl
+}
+// Data manipulations ./
+
+// V-DOM manipulations /.
+export function DnD({ linkCollection, setReorderedLinkCollection }) {
+  // abstraction of linkCollection - perhaps obsolete
+  const [linkNodes, setLinkNodes] = useState(
+    linkCollection.map((linkNode) => {
+      linkNode.id = linkNode.position + "th-link"
+      return linkNode
+    })
+  )
+  const [sortedLinkCollection, setSortedLinkCollection] = useState([])
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
+
+  // up-drill every time reorder happens
+  useEffect(() => {
+    // setSortedLinkCollection(linkNodes)
+    setReorderedLinkCollection(linkNodes)
+  }, [linkNodes])
+
+  const uniqueId = useId()
+
+  let counter = 0
+
+  return (
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragEnd={handleDragEnd}
+      id={uniqueId}
+    >
+      <SortableContext items={linkNodes} strategy={verticalListSortingStrategy}>
+        {linkNodes.map((linkNode) => {
+          console.log("round #" + counter + " id is: " + linkNode.id)
+          counter++
+
+          return (
+            <SortableLinkNode
+              key={linkNode.position}
+              id={linkNode.id}
+              text={linkNode.text}
+              url={linkNode.url}
+            />
+          )
+        })}
+      </SortableContext>
+    </DndContext>
+  )
+
+  function handleDragEnd(event) {
+    announce("handleDragEnd", event)
+    announce("known Tags:", linkCollection)
+
+    const { active, over } = event
+
+    console.log(`%c active.id => ${active.id}`, `color: green;`)
+    console.log(`%c over.id => ${over.id}`, `color: green;`)
+
+    if (active.id !== over.id) {
+      setLinkNodes((items) => {
+        const oldIndex = items.map((linkNode) => linkNode.id).indexOf(active.id)
+
+        const newIndex = items.map((linkNode) => linkNode.id).indexOf(over.id)
+
+        return arrayMove(items, oldIndex, newIndex)
+      })
+    }
+  }
+}
+
+// V-DOM manipulations ./
+
+// Mixed V-DOM & data manipulations /.
+function sendLinkInputToUpdate(linkPosition) {
+  let bufferText = document.getElementById(
+    "linkTextInput-" + linkPosition
+  ).value
+  console.log("bufferText= " + bufferText)
+
+  let bufferUrl = document.getElementById("linkUrlInput-" + linkPosition).value
+  console.log("bufferURL= " + bufferUrl)
+
+  updateLinkCollectionEntry(bufferText, bufferUrl, linkPosition)
+}
+
+function updateFullLinkCollection(
+  reorderedLinkCollection,
+  setLinkCollectionIsSortable
+) {
+  // make sure 'position' matches the order desired by the user
+  reorderedLinkCollection.forEach((linkNode, index) => {
+    console.log(
+      `%c changing linkNode.position from ${linkNode.position} => ${index}`,
+      `color: green;`
+    )
+    linkNode.position = index
+
+    // commit to database
+    handleDataUpdate(linkNode.text, linkNode.url, linkNode.position)
+  })
+
+  announce("reordered LinkCollection: ", reorderedLinkCollection)
+
+  // reset the GUI to default
+  // like  setTagsAreSortable(false)
+  setLinkCollectionIsSortable(false)
+}
+
+function cancelLinkCollectionUpdate(setLinkCollectionIsSortable) {
+  // reset the GUI to default
+  setLinkCollectionIsSortable(false)
+}
+// Mixed V-DOM & data manipulations ./
+
+// Support functions (debug) /.
+function announce(announcement, objectToLog) {
+  let colorCode = ""
+
+  switch (announcement) {
+    case "got tags from API":
+      colorCode = "#eee600" // titanium yellow
+      break
+
+    case "populated link collection list":
+      colorCode = "#ffe4c4" // bisque
+      break
+
+    case "string of tags got some values":
+      colorCode = "#00ff00" // lime
+      break
+
+    case "user popped tag with id =>":
+      colorCode = "#da70d6" // orchid
+      break
+
+    case "user is saving tag with text [parameter]: ":
+    case "user is saving tag with text [state variable]: ":
+    case "user is saving tag with text [getById]: ":
+      colorCode = "#00ffff" // cyan
+      break
+
+    default:
+      colorCode = "#7fffd4" // green
+      break
+  }
+
+  console.log(`%c /////////////////`, `color: ${colorCode}; font-size: 20px;`)
+  console.log(`%c ${announcement}`, `color: ${colorCode};`)
+
+  if (objectToLog != null) {
+    console.log(
+      `%c objectToLog type => ${typeof objectToLog}`,
+      `color: ${colorCode};`
+    )
+    console.log(`%c objectToLog => ${objectToLog}`, `color: ${colorCode};`)
+    console.log(`%c as a table:`, `color: ${colorCode};`)
+    console.table(objectToLog)
+  } else {
+    console.log(`%c alert: no object to log!!`, `color: ${colorCode};`)
+  }
+}
+// Support functions (debug) ./
