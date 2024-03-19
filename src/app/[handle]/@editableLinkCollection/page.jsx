@@ -65,6 +65,7 @@ function EditableLinkCollectionWithContext() {
   // new state variables
   const [linkCollectionIsSortable, setLinkCollectionIsSortable] =
     useState(false)
+
   // new list - will be used to populate data and V-DOM
   const [listOfLinkCollectionEntries, setListOfLinkCollectionEntries] =
     useState(linkedCollection.contentBox.map((link) => link))
@@ -79,6 +80,7 @@ function EditableLinkCollectionWithContext() {
         <InEditableLinkCollection
           linkCollection={listOfLinkCollectionEntries}
           setLinkCollection={setListOfLinkCollectionEntries}
+          setLinkCollectionIsSortable={setLinkCollectionIsSortable}
         />
       </>
     )
@@ -104,11 +106,12 @@ function EditableLinkCollectionWithContext() {
       </>
     )
   }
-
-  return null
 }
 
-export function InEditableLinkCollection({ linkCollection }) {
+export function InEditableLinkCollection({
+  linkCollection,
+  setLinkCollectionIsSortable,
+}) {
   const [reorderedLinkCollection, setReorderedLinkCollection] = useState([
     linkCollection,
   ])
@@ -119,18 +122,34 @@ export function InEditableLinkCollection({ linkCollection }) {
         linkCollection={linkCollection}
         setReorderedLinkCollection={setReorderedLinkCollection}
       />
-      <div className="flex justify-end">
-        <Button
-          id="saveReorderedLinkCollectionButton"
-          variant="outline"
-          className="bg-white text-black"
-          onClick={() => {
-            updateFullLinkCollection(reorderedLinkCollection)
-          }}
-          // onClick={() => setLinkCollectionIsSortable(true)}
-        >
-          save
-        </Button>
+      <div className="flex justify-end gap-5">
+        <div>
+          <Button
+            id="cancelReorderedLinkCollectionButton"
+            variant="outline"
+            className="bg-white text-black"
+            onClick={() => {
+              cancelLinkCollectionUpdate(setLinkCollectionIsSortable)
+            }}
+          >
+            cancel
+          </Button>
+        </div>
+        <div>
+          <Button
+            id="saveReorderedLinkCollectionButton"
+            variant="outline"
+            className="bg-white text-black"
+            onClick={() => {
+              updateFullLinkCollection(
+                reorderedLinkCollection,
+                setLinkCollectionIsSortable
+              )
+            }}
+          >
+            save
+          </Button>
+        </div>
       </div>
     </>
   )
@@ -257,22 +276,6 @@ function updateLinkCollectionEntry(linkText, linkUrl, linkPosition) {
   document.getElementById("linkText-" + linkPosition).innerHTML =
     linkText.length > 0 ? linkText : linkUrl
 }
-
-function updateFullLinkCollection(reorderedLinkCollection) {
-  // make sure 'position' matches the order desired by the user
-  reorderedLinkCollection.forEach((linkNode, index) => {
-    console.log(
-      `%c changing linkNode.position from ${linkNode.position} => ${index}`,
-      `color: green;`
-    )
-    linkNode.position = index
-
-    // commit to database
-    handleDataUpdate(linkNode.text, linkNode.url, linkNode.position)
-  })
-
-  announce("reordered LinkCollection: ", reorderedLinkCollection)
-}
 // Data manipulations ./
 
 // V-DOM manipulations /.
@@ -362,6 +365,34 @@ function sendLinkInputToUpdate(linkPosition) {
   console.log("bufferURL= " + bufferUrl)
 
   updateLinkCollectionEntry(bufferText, bufferUrl, linkPosition)
+}
+
+function updateFullLinkCollection(
+  reorderedLinkCollection,
+  setLinkCollectionIsSortable
+) {
+  // make sure 'position' matches the order desired by the user
+  reorderedLinkCollection.forEach((linkNode, index) => {
+    console.log(
+      `%c changing linkNode.position from ${linkNode.position} => ${index}`,
+      `color: green;`
+    )
+    linkNode.position = index
+
+    // commit to database
+    handleDataUpdate(linkNode.text, linkNode.url, linkNode.position)
+  })
+
+  announce("reordered LinkCollection: ", reorderedLinkCollection)
+
+  // reset the GUI to default
+  // like  setTagsAreSortable(false)
+  setLinkCollectionIsSortable(false)
+}
+
+function cancelLinkCollectionUpdate(setLinkCollectionIsSortable) {
+  // reset the GUI to default
+  setLinkCollectionIsSortable(false)
 }
 // Mixed V-DOM & data manipulations ./
 
