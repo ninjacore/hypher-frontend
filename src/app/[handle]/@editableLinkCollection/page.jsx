@@ -1,6 +1,6 @@
 "use client"
 
-import { useContext, useState, useEffect, use } from "react"
+import { useId, useContext, useState, useEffect, use } from "react"
 
 import { ProfileContext, Profile } from "../page.jsx"
 import { IconMapper } from "../../../components/iconMapper"
@@ -19,6 +19,25 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
+
+// imports for sorting functionality /.
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core"
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable"
+
+import { SortableLinkNode } from "./SortableLinkNode/SortableLinkNode"
+// imports for sorting functionality ./
 
 export default function Page() {
   return (
@@ -55,6 +74,8 @@ function EditableLinkCollectionWithContext() {
     return (
       <>
         <b>{sectionTitle}</b>
+        <p>Pick up a link to change its position in the collection.</p>
+
         <InEditableLinkCollection
           linkCollection={listOfLinkCollectionEntries}
           setLinkCollection={setListOfLinkCollectionEntries}
@@ -87,23 +108,26 @@ function EditableLinkCollectionWithContext() {
   return null
 }
 
-export function InEditableLinkCollection({
-  linkCollection,
-  setLinkCollection,
-}) {
-  return linkCollection.map((link) => {
-    return (
-      <div
-        key={"pos-" + link.position}
-        className="my-4 mx-2 py-2 px-3 bg-konkikyou-blue"
-      >
-        <IconMapper url={link.url} />
-        <span className="mx-2">
-          {link.text.length > 0 ? link.text : link.url}
-        </span>
-      </div>
-    )
-  })
+export function InEditableLinkCollection({ linkCollection }) {
+  // return linkCollection.map((link) => {
+  //   return (
+  //     <div
+  //       key={"pos-" + link.position}
+  //       className="my-4 mx-2 py-2 px-3 bg-konkikyou-blue"
+  //     >
+  //       <IconMapper url={link.url} />
+  //       <span className="mx-2">
+  //         {link.text.length > 0 ? link.text : link.url}
+  //       </span>
+  //     </div>
+  //   )
+  // })
+
+  return (
+    <>
+      <DnD linkCollection={linkCollection} />
+    </>
+  )
 }
 
 export function EditableLinkCollection({ linkCollection, setLinkCollection }) {
@@ -228,6 +252,81 @@ function updateLinkCollection(linkText, linkUrl, linkPosition) {
     linkText.length > 0 ? linkText : linkUrl
 }
 // Data manipulations ./
+
+// V-DOM manipulations /.
+export function DnD({ linkCollection }) {
+  // abstraction of linkCollection - perhaps obsolete
+  const [linkNodes, setLinkNodes] = useState(
+    linkCollection.map((linkNode) => {
+      linkNode.id = linkNode.position + "th-link"
+      return linkNode
+    })
+  )
+  const [sortedLinkCollection, setSortedLinkCollection] = useState([])
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
+
+  // up-drill every time reorder happens
+  useEffect(() => {
+    setSortedLinkCollection(linkNodes)
+  }, [linkNodes])
+
+  const uniqueId = useId()
+
+  let counter = 0
+
+  return (
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragEnd={handleDragEnd}
+      id={uniqueId}
+    >
+      <SortableContext items={linkNodes} strategy={verticalListSortingStrategy}>
+        {linkNodes.map((linkNode) => {
+          console.log("round #" + counter + " id is: " + linkNode.id)
+          counter++
+
+          return (
+            <SortableLinkNode
+              key={linkNode.position}
+              id={linkNode.id}
+              text={linkNode.text}
+              url={linkNode.url}
+            />
+          )
+        })}
+      </SortableContext>
+    </DndContext>
+  )
+
+  function handleDragEnd(event) {
+    announce("handleDragEnd", event)
+    announce("known Tags:", linkCollection)
+
+    const { active, over } = event
+
+    console.log(`%c active.id => ${active.id}`, `color: green;`)
+    console.log(`%c over.id => ${over.id}`, `color: green;`)
+
+    if (active.id !== over.id) {
+      setLinkNodes((items) => {
+        const oldIndex = items.map((linkNode) => linkNode.id).indexOf(active.id)
+
+        const newIndex = items.map((linkNode) => linkNode.id).indexOf(over.id)
+
+        return arrayMove(items, oldIndex, newIndex)
+      })
+    }
+  }
+}
+
+// V-DOM manipulations ./
 
 // Mixed V-DOM & data manipulations /.
 function sendLinkInputToUpdate(linkPosition) {
