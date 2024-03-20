@@ -81,36 +81,8 @@ function EditableFeaturedContentWithContext() {
 
         <InEditableFeaturedContent
           featuredContentEntries={featuredContentEntries}
+          setFeaturedContentIsSortable={setFeaturedContentIsSortable}
         />
-        <div className="flex justify-end gap-5">
-          <div>
-            <Button
-              id="cancelReorderFeaturedContentButton"
-              variant="outline"
-              className="bg-white text-black"
-              onClick={() => {
-                cancelFeaturedContentUpdate(setFeaturedContentIsSortable)
-              }}
-            >
-              cancel
-            </Button>
-          </div>
-          <div>
-            <Button
-              id="saveReorderFeaturedContentButton"
-              variant="outline"
-              className="bg-white text-black"
-              // onClick={() => {
-              //   updateFullLinkCollection(
-              //     reorderedLinkCollection,
-              //     setLinkCollectionIsSortable
-              //   )
-              // }}
-            >
-              save
-            </Button>
-          </div>
-        </div>
       </>
     )
   } else {
@@ -258,15 +230,55 @@ function EditableFeaturedContentWithContext() {
   )
 }
 
-function InEditableFeaturedContent({ featuredContentEntries }) {
+function InEditableFeaturedContent({
+  featuredContentEntries,
+  setFeaturedContentIsSortable,
+}) {
   const [reorderedFeaturedContentEntries, setReorderedFeaturedContentEntries] =
     useState(featuredContentEntries)
 
   return (
-    <DnD
-      featuredContentEntries={featuredContentEntries}
-      setReorderedFeaturedContentEntries={setReorderedFeaturedContentEntries}
-    />
+    <>
+      <DnD
+        featuredContentEntries={featuredContentEntries}
+        setReorderedFeaturedContentEntries={setReorderedFeaturedContentEntries}
+      />
+      <div className="flex justify-end gap-5">
+        <div>
+          <Button
+            id="cancelReorderFeaturedContentButton"
+            variant="outline"
+            className="bg-white text-black"
+            onClick={() => {
+              cancelFeaturedContentUpdate(setFeaturedContentIsSortable)
+            }}
+          >
+            cancel
+          </Button>
+        </div>
+        <div>
+          <Button
+            id="saveReorderFeaturedContentButton"
+            variant="outline"
+            className="bg-white text-black"
+            // onClick={() => {
+            //   updateFullLinkCollection(
+            //     reorderedLinkCollection,
+            //     setLinkCollectionIsSortable
+            //   )
+            // }}
+            onClick={() => {
+              sendFullFeaturedContentToUpdate(
+                reorderedFeaturedContentEntries,
+                setFeaturedContentIsSortable
+              )
+            }}
+          >
+            save
+          </Button>
+        </div>
+      </div>
+    </>
   )
   // return featuredContentEntries.map((featuredContent) => {
   //   return (
@@ -413,51 +425,51 @@ function EditableFeaturedContent({ featuredContentEntries }) {
 }
 
 // OLD FUNCTIONS BELOW - to be checked and updated
-function updateFeaturedContent(
-  featuredTitle,
-  featuredLink,
-  featuredDescription,
-  contentBoxPosition
-) {
-  // save to backend
-  handleDataUpdate(
-    featuredTitle,
-    featuredLink,
-    featuredDescription,
-    contentBoxPosition
-  )
+// function updateFeaturedContent(
+//   featuredTitle,
+//   featuredLink,
+//   featuredDescription,
+//   contentBoxPosition
+// ) {
+//   // save to backend
+//   handleDataUpdate(
+//     featuredTitle,
+//     featuredLink,
+//     featuredDescription,
+//     contentBoxPosition
+//   )
 
-  // TODO: only continue on successful save!
-  console.log(
-    `%c featuredTitle=${featuredTitle}, featuredLink=${featuredLink}, featuredDescription=${featuredDescription}, contentBoxPosition=${contentBoxPosition}`,
-    "color: cyan; background-color: black; font-size: 16px; padding: 4px; border-radius: 4px;"
-  )
+//   // TODO: only continue on successful save!
+//   console.log(
+//     `%c featuredTitle=${featuredTitle}, featuredLink=${featuredLink}, featuredDescription=${featuredDescription}, contentBoxPosition=${contentBoxPosition}`,
+//     "color: cyan; background-color: black; font-size: 16px; padding: 4px; border-radius: 4px;"
+//   )
 
-  // re-render featured content (show changes)
-  document.getElementById("featuredTitle-" + contentBoxPosition).innerHTML =
-    featuredTitle
+//   // re-render featured content (show changes)
+//   document.getElementById("featuredTitle-" + contentBoxPosition).innerHTML =
+//     featuredTitle
 
-  let displayedDescription = document.getElementById(
-    "featuredDescription-" + contentBoxPosition
-  )
-  if (featuredDescription.length > 0) {
-    displayedDescription.innerHTML = featuredDescription
-  } else {
-    displayedDescription.innerHTML = featuredLink
-  }
-}
+//   let displayedDescription = document.getElementById(
+//     "featuredDescription-" + contentBoxPosition
+//   )
+//   if (featuredDescription.length > 0) {
+//     displayedDescription.innerHTML = featuredDescription
+//   } else {
+//     displayedDescription.innerHTML = featuredLink
+//   }
+// }
 
-function editLink(event, contentBoxPosition) {
-  console.log(
-    `%c ${event.target}`,
-    "color: cyan; background-color: black; font-size: 16px; padding: 4px; border-radius: 4px;"
-  )
+// function editLink(event, contentBoxPosition) {
+//   console.log(
+//     `%c ${event.target}`,
+//     "color: cyan; background-color: black; font-size: 16px; padding: 4px; border-radius: 4px;"
+//   )
 
-  console.log(
-    `%c link at position ${contentBoxPosition} is getting edited!!`,
-    "color: cyan; background-color: black; font-size: 16px; padding: 4px; border-radius: 4px;"
-  )
-}
+//   console.log(
+//     `%c link at position ${contentBoxPosition} is getting edited!!`,
+//     "color: cyan; background-color: black; font-size: 16px; padding: 4px; border-radius: 4px;"
+//   )
+// }
 
 /// end of old code
 
@@ -520,7 +532,6 @@ function DnD({ featuredContentEntries, setReorderedFeaturedContentEntries }) {
 
   // up-drill every time reorder happens
   useEffect(() => {
-    // setSortedLinkCollection(linkNodes)
     setReorderedFeaturedContentEntries(featuredContentNodes)
   }, [featuredContentNodes])
 
@@ -628,6 +639,35 @@ function sendFeaturedContentToUpdate(featuredContentPosition) {
 
 function cancelFeaturedContentUpdate(setFeaturedContentIsSortable) {
   // reset the GUI to default
+  setFeaturedContentIsSortable(false)
+}
+
+function sendFullFeaturedContentToUpdate(
+  reorderedFeaturedContentEntries,
+  setFeaturedContentIsSortable
+) {
+  reorderedFeaturedContentEntries.forEach((featuredContent, index) => {
+    console.log(
+      `%c changing linkNode.position from ${featuredContent.position} => ${index}`,
+      `color: green;`
+    )
+    // important: make sure 'position' matches the order desired by the user
+
+    featuredContent.position = index
+
+    // commit to database
+    handleDataUpdate(
+      featuredContent.title,
+      featuredContent.url,
+      featuredContent.description,
+      featuredContent.position
+    )
+  })
+
+  // keep new order without reload from backend
+  // setFeaturedContentEntries(reorderedFeaturedContentEntries)
+
+  // reset view
   setFeaturedContentIsSortable(false)
 }
 // Mixed V-DOM & data manipulations ./

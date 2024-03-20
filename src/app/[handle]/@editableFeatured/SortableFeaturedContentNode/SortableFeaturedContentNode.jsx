@@ -19,9 +19,6 @@ function SortableFeaturedContentNode(props) {
     transition,
   }
 
-  console.log("SortableFeaturedContentNode::props")
-  console.table(props)
-
   return (
     <div
       ref={setNodeRef}
