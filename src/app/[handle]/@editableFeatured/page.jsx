@@ -77,8 +77,11 @@ function EditableFeaturedContentWithContext() {
     return (
       <>
         <b>{title}</b>
+        <p>Pick up an entry to change its position in the collection.</p>
 
-        <InEditableFeaturedContent />
+        <InEditableFeaturedContent
+          featuredContentEntries={featuredContentEntries}
+        />
       </>
     )
   } else {
@@ -89,6 +92,16 @@ function EditableFeaturedContentWithContext() {
         <EditableFeaturedContent
           featuredContentEntries={featuredContentEntries}
         />
+        <div className="flex justify-end">
+          <Button
+            id="activateReorderFeaturedContentButton"
+            variant="outline"
+            className="bg-white text-black"
+            onClick={() => setFeaturedContentIsSortable(true)}
+          >
+            change order
+          </Button>
+        </div>
       </>
     )
   }
@@ -216,8 +229,34 @@ function EditableFeaturedContentWithContext() {
   )
 }
 
-function InEditableFeaturedContent() {
-  return <></>
+function InEditableFeaturedContent({ featuredContentEntries }) {
+  return featuredContentEntries.map((featuredContent) => {
+    return (
+      <Card
+        key={featuredContent.category + featuredContent.position}
+        className="my-4"
+      >
+        <a href={featuredContent.url} target="_blank">
+          <div className="flex">
+            <div className="text-5xl py-4 px-2">
+              <IconMapper url={featuredContent.category + ":"} />
+            </div>
+            <div className="grow p-2">
+              <span>
+                {featuredContent.title.length > 0 ? featuredContent.title : ""}
+              </span>
+              <br />
+              <span>
+                {featuredContent.description.length > 0
+                  ? featuredContent.description
+                  : featuredContent.url}
+              </span>
+            </div>
+          </div>
+        </a>
+      </Card>
+    )
+  })
 }
 
 function EditableFeaturedContent({ featuredContentEntries }) {
