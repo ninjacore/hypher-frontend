@@ -82,6 +82,35 @@ function EditableFeaturedContentWithContext() {
         <InEditableFeaturedContent
           featuredContentEntries={featuredContentEntries}
         />
+        <div className="flex justify-end gap-5">
+          <div>
+            <Button
+              id="cancelReorderFeaturedContentButton"
+              variant="outline"
+              className="bg-white text-black"
+              onClick={() => {
+                cancelFeaturedContentUpdate(setFeaturedContentIsSortable)
+              }}
+            >
+              cancel
+            </Button>
+          </div>
+          <div>
+            <Button
+              id="saveReorderFeaturedContentButton"
+              variant="outline"
+              className="bg-white text-black"
+              // onClick={() => {
+              //   updateFullLinkCollection(
+              //     reorderedLinkCollection,
+              //     setLinkCollectionIsSortable
+              //   )
+              // }}
+            >
+              save
+            </Button>
+          </div>
+        </div>
       </>
     )
   } else {
@@ -230,33 +259,42 @@ function EditableFeaturedContentWithContext() {
 }
 
 function InEditableFeaturedContent({ featuredContentEntries }) {
-  return featuredContentEntries.map((featuredContent) => {
-    return (
-      <Card
-        key={featuredContent.category + featuredContent.position}
-        className="my-4"
-      >
-        <a href={featuredContent.url} target="_blank">
-          <div className="flex">
-            <div className="text-5xl py-4 px-2">
-              <IconMapper url={featuredContent.category + ":"} />
-            </div>
-            <div className="grow p-2">
-              <span>
-                {featuredContent.title.length > 0 ? featuredContent.title : ""}
-              </span>
-              <br />
-              <span>
-                {featuredContent.description.length > 0
-                  ? featuredContent.description
-                  : featuredContent.url}
-              </span>
-            </div>
-          </div>
-        </a>
-      </Card>
-    )
-  })
+  const [reorderedFeaturedContentEntries, setReorderedFeaturedContentEntries] =
+    useState(featuredContentEntries)
+
+  return (
+    <DnD
+      featuredContentEntries={featuredContentEntries}
+      setReorderedFeaturedContentEntries={setReorderedFeaturedContentEntries}
+    />
+  )
+  // return featuredContentEntries.map((featuredContent) => {
+  //   return (
+  // <Card
+  //   key={featuredContent.category + featuredContent.position}
+  //   className="my-4"
+  // >
+  //   <a href={featuredContent.url} target="_blank">
+  //     <div className="flex">
+  //       <div className="text-5xl py-4 px-2">
+  //         <IconMapper url={featuredContent.category + ":"} />
+  //       </div>
+  //       <div className="grow p-2">
+  //         <span>
+  //           {featuredContent.title.length > 0 ? featuredContent.title : ""}
+  //         </span>
+  //         <br />
+  //         <span>
+  //           {featuredContent.description.length > 0
+  //             ? featuredContent.description
+  //             : featuredContent.url}
+  //         </span>
+  //       </div>
+  //     </div>
+  //   </a>
+  // </Card>
+  //   )
+  // })
 }
 
 function EditableFeaturedContent({ featuredContentEntries }) {
@@ -461,6 +499,91 @@ function handleDataUpdate(
 }
 // Network interactions ./
 
+// V-DOM Manipulations /.
+function DnD({ featuredContentEntries, setReorderedFeaturedContentEntries }) {
+  announce("this is the featuredContentEntries", featuredContentEntries, "blue")
+
+  // preparing entries for drag and drop
+  const [featuredContentNodes, setFeaturedContentNodes] = useState(
+    featuredContentEntries.map((featuredContentNode) => {
+      featuredContentNode.id = featuredContentNode.position + "th-content"
+      return featuredContentNode
+    })
+  )
+
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
+
+  // up-drill every time reorder happens
+  useEffect(() => {
+    // setSortedLinkCollection(linkNodes)
+    setReorderedFeaturedContentEntries(featuredContentNodes)
+  }, [featuredContentNodes])
+
+  const uniqueId = useId()
+
+  let counter = 0
+
+  return (
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragEnd={handleDragEnd}
+      id={uniqueId}
+    >
+      <SortableContext
+        items={featuredContentNodes}
+        strategy={verticalListSortingStrategy}
+      >
+        {featuredContentNodes.map((contentNode) => {
+          console.log("round #" + counter + " id is: " + contentNode.id)
+          counter++
+
+          return (
+            <SortableFeaturedContentNode
+              key={contentNode.position}
+              id={contentNode.id}
+              title={contentNode.title}
+              description={contentNode.description}
+              url={contentNode.url}
+              category={contentNode.category}
+            />
+          )
+        })}
+      </SortableContext>
+    </DndContext>
+  )
+
+  function handleDragEnd(event) {
+    announce("handleDragEnd", event)
+    announce("known content:", featuredContentEntries)
+
+    const { active, over } = event
+
+    console.log(`%c active.id => ${active.id}`, `color: green;`)
+    console.log(`%c over.id => ${over.id}`, `color: green;`)
+
+    if (active.id !== over.id) {
+      setFeaturedContentNodes((items) => {
+        const oldIndex = items
+          .map((contentNode) => contentNode.id)
+          .indexOf(active.id)
+
+        const newIndex = items
+          .map((contentNode) => contentNode.id)
+          .indexOf(over.id)
+
+        return arrayMove(items, oldIndex, newIndex)
+      })
+    }
+  }
+}
+// V-DOM Manipulations ./
+
 // Mixed V-DOM & data manipulations /.
 function sendFeaturedContentToUpdate(featuredContentPosition) {
   // featuredTitleInput
@@ -501,6 +624,11 @@ function sendFeaturedContentToUpdate(featuredContentPosition) {
   } else {
     displayedDescription.innerHTML = bufferLink
   }
+}
+
+function cancelFeaturedContentUpdate(setFeaturedContentIsSortable) {
+  // reset the GUI to default
+  setFeaturedContentIsSortable(false)
 }
 // Mixed V-DOM & data manipulations ./
 
