@@ -79,7 +79,6 @@ function EditableLinkCollectionWithContext() {
 
         <InEditableLinkCollection
           linkCollection={listOfLinkCollectionEntries}
-          setLinkCollection={setListOfLinkCollectionEntries}
           setLinkCollectionIsSortable={setLinkCollectionIsSortable}
         />
       </>
@@ -280,6 +279,8 @@ function updateLinkCollectionEntry(linkText, linkUrl, linkPosition) {
 
 // V-DOM manipulations /.
 export function DnD({ linkCollection, setReorderedLinkCollection }) {
+  announce("this is the linkCollection", linkCollection)
+
   // abstraction of linkCollection - perhaps obsolete
   const [linkNodes, setLinkNodes] = useState(
     linkCollection.map((linkNode) => {
@@ -333,7 +334,7 @@ export function DnD({ linkCollection, setReorderedLinkCollection }) {
 
   function handleDragEnd(event) {
     announce("handleDragEnd", event)
-    announce("known Tags:", linkCollection)
+    announce("known Links:", linkCollection)
 
     const { active, over } = event
 
@@ -351,7 +352,6 @@ export function DnD({ linkCollection, setReorderedLinkCollection }) {
     }
   }
 }
-
 // V-DOM manipulations ./
 
 // Mixed V-DOM & data manipulations /.
@@ -371,12 +371,12 @@ function updateFullLinkCollection(
   reorderedLinkCollection,
   setLinkCollectionIsSortable
 ) {
-  // make sure 'position' matches the order desired by the user
   reorderedLinkCollection.forEach((linkNode, index) => {
     console.log(
       `%c changing linkNode.position from ${linkNode.position} => ${index}`,
       `color: green;`
     )
+    // important: make sure 'position' matches the order desired by the user, thus:
     linkNode.position = index
 
     // commit to database
