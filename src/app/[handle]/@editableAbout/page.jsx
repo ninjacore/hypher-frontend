@@ -42,6 +42,7 @@ function EditableAbout() {
 
   // return <>{mainContent.bio}</>
 
+  // TODO: create action to update bio in database
   return (
     <div onClick={() => setEditBio(true)}>
       {editBio ? (
