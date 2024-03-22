@@ -54,8 +54,13 @@ function EditableFeaturedContentWithContext() {
     // You can return a loading spinner, a placeholder, or null to avoid rendering this component prematurely
     return <div>Loading...</div> // or return null;
   }
+
+  // load the data from context
   const { featuredContentData } = profile
-  // const featuredContentData = featuredContentData
+  // sort by position to display it correctly
+  let featuredContentByPosition = featuredContentData.contentBox.toSorted(
+    (a, b) => a.position - b.position
+  )
 
   console.log("featuredContent.contentBox=")
   console.table(featuredContentData.contentBox)
@@ -66,7 +71,7 @@ function EditableFeaturedContentWithContext() {
   const [featuredContentIsSortable, setFeaturedContentIsSortable] =
     useState(false)
   const [featuredContentEntries, setFeaturedContentEntries] = useState(
-    featuredContentData.contentBox.map((featuredContent) => featuredContent)
+    featuredContentByPosition.map((featuredContent) => featuredContent)
   )
   announce("populated featured content list", featuredContentEntries)
 

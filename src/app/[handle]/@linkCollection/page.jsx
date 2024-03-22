@@ -27,7 +27,12 @@ function LinkCollection() {
   console.log("linkedCollection.contentBox=")
   console.table(linkedCollection.contentBox)
 
-  const innerHTML = linkedCollection.contentBox.map((link) => {
+  // sort by position
+  let linkCollectionByPosition = linkedCollection.contentBox.toSorted(
+    (a, b) => a.position - b.position
+  )
+
+  const innerHTML = linkCollectionByPosition.map((link) => {
     return (
       <div
         key={"pos-" + link.position}

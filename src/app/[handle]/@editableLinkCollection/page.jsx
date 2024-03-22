@@ -59,6 +59,11 @@ function EditableLinkCollectionWithContext() {
   const { linkCollectionData } = profile
   const linkedCollection = linkCollectionData
 
+  // sort by position to display it correctly
+  let linkCollectionByPosition = linkedCollection.contentBox.toSorted(
+    (a, b) => a.position - b.position
+  )
+
   console.log("linkedCollection.contentBox=")
   console.table(linkedCollection.contentBox)
 
@@ -68,7 +73,7 @@ function EditableLinkCollectionWithContext() {
 
   // new list - will be used to populate data and V-DOM
   const [listOfLinkCollectionEntries, setListOfLinkCollectionEntries] =
-    useState(linkedCollection.contentBox.map((link) => link))
+    useState(linkCollectionByPosition.map((link) => link))
   announce("populated link collection list", listOfLinkCollectionEntries)
 
   if (linkCollectionIsSortable) {
