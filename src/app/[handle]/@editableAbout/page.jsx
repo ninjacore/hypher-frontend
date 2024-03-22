@@ -40,27 +40,101 @@ function EditableAbout() {
   const { mainProfileData } = profile
   const mainContent = mainProfileData.contentBox?.[0]
 
-  // return <>{mainContent.bio}</>
+  if (editBio) {
+    return (
+      <>
+        <Textarea placeholder="Type your message here." id="aboutText">
+          {mainContent.bio}
+        </Textarea>
+        <Button
+          variant="outline"
+          onClick={() => {
+            saveUpdatedBio(setEditBio)
+          }}
+        >
+          save
+        </Button>
+      </>
+    )
+  } else {
+    // default HTML
 
-  return (
-    <div onClick={() => setEditBio(true)}>
-      {editBio ? (
-        <>
-          <Textarea placeholder="Type your message here." id="aboutText">
-            {mainContent.bio}
-          </Textarea>
-          <Button variant="outline">ok</Button>
-        </>
-      ) : (
-        <>{mainContent.bio}</>
-      )}
-      {editBio ? <></> : <EditButton />}
-    </div>
-  )
+    return (
+      <>
+        <div onClick={() => setEditBio(true)}>{mainContent.bio}</div>
+      </>
+    )
+  }
+
+  // // old logic
+  // return (
+  //   <div onClick={() => setEditBio(true)}>
+  //     {editBio ? (
+  //       <>
+  //         <Textarea placeholder="Type your message here." id="aboutText">
+  //           {mainContent.bio}
+  //         </Textarea>
+  //         <Button
+  //           variant="outline"
+  //           onClick={() => {
+  //             saveUpdatedBio(setEditBio)
+  //           }}
+  //         >
+  //           ok
+  //         </Button>
+  //       </>
+  //     ) : (
+  //       <>{mainContent.bio}</>
+  //     )}
+  //     {editBio ? <></> : <EditButton />}
+  //   </div>
+  // )
 }
 
-/**
+// Network interactions /.
+function handleDataUpdate(aboutText) {
+  // get handle from url of this page
+  const url = window.location.href
+  const handle = url.split("/").pop()
+  console.log("handle=")
+  console.log(handle)
 
+  const apiURL = `http://localhost:5678/api/v1/profiles/${handle}/about`
 
+  fetch(apiURL, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      bio: aboutText,
+    }),
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log("Success:", data)
+      return data
+    })
+    .catch((error) => {
+      console.error("Error:", error)
+      return error
+    })
+}
 
- */
+// Network interactions ./
+
+// Mixed V-DOM & Data-manipulations /.
+function saveUpdatedBio(setEditBio) {
+  let textBuffer = document.getElementById("aboutText").value
+  console.log("updated bio: ", textBuffer)
+
+  // TODO: update context (so change shows for user)
+
+  // save to database
+  // {{SERVICE_IP}}:{{SERVICE_PORT}}/{{API_VERSION}}/profiles/dnt.is/about
+  handleDataUpdate(textBuffer)
+
+  // reset view
+  setEditBio(false)
+}
+// Mixed V-DOM & Data-manipulations ./
