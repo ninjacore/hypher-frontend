@@ -60,35 +60,12 @@ function EditableAbout() {
     // default HTML
 
     return (
-      <>
-        <div onClick={() => setEditBio(true)}>{mainContent.bio}</div>
-      </>
+      <div onClick={() => setEditBio(true)}>
+        {mainContent.bio}
+        <EditButton />
+      </div>
     )
   }
-
-  // // old logic
-  // return (
-  //   <div onClick={() => setEditBio(true)}>
-  //     {editBio ? (
-  //       <>
-  //         <Textarea placeholder="Type your message here." id="aboutText">
-  //           {mainContent.bio}
-  //         </Textarea>
-  //         <Button
-  //           variant="outline"
-  //           onClick={() => {
-  //             saveUpdatedBio(setEditBio)
-  //           }}
-  //         >
-  //           ok
-  //         </Button>
-  //       </>
-  //     ) : (
-  //       <>{mainContent.bio}</>
-  //     )}
-  //     {editBio ? <></> : <EditButton />}
-  //   </div>
-  // )
 }
 
 // Network interactions /.
@@ -120,7 +97,6 @@ function handleDataUpdate(aboutText) {
       return error
     })
 }
-
 // Network interactions ./
 
 // Mixed V-DOM & Data-manipulations /.
@@ -128,10 +104,7 @@ function saveUpdatedBio(setEditBio) {
   let textBuffer = document.getElementById("aboutText").value
   console.log("updated bio: ", textBuffer)
 
-  // TODO: update context (so change shows for user)
-
   // save to database
-  // {{SERVICE_IP}}:{{SERVICE_PORT}}/{{API_VERSION}}/profiles/dnt.is/about
   handleDataUpdate(textBuffer)
 
   // reset view
