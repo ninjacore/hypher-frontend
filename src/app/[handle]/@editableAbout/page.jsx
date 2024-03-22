@@ -50,7 +50,14 @@ function EditableAbout() {
           <Textarea placeholder="Type your message here." id="aboutText">
             {mainContent.bio}
           </Textarea>
-          <Button variant="outline">ok</Button>
+          <Button
+            variant="outline"
+            onClick={() => {
+              saveUpdatedBio()
+            }}
+          >
+            ok
+          </Button>
         </>
       ) : (
         <>{mainContent.bio}</>
@@ -60,8 +67,12 @@ function EditableAbout() {
   )
 }
 
-/**
+function saveUpdatedBio() {
+  let textBuffer = document.getElementById("aboutText").value
+  console.log("updated bio: ", textBuffer)
 
+  // update context (so change shows for user)
 
-
- */
+  // save to database
+  // {{SERVICE_IP}}:{{SERVICE_PORT}}/{{API_VERSION}}/profiles/dnt.is/about
+}
