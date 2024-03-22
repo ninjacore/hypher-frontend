@@ -30,7 +30,16 @@ function Featured() {
   console.log(featuredContent)
 
   let title = featuredContent.shortTitle
-  const innerHTML = featuredContent.contentBox.map((contentBox) => {
+
+  console.log("featuredContent.contentBox=")
+  console.table(featuredContent.contentBox)
+
+  // sort by position to display it correctly
+  let featuredContentByPosition = featuredContent.contentBox.toSorted(
+    (a, b) => a.position - b.position
+  )
+
+  const innerHTML = featuredContentByPosition.map((contentBox) => {
     return (
       <Card key={contentBox.category + contentBox.position} className="my-4">
         <a href={contentBox.url} target="_blank">
