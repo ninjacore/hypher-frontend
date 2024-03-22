@@ -40,41 +40,59 @@ function EditableAbout() {
   const { mainProfileData } = profile
   const mainContent = mainProfileData.contentBox?.[0]
 
-  // return <>{mainContent.bio}</>
+  if (editBio) {
+    return (
+      <>
+        <Textarea placeholder="Type your message here." id="aboutText">
+          {mainContent.bio}
+        </Textarea>
+        <Button
+          variant="outline"
+          onClick={() => {
+            saveUpdatedBio(setEditBio)
+          }}
+        >
+          save
+        </Button>
+      </>
+    )
+  } else {
+    // default HTML
 
-  // TODO: create action to update bio in database
-  return (
-    <div onClick={() => setEditBio(true)}>
-      {editBio ? (
-        <>
-          <Textarea placeholder="Type your message here." id="aboutText">
-            {mainContent.bio}
-          </Textarea>
-          <Button
-            variant="outline"
-            onClick={() => {
-              saveUpdatedBio()
-            }}
-          >
-            ok
-          </Button>
-        </>
-      ) : (
-        <>{mainContent.bio}</>
-      )}
-      {editBio ? <></> : <EditButton />}
-    </div>
-  )
+    return (
+      <>
+        <div onClick={() => setEditBio(true)}>{mainContent.bio}</div>
+      </>
+    )
+  }
+
+  // // old logic
+  // return (
+  //   <div onClick={() => setEditBio(true)}>
+  //     {editBio ? (
+  //       <>
+  //         <Textarea placeholder="Type your message here." id="aboutText">
+  //           {mainContent.bio}
+  //         </Textarea>
+  //         <Button
+  //           variant="outline"
+  //           onClick={() => {
+  //             saveUpdatedBio(setEditBio)
+  //           }}
+  //         >
+  //           ok
+  //         </Button>
+  //       </>
+  //     ) : (
+  //       <>{mainContent.bio}</>
+  //     )}
+  //     {editBio ? <></> : <EditButton />}
+  //   </div>
+  // )
 }
 
-function saveUpdatedBio() {
-  let textBuffer = document.getElementById("aboutText").value
-  console.log("updated bio: ", textBuffer)
-
-  // TODO: update context (so change shows for user)
-
-  // save to database
-  // {{SERVICE_IP}}:{{SERVICE_PORT}}/{{API_VERSION}}/profiles/dnt.is/about
+// Network interactions /.
+function handleDataUpdate(aboutText) {
   // get handle from url of this page
   const url = window.location.href
   const handle = url.split("/").pop()
@@ -89,7 +107,7 @@ function saveUpdatedBio() {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      bio: textBuffer,
+      bio: aboutText,
     }),
   })
     .then((response) => response.json())
@@ -102,3 +120,21 @@ function saveUpdatedBio() {
       return error
     })
 }
+
+// Network interactions ./
+
+// Mixed V-DOM & Data-manipulations /.
+function saveUpdatedBio(setEditBio) {
+  let textBuffer = document.getElementById("aboutText").value
+  console.log("updated bio: ", textBuffer)
+
+  // TODO: update context (so change shows for user)
+
+  // save to database
+  // {{SERVICE_IP}}:{{SERVICE_PORT}}/{{API_VERSION}}/profiles/dnt.is/about
+  handleDataUpdate(textBuffer)
+
+  // reset view
+  setEditBio(false)
+}
+// Mixed V-DOM & Data-manipulations ./
