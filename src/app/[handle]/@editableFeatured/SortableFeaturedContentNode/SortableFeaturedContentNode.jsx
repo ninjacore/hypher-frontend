@@ -27,16 +27,6 @@ function SortableFeaturedContentNode(props) {
       {...listeners}
       className=""
     >
-      {/* <span className="">{props.text + " :: " + props.url}</span> */}
-      {/* <div
-        key={"pos-" + props.position}
-        className="my-4 mx-2 py-2 px-3 bg-konkikyou-blue"
-      >
-        <IconMapper url={props.url} />
-        <span className="mx-2">
-          {props.title.length > 0 ? props.title : props.url}
-        </span>
-      </div> */}
       <Card key={props.category + props.position} className="my-4">
         <div className="flex">
           <div className="text-5xl py-4 px-2">

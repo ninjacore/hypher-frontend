@@ -1,31 +1,3 @@
-// Tags: String
-//     givenTags: Array<String>
-//     clearedTags: DoublyLinkedList<TagNode>
-//       tag.id
-//       tag.text
-//       tag.position
-//       tag.previousTag
-//       tag.nextTag
-//       tag.isVisible
-//       tag.isMarkedForDeletion
-// knownTags: DoublyLinkedList<TagNode>
-
-// tagsDisplayed: DoublyLinkedList<TagNode>
-// tagsDeleteBuffer: DoublyLinkedList<TagNode>
-
-// operations needed:
-// - add tag
-// - remove tag
-//   1. find this.prevTag -> prevTag.nextTag = this.nextTag
-//   2. this.nextTag -> nextTag.prevTag = this.prevTag
-// - (re:)order tags
-//   - get/set:before
-//   - get/set:after
-// - number of tags -> progress bar
-// - copy list
-// - get first tag
-// - get last tag
-
 import { uuidv4 } from "@/lib/utils"
 
 export class TagNode {

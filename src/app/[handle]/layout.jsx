@@ -18,24 +18,11 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faAngleRight, faPenToSquare } from "@fortawesome/free-solid-svg-icons"
 
 import { EditButton } from "@/components/ui/editButtonPen"
-// import { showTextArea } from "./utils/showTextArea"
-// import { Textarea } from "@/components/ui/textarea"
 
 const title = "Profile Page"
 
 // to be handled by token
 const pageOwner = true
-
-// to be handley by button click
-// const editMode = false
-
-// export const metadata = {
-//   title,
-//   openGraph: {
-//     title,
-//     images: [`/api/og?title=${title}`],
-//   },
-// }
 
 function ProfilePageButton({ isOwner, setEditMode }) {
   if (isOwner) {
@@ -71,7 +58,6 @@ export default function Layout({
 
   // edit mode
   if (editMode) {
-    // const [editBio, setEditBio] = useState(false)
     return (
       <>
         <Card className="mb-2">

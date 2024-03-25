@@ -293,7 +293,6 @@ export function DnD({ linkCollection, setReorderedLinkCollection }) {
       return linkNode
     })
   )
-  const [sortedLinkCollection, setSortedLinkCollection] = useState([])
 
   const sensors = useSensors(
     useSensor(PointerSensor),
@@ -304,7 +303,6 @@ export function DnD({ linkCollection, setReorderedLinkCollection }) {
 
   // up-drill every time reorder happens
   useEffect(() => {
-    // setSortedLinkCollection(linkNodes)
     setReorderedLinkCollection(linkNodes)
   }, [linkNodes])
 
@@ -391,7 +389,6 @@ function updateFullLinkCollection(
   announce("reordered LinkCollection: ", reorderedLinkCollection)
 
   // reset the GUI to default
-  // like  setTagsAreSortable(false)
   setLinkCollectionIsSortable(false)
 }
 

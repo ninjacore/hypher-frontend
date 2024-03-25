@@ -27,7 +27,7 @@ function LinkCollection() {
   console.log("linkedCollection.contentBox=")
   console.table(linkedCollection.contentBox)
 
-  // sort by position
+  // sort by position to display it correctly
   let linkCollectionByPosition = linkedCollection.contentBox.toSorted(
     (a, b) => a.position - b.position
   )

@@ -1,7 +1,7 @@
 "use client"
 import React, { useId, useEffect, useState } from "react"
 
-import { TagNode } from "../components/TagNode/TagNode"
+import { TagNode } from "../TagNode/TagNode"
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faXmark } from "@fortawesome/free-solid-svg-icons"
@@ -37,7 +37,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable"
 
-import { SortableItem } from "./components/SortableItem/SortableItem"
+import { SortableItem } from "./SortableItem/SortableItem"
 // imports for sorting functionality ./
 
 export default function Page() {
