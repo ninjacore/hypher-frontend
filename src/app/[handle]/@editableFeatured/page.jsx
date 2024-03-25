@@ -1,7 +1,6 @@
 "use client"
 
 import { useId, useContext, useState, useEffect, use } from "react"
-// import { ProfileContext, Profile } from "../ProfileProvider"
 import { ProfileContext, Profile } from "../page.jsx"
 import { IconMapper } from "../../../components/iconMapper"
 import { Card } from "@/components/ui/card"
@@ -78,7 +77,6 @@ function EditableFeaturedContentWithContext() {
   let title = featuredContentData.shortTitle
 
   if (featuredContentIsSortable) {
-    // do some
     return (
       <>
         <b>{title}</b>
@@ -111,128 +109,6 @@ function EditableFeaturedContentWithContext() {
       </>
     )
   }
-
-  // OLD CODE BELOW - to be deleted
-  const innerHTML = featuredContentData.contentBox.map((contentBox) => {
-    // pre-load from context if available
-    let defaultFeaturedTitle = ""
-    let defaultFeaturedLink = ""
-    let defaultFeaturedDescription = ""
-
-    if (contentBox.title.length > 0) {
-      defaultFeaturedTitle = contentBox.title
-    }
-    if (contentBox.url.length > 0) {
-      defaultFeaturedLink = contentBox.url
-    }
-    if (contentBox.description.length > 0) {
-      defaultFeaturedDescription = contentBox.description
-    }
-
-    // for the input fields
-    const [featuredTitle, setFeaturedTitle] = useState(defaultFeaturedTitle)
-    const [featuredLink, setFeaturedLink] = useState(defaultFeaturedLink)
-    const [featuredDescription, setFeaturedDescription] = useState(
-      defaultFeaturedDescription
-    )
-
-    return (
-      <Card key={contentBox.category + contentBox.position} className="my-4">
-        {/* <a onClick={(e) => editLink(e, 2)} id={contentBox.position + "x"}> */}
-        <Dialog>
-          <DialogTrigger asChild>
-            <div className="flex group/edit">
-              <div className="text-5xl py-4 px-2">
-                <IconMapper url={contentBox.category + ":"} />
-              </div>
-              <div className="grow p-2">
-                <span id={"featuredTitle-" + contentBox.position}>
-                  {/* {contentBox.title.length > 0 ? contentBox.title : ""} */}
-                  {defaultFeaturedTitle}
-                </span>
-                <EditButton />
-                <br />
-                <span id={"featuredDescription-" + contentBox.position}>
-                  {contentBox.description.length > 0
-                    ? contentBox.description
-                    : contentBox.url}
-                </span>
-              </div>
-            </div>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>Edit Content</DialogTitle>
-              <DialogDescription>
-                Make changes to your content here. Click save when you're done.
-              </DialogDescription>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="featuredTitle" className="text-right">
-                  Title
-                </Label>
-                <Input
-                  id="featuredTitle"
-                  type="text"
-                  className="col-span-3"
-                  onChange={(e) => setFeaturedTitle(e.target.value)}
-                  value={featuredTitle}
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="featuredLink" className="text-right">
-                  Link
-                </Label>
-                <Input
-                  id="featuredLink"
-                  type="text"
-                  className="col-span-3"
-                  onChange={(e) => setFeaturedLink(e.target.value)}
-                  value={featuredLink}
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="featuredDescription" className="text-right">
-                  Description
-                </Label>
-                <Input
-                  id="featuredDescription"
-                  type="text"
-                  className="col-span-3"
-                  onChange={(e) => setFeaturedDescription(e.target.value)}
-                  value={featuredDescription}
-                />
-              </div>
-            </div>
-            <DialogFooter>
-              <DialogClose>
-                <Button
-                  type="submit"
-                  onClick={(e) => {
-                    updateFeaturedContent(
-                      featuredTitle,
-                      featuredLink,
-                      featuredDescription,
-                      contentBox.position
-                    )
-                  }}
-                >
-                  Save changes
-                </Button>
-              </DialogClose>
-            </DialogFooter>
-          </DialogContent>
-        </Dialog>
-      </Card>
-    )
-  }, [])
-  return (
-    <>
-      <b>{title}</b>
-      <div className="">{innerHTML}</div>
-    </>
-  )
 }
 
 function InEditableFeaturedContent({
@@ -266,12 +142,6 @@ function InEditableFeaturedContent({
             id="saveReorderFeaturedContentButton"
             variant="outline"
             className="bg-white text-black"
-            // onClick={() => {
-            //   updateFullLinkCollection(
-            //     reorderedLinkCollection,
-            //     setLinkCollectionIsSortable
-            //   )
-            // }}
             onClick={() => {
               sendFullFeaturedContentToUpdate(
                 reorderedFeaturedContentEntries,
@@ -285,33 +155,6 @@ function InEditableFeaturedContent({
       </div>
     </>
   )
-  // return featuredContentEntries.map((featuredContent) => {
-  //   return (
-  // <Card
-  //   key={featuredContent.category + featuredContent.position}
-  //   className="my-4"
-  // >
-  //   <a href={featuredContent.url} target="_blank">
-  //     <div className="flex">
-  //       <div className="text-5xl py-4 px-2">
-  //         <IconMapper url={featuredContent.category + ":"} />
-  //       </div>
-  //       <div className="grow p-2">
-  //         <span>
-  //           {featuredContent.title.length > 0 ? featuredContent.title : ""}
-  //         </span>
-  //         <br />
-  //         <span>
-  //           {featuredContent.description.length > 0
-  //             ? featuredContent.description
-  //             : featuredContent.url}
-  //         </span>
-  //       </div>
-  //     </div>
-  //   </a>
-  // </Card>
-  //   )
-  // })
 }
 
 function EditableFeaturedContent({ featuredContentEntries }) {
@@ -343,7 +186,6 @@ function EditableFeaturedContent({ featuredContentEntries }) {
         key={featuredContent.category + featuredContent.position}
         className="my-4"
       >
-        {/* <a onClick={(e) => editLink(e, 2)} id={contentBox.position + "x"}> */}
         <Dialog>
           <DialogTrigger asChild>
             <div className="flex group/edit">
@@ -352,7 +194,6 @@ function EditableFeaturedContent({ featuredContentEntries }) {
               </div>
               <div className="grow p-2">
                 <span id={"featuredTitle-" + featuredContent.position}>
-                  {/* {contentBox.title.length > 0 ? contentBox.title : ""} */}
                   {defaultFeaturedTitle}
                 </span>
                 <EditButton />
@@ -428,55 +269,6 @@ function EditableFeaturedContent({ featuredContentEntries }) {
     )
   })
 }
-
-// OLD FUNCTIONS BELOW - to be checked and updated
-// function updateFeaturedContent(
-//   featuredTitle,
-//   featuredLink,
-//   featuredDescription,
-//   contentBoxPosition
-// ) {
-//   // save to backend
-//   handleDataUpdate(
-//     featuredTitle,
-//     featuredLink,
-//     featuredDescription,
-//     contentBoxPosition
-//   )
-
-//   // TODO: only continue on successful save!
-//   console.log(
-//     `%c featuredTitle=${featuredTitle}, featuredLink=${featuredLink}, featuredDescription=${featuredDescription}, contentBoxPosition=${contentBoxPosition}`,
-//     "color: cyan; background-color: black; font-size: 16px; padding: 4px; border-radius: 4px;"
-//   )
-
-//   // re-render featured content (show changes)
-//   document.getElementById("featuredTitle-" + contentBoxPosition).innerHTML =
-//     featuredTitle
-
-//   let displayedDescription = document.getElementById(
-//     "featuredDescription-" + contentBoxPosition
-//   )
-//   if (featuredDescription.length > 0) {
-//     displayedDescription.innerHTML = featuredDescription
-//   } else {
-//     displayedDescription.innerHTML = featuredLink
-//   }
-// }
-
-// function editLink(event, contentBoxPosition) {
-//   console.log(
-//     `%c ${event.target}`,
-//     "color: cyan; background-color: black; font-size: 16px; padding: 4px; border-radius: 4px;"
-//   )
-
-//   console.log(
-//     `%c link at position ${contentBoxPosition} is getting edited!!`,
-//     "color: cyan; background-color: black; font-size: 16px; padding: 4px; border-radius: 4px;"
-//   )
-// }
-
-/// end of old code
 
 // Network interactions /.
 function handleDataUpdate(
