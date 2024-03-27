@@ -4,6 +4,8 @@ import "./globals.css"
 // shadcn
 import { cn } from "../lib/utils"
 
+import StoreProvider from "./StoreProvider"
+
 const inter = Inter({ subsets: ["latin"] })
 
 export default function RootLayout({ children }) {
@@ -15,6 +17,7 @@ export default function RootLayout({ children }) {
             <div className="ml-10 flex items-baseline space-x-4">
               TOP BAR - to be navigation
             </div>
+            <StoreProvider />
           </div>
           {children}
         </div>
