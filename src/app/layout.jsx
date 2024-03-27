@@ -17,9 +17,8 @@ export default function RootLayout({ children }) {
             <div className="ml-10 flex items-baseline space-x-4">
               TOP BAR - to be navigation
             </div>
-            <StoreProvider />
           </div>
-          {children}
+          <StoreProvider>{children}</StoreProvider>
         </div>
       </body>
     </html>
