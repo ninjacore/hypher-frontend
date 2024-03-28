@@ -2,10 +2,10 @@ import { createSlice } from "@reduxjs/toolkit"
 
 const initialState = {
   links: [
-    { id: 0, name: "GitHub", url: "https://github.com", position: 0 },
-    { id: 1, name: "LinkedIn", url: "https://linkedin.com", position: 1 },
-    { id: 2, name: "Twitter", url: "https://twitter.com", position: 2 },
-    { id: 3, name: "Instagram", url: "https://instagram.com", position: 3 },
+    { id: 0, text: "GitHub", url: "https://github.com", position: 0 },
+    { id: 1, text: "LinkedIn", url: "https://linkedin.com", position: 1 },
+    { id: 2, text: "Twitter", url: "https://twitter.com", position: 2 },
+    { id: 3, text: "Instagram", url: "https://instagram.com", position: 3 },
   ],
 }
 
@@ -21,10 +21,10 @@ const linkCollectionSlice = createSlice({
       state.links = state.links.filter((link) => link.id !== action.payload)
     },
     updateLink: (state, action) => {
-      const { id, name, url, position } = action.payload
+      const { id, text, url, position } = action.payload
       const link = state.links.find((link) => link.id === id)
       if (link) {
-        link.name = name
+        link.text = text
         link.url = url
         link.position = position
       }
