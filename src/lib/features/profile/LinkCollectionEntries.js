@@ -121,9 +121,9 @@ function updatableLink(link) {
           </div>
           <DialogFooter>
             <DialogClose>
-              <Button type="submit" onClick={onUpdateLinkClicked}>
+              <span type="submit" onClick={onUpdateLinkClicked}>
                 Save changes
-              </Button>
+              </span>
             </DialogClose>
           </DialogFooter>
         </DialogContent>
@@ -182,7 +182,7 @@ function AddLinkSection() {
           onChange={onLinkUrlChange}
         />
       </div>
-      <Button onClick={onSaveLinkClicked}>Save Link</Button>
+      <span onClick={onSaveLinkClicked}>Save Link</span>
     </div>
   )
 }
