@@ -44,13 +44,20 @@ function updatableLink(link) {
   const [linkText, setLinkText] = useState(link.text)
   const [linkUrl, setLinkUrl] = useState(link.url)
 
+  const [linkTextBuffer, setLinkTextBuffer] = useState(link.text)
+  const [linkUrlBuffer, setLinkUrlBuffer] = useState(link.url)
+
   const dispatch = useDispatch()
 
-  const onLinkTextChange = (e) => setLinkText(e.target.value)
-  const onLinkUrlChange = (e) => setLinkUrl(e.target.value)
+  const onLinkTextChange = (e) => setLinkTextBuffer(e.target.value)
+  const onLinkUrlChange = (e) => setLinkUrlBuffer(e.target.value)
 
   const onUpdateLinkClicked = () => {
-    if (linkText && linkUrl) {
+    if (linkTextBuffer && linkUrlBuffer) {
+      // save from buffer to state
+      setLinkText(linkTextBuffer)
+      setLinkUrl(linkUrlBuffer)
+
       dispatch(
         updateLink({
           id: nanoid(),
@@ -102,7 +109,7 @@ function updatableLink(link) {
                 id={"linkTextInput-" + link.position}
                 type="text"
                 className="col-span-3"
-                value={linkText}
+                value={linkTextBuffer}
                 onChange={onLinkTextChange}
               />
             </div>
@@ -114,7 +121,7 @@ function updatableLink(link) {
                 id={"linkUrlInput-" + link.position}
                 type="text"
                 className="col-span-3"
-                value={linkUrl}
+                value={linkUrlBuffer}
                 onChange={onLinkUrlChange}
               />
             </div>
