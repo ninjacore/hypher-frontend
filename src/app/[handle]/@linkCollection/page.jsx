@@ -4,10 +4,14 @@ import { useContext } from "react"
 import { ProfileContext, Profile } from "../page.jsx"
 import { IconMapper } from "../../../components/iconMapper"
 
+// import state of link collection
+import { LinkCollectionEntries } from "@/lib/features/profile/linkCollectionEntries"
+
 export default function Page() {
   return (
     <Profile>
       <LinkCollection />
+      <LinkCollectionEntries />
     </Profile>
   )
 }

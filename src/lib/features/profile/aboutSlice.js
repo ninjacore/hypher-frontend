@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit"
 
-const initialState = { id: 0, about: "Loading..." }
+const initialState = { id: 0, about: "zzz" }
 
 const aboutSlice = createSlice({
   name: "about",

@@ -1,6 +1,6 @@
 "use client"
 
-import { useId, useContext, useState, useEffect, use } from "react"
+import { useId, useContext, useState, useEffect } from "react"
 
 import { ProfileContext, Profile } from "../page.jsx"
 import { IconMapper } from "../../../components/iconMapper"
@@ -38,6 +38,9 @@ import {
 
 import { SortableLinkNode } from "./SortableLinkNode/SortableLinkNode"
 // imports for sorting functionality ./
+
+// import state of link collection
+import { LinkCollectionEntries } from "@/lib/features/profile/linkCollectionEntries"
 
 export default function Page() {
   return (
@@ -86,6 +89,7 @@ function EditableLinkCollectionWithContext() {
           linkCollection={listOfLinkCollectionEntries}
           setLinkCollectionIsSortable={setLinkCollectionIsSortable}
         />
+        <LinkCollectionEntries />
       </>
     )
   } else {
@@ -107,6 +111,7 @@ function EditableLinkCollectionWithContext() {
             change order
           </Button>
         </div>
+        <LinkCollectionEntries />
       </>
     )
   }
