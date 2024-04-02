@@ -18,42 +18,87 @@ import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 // imports for UI ./
 
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { useDispatch } from "react-redux"
 import { nanoid } from "@reduxjs/toolkit"
 
 // to read data from the Redux store
 import { useSelector } from "react-redux"
 
+// specific READ actions for this feature
+import {
+  selectAllLinks,
+  fetchLinkCollection,
+} from "@/lib/features/profile/linkCollectionSlice"
+// specific WRITE actions for this feature
+import { selectLinkById } from "@/lib/features/profile/linkCollectionSlice"
+
 // to save data to the Redux store
 import { addLink, updateLink } from "@/lib/features/profile/linkCollectionSlice"
 
 export const LinkCollectionEntries = () => {
   // useSelector is a hook that allows you to extract data from the Redux store state
-  const links = useSelector((state) => state.linkCollection.links)
-  // to not cause 'too many rerenders' error
-  const renderedLinkCollection = links.map((link) => {
-    // non-editable link collection
-    return (
-      <div
-        key={"pos-" + link.position}
-        className="my-4 mx-2 py-2 px-3 bg-konkikyou-blue"
-      >
-        <a href={link.url} target="_blank">
-          <IconMapper url={link.url} />
-          <span className="mx-2">
-            {link.text.length > 0 ? link.text : link.url}
-          </span>
-        </a>
-      </div>
-    )
-  })
+  // const links = useSelector((state) => state.linkCollection.links)
+  const dispatch = useDispatch()
+  const links = useSelector(selectAllLinks)
+
+  const linkCollectionStatus = useSelector(
+    (state) => state.linkCollection.status
+  )
+
+  useEffect(() => {
+    if (linkCollectionStatus === "idle") {
+      dispatch(fetchLinkCollection("dnt.is"))
+    }
+  }, [linkCollectionStatus, dispatch])
+
+  // // to not cause 'too many rerenders' error
+  // const renderedLinkCollection = links.map((link) => {
+  //   // non-editable link collection
+  //   return (
+  //     <div
+  //       key={"pos-" + link.position}
+  //       className="my-4 mx-2 py-2 px-3 bg-konkikyou-blue"
+  //     >
+  //       <a href={link.url} target="_blank">
+  //         <IconMapper url={link.url} />
+  //         <span className="mx-2">
+  //           {link.text.length > 0 ? link.text : link.url}
+  //         </span>
+  //       </a>
+  //     </div>
+  //   )
+  // })
+
+  let contentOfLinkCollection = []
+  if (linkCollectionStatus === "loading") {
+    contentOfLinkCollection = <div>Loading...</div>
+  } else if (linkCollectionStatus === "failed") {
+    contentOfLinkCollection = <div>Error!</div>
+  } else if (linkCollectionStatus === "succeeded") {
+    contentOfLinkCollection = links.map((link) => {
+      return (
+        <div
+          key={"pos-" + link.position}
+          className="my-4 mx-2 py-2 px-3 bg-konkikyou-blue"
+        >
+          <a href={link.url} target="_blank">
+            <IconMapper url={link.url} />
+            <span className="mx-2">
+              {link.text.length > 0 ? link.text : link.url}
+            </span>
+          </a>
+        </div>
+      )
+    })
+  }
 
   return (
     <>
       <b>LET'S CONNECT | Links via Redux</b>
       {/* {links.map((link) => updatableLink(link))} */}
-      {renderedLinkCollection}
+      {/* {renderedLinkCollection} */}
+      {contentOfLinkCollection}
       <AddLinkSection />
     </>
   )
@@ -170,6 +215,8 @@ function AddLinkSection() {
 
   const onSaveLinkClicked = () => {
     if (linkText && linkUrl) {
+      // TODO: change so it uses imported WRITE action
+
       dispatch(
         addLink({
           id: nanoid(),
