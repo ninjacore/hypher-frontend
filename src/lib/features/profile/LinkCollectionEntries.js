@@ -31,11 +31,30 @@ import { addLink, updateLink } from "@/lib/features/profile/linkCollectionSlice"
 export const LinkCollectionEntries = () => {
   // useSelector is a hook that allows you to extract data from the Redux store state
   const links = useSelector((state) => state.linkCollection.links)
+  // to not cause 'too many rerenders' error
+  const renderedLinkCollection = links.map((link) => {
+    // non-editable link collection
+    return (
+      <div
+        key={"pos-" + link.position}
+        className="my-4 mx-2 py-2 px-3 bg-konkikyou-blue"
+      >
+        <a href={link.url} target="_blank">
+          <IconMapper url={link.url} />
+          <span className="mx-2">
+            {link.text.length > 0 ? link.text : link.url}
+          </span>
+        </a>
+      </div>
+    )
+  })
 
   return (
     <>
       <b>LET'S CONNECT | Links via Redux</b>
-      {links.map((link) => updatableLink(link))}
+      {/* {links.map((link) => updatableLink(link))} */}
+      {renderedLinkCollection}
+      <AddLinkSection />
     </>
   )
 }
@@ -54,18 +73,19 @@ function updatableLink(link) {
 
   const onUpdateLinkClicked = () => {
     if (linkTextBuffer && linkUrlBuffer) {
-      // save from buffer to state
-      setLinkText(linkTextBuffer)
-      setLinkUrl(linkUrlBuffer)
-
       dispatch(
         updateLink({
           id: nanoid(),
-          text: linkText,
-          url: linkUrl,
+          text: linkTextBuffer,
+          url: linkUrlBuffer,
           position: link.position,
         })
       )
+
+      // TODO: reactivate once store is definitively working
+      // // save from buffer to state
+      // setLinkText(linkTextBuffer)
+      // setLinkUrl(linkUrlBuffer)
     }
   }
 
@@ -171,6 +191,7 @@ function AddLinkSection() {
         </Label>
         <Input
           //   id={"linkTextInput-" + link.position}
+          id="linkTextInput"
           type="text"
           className="col-span-3"
           value={linkText}
@@ -183,6 +204,7 @@ function AddLinkSection() {
         </Label>
         <Input
           //   id={"linkUrlInput-" + link.position}
+          id="linkUrlInput"
           type="text"
           className="col-span-3"
           value={linkUrl}
