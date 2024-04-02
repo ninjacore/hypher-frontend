@@ -14,9 +14,23 @@ const linkCollectionSlice = createSlice({
   name: "linkCollection",
   initialState,
   reducers: {
-    addLink: (state, action) => {
-      state.links.push(action.payload)
+    // example if payload not known to component
+    addLink: {
+      reducer(state, action) {
+        state.links.push(action.payload)
+      },
+      prepare(text, url, position) {
+        return {
+          payload: {
+            id: nanoid(),
+            text,
+            url,
+            position,
+          },
+        }
+      },
     },
+    // default style of reducer
     removeLink: (state, action) => {
       state.links = state.links.filter((link) => link.id !== action.payload)
     },
