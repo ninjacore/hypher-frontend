@@ -46,6 +46,20 @@ export const fetchLinkCollection = createAsyncThunk(
   }
 )
 
+export const addNewLink = createAsyncThunk(
+  "linkCollection/addNewLink",
+  async (newLinkItem) => {
+    const response = await client(
+      "http://localhost:5678/api/v1/linkCollections",
+      {
+        method: "POST",
+        body: JSON.stringify(newLinkItem),
+      }
+    )
+    return response.data
+  }
+)
+
 // draft code - real reducers will probably handle full collection updates
 const linkCollectionSlice = createSlice({
   name: "linkCollection",
@@ -94,6 +108,9 @@ const linkCollectionSlice = createSlice({
       .addCase(fetchLinkCollection.rejected, (state, action) => {
         state.status = "failed"
         state.error = action.error.message
+      })
+      .addCase(addNewLink.fulfilled, (state, action) => {
+        state.links.push(action.payload)
       })
   },
 })

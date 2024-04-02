@@ -32,6 +32,7 @@ import {
 } from "@/lib/features/profile/linkCollectionSlice"
 // specific WRITE actions for this feature
 import { selectLinkById } from "@/lib/features/profile/linkCollectionSlice"
+import { addNewLink } from "@/lib/features/profile/linkCollectionSlice"
 
 // to save data to the Redux store
 import { addLink, updateLink } from "@/lib/features/profile/linkCollectionSlice"
@@ -208,25 +209,49 @@ function AddLinkSection() {
   const [linkText, setLinkText] = useState("")
   const [linkUrl, setLinkUrl] = useState("")
 
+  // for API DB
+  const [addRequestStatus, setAddRequestStatus] = useState("idle")
+
   const dispatch = useDispatch()
 
   const onLinkTextChange = (e) => setLinkText(e.target.value)
   const onLinkUrlChange = (e) => setLinkUrl(e.target.value)
 
-  const onSaveLinkClicked = () => {
-    if (linkText && linkUrl) {
-      // TODO: change so it uses imported WRITE action
+  const onSaveLinkClicked = async () => {
+    // OLD LOGIC
+    // if (linkText && linkUrl) {
+    //   dispatch(
+    //     addLink({
+    //       id: nanoid(),
+    //       text: linkText,
+    //       url: linkUrl,
+    //       position: 0,
+    //     })
+    //   )
+    //   setLinkText("")
+    //   setLinkUrl("")
+    // }
 
-      dispatch(
-        addLink({
-          id: nanoid(),
-          text: linkText,
-          url: linkUrl,
-          position: 0,
-        })
-      )
-      setLinkText("")
-      setLinkUrl("")
+    if (linkText && linkUrl) {
+      try {
+        setAddRequestStatus("pending")
+        await dispatch(
+          addNewLink({
+            text: linkText,
+            url: linkUrl,
+            position: 99,
+          })
+        ).unwrap()
+        // unwraps the Promise returned by `dispatch(addNewLink())` to handle the rejection
+        setLinkText("")
+        setLinkUrl("")
+
+        // setAddRequestStatus("succeeded")
+      } catch (err) {
+        setAddRequestStatus("failed")
+      } finally {
+        setAddRequestStatus("idle")
+      }
     }
   }
 
