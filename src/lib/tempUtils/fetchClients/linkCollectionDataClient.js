@@ -1,44 +1,76 @@
 "use client"
 import { useState, useEffect } from "react"
 
-// async function linkCollectionDataClient(handle) {
-//   // to make sure state is updated once we get the data pt.1
-//   const [data, setData] = useState(null)
-//   const [loaded, setLoaded] = useState(false)
+export async function linkCollectionDataClient(
+  handle,
+  contentBoxPosition,
+  method,
+  body
+) {
+  // to make sure state is updated once we get the data pt.1
+  const [data, setData] = useState(null)
+  const [loaded, setLoaded] = useState(false)
+  const [serverResponse, setServerResponse] = useState(null)
 
-//   const apiUrl = `http://localhost:5678/api/v1/linkCollections/byHandle/${handle}`
+  console.log(
+    `%c starting fetch for ${handle}`,
+    "color: green; font-size: 1.2em; font-weight: bold;"
+  )
 
-//   // to make sure state is updated once we get the data pt.2
-//   await fetch(apiUrl).then((response) =>
-//     response
-//       .json()
-//       .then((data) => ({
-//         data: data,
-//         status: response.status,
-//       }))
-//       .then((res) => {
-//         console.log("decodedResponse=", res)
-//         // only load if there's data
-//         if (res.data) {
-//           // split profile data to make it usable
-//           let splitData = splitProfileData(res.data)
-//           console.log("splitData=")
-//           console.log(splitData)
-//           setData(splitData)
-//           setLoaded(true)
-//         }
-//       })
-//   )
+  const apiUrl = `http://localhost:5678/api/v1/linkCollections/byHandle/${handle}?contentBoxPosition=${contentBoxPosition}`
 
-//   return data
-// }
-// export default linkCollectionDataClient
+  // to make sure state is updated once we get the data pt.2
+  try {
+    await fetch(apiUrl, {
+      method: method,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(body),
+    }).then((response) =>
+      response
+        .json()
+        .then((data) => ({
+          data: data,
+          status: response.status,
+        }))
+        .then((res) => {
+          if (res.data) {
+            // // split profile data to make it usable
+            // let splitData = splitProfileData(res.data)
+            // console.log("splitData=")
+            // console.log(splitData)
+            console.log(
+              `%c response status: ${res.status}`,
+              "color: blue; font-size: 1.2em; font-weight: bold;"
+            )
+            console.log(
+              `%c response data: ${JSON.stringify(res.data)}`,
+              "color: blue; font-size: 1.2em; font-weight: bold;"
+            )
+
+            // setData(res.data)
+            setServerResponse(res)
+            setLoaded(true)
+          }
+        })
+    )
+  } catch (error) {
+    console.log(
+      `%c ERROR IN HTTP REQUEST: ${error}`,
+      "color: red; font-size: 1.2em; font-weight: bold;"
+    )
+  }
+
+  return serverResponse
+}
 
 export async function client(endpoint, { body, ...customConfig } = {}) {
   const headers = { "Content-Type": "application/json" }
 
   const config = {
-    method: body ? "POST" : "GET",
+    // method: body ? "POST" : "GET",
+    method: customConfig.method || "PUT",
     ...customConfig,
     headers: {
       ...headers,
@@ -47,12 +79,12 @@ export async function client(endpoint, { body, ...customConfig } = {}) {
   }
 
   if (body) {
-    config.body = JSON.stringify(body)
+    config.body = body //JSON.stringify(body)
   }
 
   let data
 
-  endpoint = "http://localhost:5678/api/v1/linkCollections/byHandle/dnt.is"
+  // endpoint = "http://localhost:5678/api/v1/linkCollections/byHandle/dnt.is"
 
   try {
     const response = await window.fetch(endpoint, config)

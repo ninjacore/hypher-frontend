@@ -2,7 +2,10 @@ import { createSlice } from "@reduxjs/toolkit"
 
 // for data fetch
 import { nanoid, createAsyncThunk } from "@reduxjs/toolkit"
-import { client } from "@/lib/tempUtils/fetchClients/linkCollectionDataClient"
+import {
+  client,
+  linkCollectionDataClient,
+} from "@/lib/tempUtils/fetchClients/linkCollectionDataClient"
 
 // const initialState = {
 //   links: [
@@ -50,13 +53,22 @@ export const addNewLink = createAsyncThunk(
   "linkCollection/addNewLink",
   async (newLinkItem) => {
     const response = await client(
-      "http://localhost:5678/api/v1/linkCollections",
+      `http://localhost:5678/api/v1/linkCollections/byHandle/${newLinkItem.handle}?contentBoxPosition=${newLinkItem.position}`,
       {
-        method: "POST",
-        body: JSON.stringify(newLinkItem),
+        body: JSON.stringify({
+          url: newLinkItem.url,
+          text: newLinkItem.text,
+        }),
+        method: "PUT",
       }
     )
     return response.data
+
+    // const response = await linkCollectionDataClient("dnt.is", 0, "PUT", {
+    //   url: "newLinkItem.url",
+    //   text: "newLinkItem.text",
+    // })
+    // return response
   }
 )
 
@@ -70,13 +82,14 @@ const linkCollectionSlice = createSlice({
       reducer(state, action) {
         state.links.push(action.payload)
       },
-      prepare(text, url, position) {
+      prepare(url, text, contentBoxPosition, handle) {
         return {
           payload: {
             id: nanoid(),
             text,
             url,
-            position,
+            contentBoxPosition,
+            handle,
           },
         }
       },

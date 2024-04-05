@@ -232,26 +232,33 @@ function AddLinkSection() {
     //   setLinkUrl("")
     // }
 
-    if (linkText && linkUrl) {
-      try {
-        setAddRequestStatus("pending")
-        await dispatch(
-          addNewLink({
-            text: linkText,
-            url: linkUrl,
-            position: 99,
-          })
-        ).unwrap()
-        // unwraps the Promise returned by `dispatch(addNewLink())` to handle the rejection
-        setLinkText("")
-        setLinkUrl("")
+    console.log("onSaveLinkClicked")
+    console.log("linkText=", linkText)
+    console.log("linkUrl=", linkUrl)
 
-        // setAddRequestStatus("succeeded")
-      } catch (err) {
-        setAddRequestStatus("failed")
-      } finally {
-        setAddRequestStatus("idle")
-      }
+    if (linkText && linkUrl) {
+      // try {
+      setAddRequestStatus("pending")
+      await dispatch(
+        addNewLink({
+          url: linkUrl,
+          text: linkText,
+          position: 0,
+          handle: "dnt.is",
+        })
+      )
+      console.log("dispatched addNewLink")
+      // .unwrap()
+      // unwraps the Promise returned by `dispatch(addNewLink())` to handle the rejection
+      setLinkText("")
+      setLinkUrl("")
+
+      // setAddRequestStatus("succeeded")
+      // } catch (err) {
+      //   setAddRequestStatus("failed")
+      // } finally {
+      //   setAddRequestStatus("idle")
+      // }
     }
   }
 
