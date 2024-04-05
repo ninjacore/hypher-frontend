@@ -3,8 +3,9 @@ import { createSlice } from "@reduxjs/toolkit"
 // for data fetch
 import { nanoid, createAsyncThunk } from "@reduxjs/toolkit"
 import {
-  client,
+  putClient,
   linkCollectionDataClient,
+  getOrPostClient,
 } from "@/lib/tempUtils/fetchClients/linkCollectionDataClient"
 
 // const initialState = {
@@ -43,7 +44,7 @@ export const fetchLinkCollection = createAsyncThunk(
     // const data = await linkCollectionDataClient(handle)
     // return data
     // 3rd approach..
-    const response = await client()
+    const response = await getOrPostClient()
     console.log("got something!! --> ", response.data)
     return response.data
   }
@@ -52,7 +53,7 @@ export const fetchLinkCollection = createAsyncThunk(
 export const addNewLink = createAsyncThunk(
   "linkCollection/addNewLink",
   async (newLinkItem) => {
-    const response = await client(
+    const response = await putClient(
       `http://localhost:5678/api/v1/linkCollections/byHandle/${newLinkItem.handle}?contentBoxPosition=${newLinkItem.position}`,
       {
         body: JSON.stringify({
