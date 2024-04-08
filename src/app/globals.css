@@ -21,3 +21,8 @@ body {
 .bg-early-spring-night {
   background-color: #424bb2;
 }
+
+/* background color for focus (e.g., drag-and-drop) */
+.bg-dark-midnight-blue {
+  background-color: #003366;
+}
