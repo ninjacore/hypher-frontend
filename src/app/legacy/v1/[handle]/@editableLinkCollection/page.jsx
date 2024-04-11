@@ -3,7 +3,7 @@
 import { useId, useContext, useState, useEffect } from "react"
 
 import { ProfileContext, Profile } from "../page.jsx"
-import { IconMapper } from "../../../components/iconMapper"
+import { IconMapper } from "@/components/iconMapper"
 import { EditButton } from "@/components/ui/editButtonPen"
 import {
   Dialog,
@@ -40,7 +40,7 @@ import { SortableLinkNode } from "./SortableLinkNode/SortableLinkNode"
 // imports for sorting functionality ./
 
 // import state of link collection
-import { LinkCollectionEntries } from "@/lib/features/profile/linkCollectionEntries"
+import { LinkCollectionEntries } from "@/lib/legacy/v1/features/profile/linkCollectionEntries"
 
 export default function Page() {
   return (

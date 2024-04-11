@@ -1,7 +1,7 @@
 "use client"
 
 // imports for UI /.
-import { IconMapper } from "../../../components/iconMapper"
+import { IconMapper } from "@/components/iconMapper"
 import { EditButton } from "@/components/ui/editButtonPen"
 import {
   Dialog,
@@ -29,13 +29,16 @@ import { useSelector } from "react-redux"
 import {
   selectAllLinks,
   fetchLinkCollection,
-} from "@/lib/features/profile/linkCollectionSlice"
+} from "@/lib/legacy/v1/features/profile/linkCollectionSlice"
 // specific WRITE actions for this feature
-import { selectLinkById } from "@/lib/features/profile/linkCollectionSlice"
-import { addNewLink } from "@/lib/features/profile/linkCollectionSlice"
+import { selectLinkById } from "@/lib/legacy/v1/features/profile/linkCollectionSlice"
+import { addNewLink } from "@/lib/legacy/v1/features/profile/linkCollectionSlice"
 
 // to save data to the Redux store
-import { addLink, updateLink } from "@/lib/features/profile/linkCollectionSlice"
+import {
+  addLink,
+  updateLink,
+} from "@/lib/legacy/v1/features/profile/linkCollectionSlice"
 
 export const LinkCollectionEntries = () => {
   // useSelector is a hook that allows you to extract data from the Redux store state

@@ -6,7 +6,7 @@ import {
   putClient,
   linkCollectionDataClient,
   getOrPostClient,
-} from "@/lib/tempUtils/fetchClients/linkCollectionDataClient"
+} from "@/lib/legacy/v1/tempUtils/fetchClients/linkCollectionDataClient"
 
 // const initialState = {
 //   links: [
