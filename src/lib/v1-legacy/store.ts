@@ -1,7 +1,7 @@
 import { configureStore } from "@reduxjs/toolkit"
 
-import aboutReducers from "./v1-legacy/features/profile/aboutSlice"
-import linkCollectionReducers from "./v1-legacy/features/profile/linkCollectionSlice"
+import aboutReducers from "../v1-legacy/features/profile/aboutSlice"
+import linkCollectionReducers from "../v1-legacy/features/profile/linkCollectionSlice"
 
 // create a store instance per-request to avoid state conflicts
 export const makeStore = () => {

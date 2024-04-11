@@ -1,0 +1,28 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  color: azure;
+  background-color: #050038;
+}
+
+/* main color */
+.bg-midnight-blue {
+  background-color: #050038;
+}
+
+/* sub color */
+.bg-konkikyou-blue {
+  background-color: #1d204b;
+}
+
+/* alternative background color */
+.bg-early-spring-night {
+  background-color: #424bb2;
+}
+
+/* background color for focus (e.g., drag-and-drop) */
+.bg-dark-midnight-blue {
+  background-color: #003366;
+}

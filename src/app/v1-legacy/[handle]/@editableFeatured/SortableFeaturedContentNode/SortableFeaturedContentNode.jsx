@@ -4,7 +4,7 @@ import React from "react"
 import { useSortable } from "@dnd-kit/sortable"
 
 import { CSS } from "@dnd-kit/utilities"
-import { IconMapper } from "../../../../components/iconMapper"
+import { IconMapper } from "@/components/iconMapper"
 
 import { Card } from "@/components/ui/card"
 

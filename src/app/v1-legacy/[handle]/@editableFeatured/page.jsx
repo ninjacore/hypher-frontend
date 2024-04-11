@@ -2,7 +2,7 @@
 
 import { useId, useContext, useState, useEffect, use } from "react"
 import { ProfileContext, Profile } from "../page.jsx"
-import { IconMapper } from "../../../components/iconMapper"
+import { IconMapper } from "@/components/iconMapper"
 import { Card } from "@/components/ui/card"
 import { EditButton } from "@/components/ui/editButtonPen"
 import {
