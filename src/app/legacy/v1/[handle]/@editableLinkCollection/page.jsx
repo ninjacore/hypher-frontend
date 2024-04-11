@@ -40,7 +40,7 @@ import { SortableLinkNode } from "./SortableLinkNode/SortableLinkNode"
 // imports for sorting functionality ./
 
 // import state of link collection
-import { LinkCollectionEntries } from "@/lib/v1-legacy/features/profile/linkCollectionEntries"
+import { LinkCollectionEntries } from "@/lib/legacy/v1/features/profile/linkCollectionEntries"
 
 export default function Page() {
   return (

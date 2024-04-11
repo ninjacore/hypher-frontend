@@ -29,16 +29,16 @@ import { useSelector } from "react-redux"
 import {
   selectAllLinks,
   fetchLinkCollection,
-} from "@/lib/v1-legacy/features/profile/linkCollectionSlice"
+} from "@/lib/legacy/v1/features/profile/linkCollectionSlice"
 // specific WRITE actions for this feature
-import { selectLinkById } from "@/lib/v1-legacy/features/profile/linkCollectionSlice"
-import { addNewLink } from "@/lib/v1-legacy/features/profile/linkCollectionSlice"
+import { selectLinkById } from "@/lib/legacy/v1/features/profile/linkCollectionSlice"
+import { addNewLink } from "@/lib/legacy/v1/features/profile/linkCollectionSlice"
 
 // to save data to the Redux store
 import {
   addLink,
   updateLink,
-} from "@/lib/v1-legacy/features/profile/linkCollectionSlice"
+} from "@/lib/legacy/v1/features/profile/linkCollectionSlice"
 
 export const LinkCollectionEntries = () => {
   // useSelector is a hook that allows you to extract data from the Redux store state
