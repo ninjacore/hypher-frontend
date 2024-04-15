@@ -1,0 +1,84 @@
+"use client"
+
+// imports for UI /.
+import { IconMapper } from "@/components/iconMapper"
+import { EditButton } from "@/components/ui/editButtonPen"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogTrigger,
+  DialogClose,
+} from "@/components/ui/dialog"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Button } from "@/components/ui/button"
+// imports for UI ./
+
+import React, { useEffect, useState } from "react"
+import { useDispatch } from "react-redux"
+import { nanoid } from "@reduxjs/toolkit"
+
+// to read data from the Redux store
+import { useSelector } from "react-redux"
+
+// specific READ actions for this feature
+import { fetchLinkCollection } from "@/lib/features/profilePage/linkCollectionSlice"
+// specific WRITE actions for this feature
+// TBD
+
+// to save data to the Redux store
+// TBD
+
+export const LinkCollectionEntries = () => {
+  const dispatch = useDispatch()
+  // useSelector is a hook that allows you to extract data
+  // from the Redux store state
+  const links = useSelector((state) => state.linkCollection.links)
+
+  const linkCollectionStatus = useSelector(
+    (state) => state.linkCollection.status
+  )
+
+  useEffect(() => {
+    if (linkCollectionStatus === "idle") {
+      dispatch(fetchLinkCollection("dnt.is"))
+    }
+  }, [linkCollectionStatus, dispatch])
+
+  let contentOfLinkCollection = []
+  if (linkCollectionStatus === "loading") {
+    contentOfLinkCollection = <div>Loading...</div>
+  } else if (linkCollectionStatus === "failed") {
+    contentOfLinkCollection = <div>Error!</div>
+  } else if (linkCollectionStatus === "succeeded") {
+    contentOfLinkCollection = links.map((link) => {
+      return (
+        <div
+          key={"pos-" + link.position}
+          className="my-4 mx-2 py-2 px-3 bg-konkikyou-blue"
+        >
+          <a href={link.url} target="_blank">
+            <IconMapper url={link.url} />
+            <span className="mx-2">
+              {link.text.length > 0 ? link.text : link.url}
+            </span>
+          </a>
+        </div>
+      )
+    })
+  }
+
+  return (
+    <>
+      <b>LET'S CONNECT | Links via Redux V2</b>
+      {/* {links.map((link) => updatableLink(link))} */}
+      {/* {renderedLinkCollection} */}
+      {contentOfLinkCollection}
+      {/* <AddLinkSection /> */}
+    </>
+  )
+}

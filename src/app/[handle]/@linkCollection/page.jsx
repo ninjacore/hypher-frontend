@@ -5,7 +5,8 @@ import { ProfileContext, Profile } from "../page.jsx"
 import { IconMapper } from "@/components/iconMapper"
 
 // import state of link collection
-import { LinkCollectionEntries } from "@/lib/legacy/v1/features/profile/linkCollectionEntries"
+// import { LinkCollectionEntries } from "@/lib/legacy/v1/features/profile/linkCollectionEntries"
+import { LinkCollectionEntries } from "@/lib/features/profilePage/linkCollectionEntries"
 
 export default function Page() {
   return (

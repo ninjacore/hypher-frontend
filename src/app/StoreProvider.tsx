@@ -4,8 +4,8 @@ import { Provider } from "react-redux"
 import { makeStore, AppStore } from "@/lib/store"
 
 // data store slices
-import aboutReducers from "@/lib/legacy/v1/features/profile/aboutSlice"
-import { setAbout } from "@/lib/legacy/v1/features/profile/aboutSlice"
+// import aboutReducers from "@/lib/legacy/v1/features/profile/aboutSlice"
+// import { setAbout } from "@/lib/legacy/v1/features/profile/aboutSlice"
 
 export default function StoreProvider({
   children,

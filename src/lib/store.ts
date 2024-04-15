@@ -1,13 +1,14 @@
 import { configureStore } from "@reduxjs/toolkit"
 
 import aboutReducers from "./legacy/v1/features/profile/aboutSlice"
-import linkCollectionReducers from "./legacy/v1/features/profile/linkCollectionSlice"
+// import linkCollectionReducers from "./legacy/v1/features/profile/linkCollectionSlice"
+
+import linkCollectionReducers from "./features/profilePage/linkCollectionSlice"
 
 // create a store instance per-request to avoid state conflicts
 export const makeStore = () => {
   return configureStore({
     reducer: {
-      about: aboutReducers,
       linkCollection: linkCollectionReducers,
     },
   })

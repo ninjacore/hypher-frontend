@@ -24,6 +24,11 @@ export function backendApiEndpointDeliverer(
       endpoint = `${baseURL}/api/v1/featuredContent?handle=${handle}`
       break
 
+    case "GETlinkCollection":
+      handleNeeded = true
+      endpoint = `${baseURL}/api/v1/linkCollection?handle=${handle}`
+      break
+
     default:
       break
   }
