@@ -3,13 +3,25 @@ export function backendApiEndpointDeliverer(
   method,
   handle = null
 ) {
+  let baseURL = "http://localhost:5678"
+
   let endpoint
   let handleNeeded = false
 
   switch (method + descriptiveEndpointName) {
     case "GETprofilePageData":
       handleNeeded = true
-      endpoint = `http://localhost:5678/api/v1/profilePage/${handle}`
+      endpoint = `${baseURL}/api/v1/profilePage/${handle}`
+      break
+
+    case "GETmainProfilePageData":
+      handleNeeded = true
+      endpoint = `${baseURL}/api/v1/profiles/handle/${handle}`
+      break
+
+    case "GETfeaturedContent":
+      handleNeeded = true
+      endpoint = `${baseURL}/api/v1/featuredContent?handle=${handle}`
       break
 
     default:
