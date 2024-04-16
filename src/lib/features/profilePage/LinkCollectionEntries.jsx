@@ -57,19 +57,14 @@ export const LinkCollectionEntries = () => {
   } else if (linkCollectionStatus === "succeeded") {
     contentOfLinkCollection = links.map((link) => {
       return (
-        <>
-          <a href={link.url} target="_blank">
-            <div
-              key={"pos-" + link.position}
-              className="my-4 mx-2 py-2 px-3 bg-konkikyou-blue"
-            >
-              <IconMapper url={link.url} />
-              <span className="mx-2">
-                {link.text.length > 0 ? link.text : link.url}
-              </span>
-            </div>
-          </a>
-        </>
+        <a href={link.url} target="_blank" key={"pos-" + link.position}>
+          <div className="my-4 mx-2 py-2 px-3 bg-konkikyou-blue">
+            <IconMapper url={link.url} />
+            <span className="mx-2">
+              {link.text.length > 0 ? link.text : link.url}
+            </span>
+          </div>
+        </a>
       )
     })
   }
