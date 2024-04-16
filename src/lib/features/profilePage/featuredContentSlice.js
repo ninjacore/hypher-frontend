@@ -13,8 +13,8 @@ const initialState = {
 export const fetchFeaturedContent = createAsyncThunk(
   "featuredContent/fetchFeaturedContent",
   async (handle) => {
-    // featuredContent box is at position 0
-    const response = await profileDataClient(handle, 0, "GET")
+    // featuredContent box is at position 1
+    const response = await profileDataClient(handle, 1, "GET")
     return response.data
   }
 )

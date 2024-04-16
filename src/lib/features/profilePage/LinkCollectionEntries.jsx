@@ -25,13 +25,13 @@ import { nanoid } from "@reduxjs/toolkit"
 // to read data from the Redux store
 import { useSelector } from "react-redux"
 
-// specific READ actions for this feature
-import { fetchLinkCollection } from "@/lib/features/profilePage/linkCollectionSlice"
-// specific WRITE actions for this feature
-// TBD
-
-// to save data to the Redux store
-// TBD
+// specific CRUD actions for this feature
+import {
+  fetchLinkCollection,
+  addNewLink,
+  updateLink,
+  deleteLink,
+} from "@/lib/features/profilePage/linkCollectionSlice"
 
 export const LinkCollectionEntries = () => {
   const dispatch = useDispatch()
@@ -57,17 +57,19 @@ export const LinkCollectionEntries = () => {
   } else if (linkCollectionStatus === "succeeded") {
     contentOfLinkCollection = links.map((link) => {
       return (
-        <div
-          key={"pos-" + link.position}
-          className="my-4 mx-2 py-2 px-3 bg-konkikyou-blue"
-        >
+        <>
           <a href={link.url} target="_blank">
-            <IconMapper url={link.url} />
-            <span className="mx-2">
-              {link.text.length > 0 ? link.text : link.url}
-            </span>
+            <div
+              key={"pos-" + link.position}
+              className="my-4 mx-2 py-2 px-3 bg-konkikyou-blue"
+            >
+              <IconMapper url={link.url} />
+              <span className="mx-2">
+                {link.text.length > 0 ? link.text : link.url}
+              </span>
+            </div>
           </a>
-        </div>
+        </>
       )
     })
   }

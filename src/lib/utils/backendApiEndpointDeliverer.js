@@ -1,7 +1,8 @@
 export function backendApiEndpointDeliverer(
   descriptiveEndpointName,
   method,
-  handle = null
+  handle = null,
+  contentBoxPosition = null
 ) {
   let baseURL = "http://localhost:5678"
 
@@ -28,6 +29,11 @@ export function backendApiEndpointDeliverer(
       handleNeeded = true
       endpoint = `${baseURL}/api/v1/linkCollection?handle=${handle}`
       break
+
+    // case "PUTlinkInLinkCollection":
+    //   handleNeeded = true
+    //   endpoint = `${baseURL}/api/v1/linkCollection/update?handle=${handle}&contentBoxPosition=${contentBoxPosition}`
+    //   break
 
     default:
       break
