@@ -4,15 +4,29 @@ import { useContext } from "react"
 import { ProfileContext, Profile } from "../page.jsx"
 import { IconMapper } from "@/components/iconMapper"
 
+// to define the handle
+// import { deriveProfileHandle } from "@/lib/utils/profileHandleDeriver.js"
+
 // import state of link collection
 // import { LinkCollectionEntries } from "@/lib/legacy/v1/features/profile/linkCollectionEntries"
 import { LinkCollectionEntries } from "@/lib/features/profilePage/linkCollectionEntries"
+import { usePathname } from "next/navigation.js"
 
 export default function Page() {
+  // let profileContext = useContext(ProfileContext)
+  // console.log("profileContext=")
+  // console.table(profileContext)
+  // let handle = profileContext
+  let handle = usePathname().split("/").pop(1)
+
+  if (!handle) {
+    return <div>Handle Loading...</div>
+  }
+
   return (
     <Profile>
       <LinkCollection />
-      <LinkCollectionEntries />
+      <LinkCollectionEntries handle={handle} />
     </Profile>
   )
 }

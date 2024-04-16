@@ -18,32 +18,47 @@ export default function Page() {
 
 export function Profile({ children }) {
   const [handle, setHandle] = useState(null)
+  // let handle = null
+  const pathname = usePathname()
+
+  // const [pathname, setPathname] = useState(null)
+  // setPathname(usePathname())
 
   // get handle from url of this page
-  const pathname = usePathname()
+  // const pathname =
   //   const handle = deriveProfileHandle(pathname)
 
   // to limit re-renders
   useEffect(() => {
-    setHandle(deriveProfileHandle(pathname))
-  }, [])
+    console.log("pathname is set to: ", pathname)
+    console.log("pathname.split('/').pop(1) = ", pathname.split("/").pop(1))
+    // setHandle(pathname.split("/").pop(1))
+    // handle = pathname.split("/").pop(1)
+    setHandle(pathname.split("/").pop(1))
+
+    // setHandle(deriveProfileHandle(pathname))
+    console.log("handle is set to: ", handle)
+  }, [pathname])
 
   //   setHanlde(deriveProfileHandle(pathname))
 
-  if (handle) {
-    return (
-      <>
-        <ProfileContext.Provider value={handle}>
-          {children}
-        </ProfileContext.Provider>
-      </>
-    )
-  }
+  // if (handle) {
+  //   console.log("if (handle) TRUE: ", handle)
+  //   return (
+  //     <>
+  //       <ProfileContext.Provider value={handle}>
+  //         {children}
+  //       </ProfileContext.Provider>
+  //     </>
+  //   )
+  // }
 
   // default
   return (
     <>
-      <span>Loading..</span>
+      <ProfileContext.Provider value={handle}>
+        {children}
+      </ProfileContext.Provider>
     </>
   )
 }

@@ -33,7 +33,7 @@ import {
   deleteLink,
 } from "@/lib/features/profilePage/linkCollectionSlice"
 
-export const LinkCollectionEntries = () => {
+export const LinkCollectionEntries = ({ handle }) => {
   const dispatch = useDispatch()
   // useSelector is a hook that allows you to extract data
   // from the Redux store state
@@ -45,7 +45,7 @@ export const LinkCollectionEntries = () => {
 
   useEffect(() => {
     if (linkCollectionStatus === "idle") {
-      dispatch(fetchLinkCollection("dnt.is"))
+      dispatch(fetchLinkCollection(handle))
     }
   }, [linkCollectionStatus, dispatch])
 
