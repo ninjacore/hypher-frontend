@@ -26,10 +26,6 @@ function Name() {
     // You can return a loading spinner, a placeholder, or null to avoid rendering this component prematurely
     return <div>Loading...</div> // or return null;
   }
-  // // const { mainProfileData } = profileHandle
-  // // const mainContent = mainProfileData.contentBox?.[0]
 
   return <>{handle}</>
-
-  // return <>{mainContent.name}</>
 }
