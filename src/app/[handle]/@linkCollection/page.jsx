@@ -1,53 +1,34 @@
 "use client"
 
-import { useContext, useEffect, useState } from "react"
-// import { ProfilePageContext } from "../ProfilePageContext"
-import { ProfileContext, Profile } from "../page.jsx"
-import { IconMapper } from "@/components/iconMapper"
+import { useContext } from "react"
+import { Profile } from "../page.jsx"
 
 // to define the handle
-// import { deriveProfileHandle } from "@/lib/utils/profileHandleDeriver.js"
-import { usePathname } from "next/navigation"
+import { ProfilePageContext } from "../ProfilePageContext"
+
+import { IconMapper } from "@/components/iconMapper"
 
 // import state of link collection
-// import { LinkCollectionEntries } from "@/lib/legacy/v1/features/profile/linkCollectionEntries"
 import { LinkCollectionEntries } from "@/lib/features/profilePage/linkCollectionEntries"
 
-// export default function Page() {
-//   // provding handle for Redux
-//   const url = window.location.href
-//   let handle = url.split("/").pop()
-
-//   return (
-//     <Profile>
-//       {/* <LinkCollection /> */}
-//       <LinkCollectionEntries handle={handle} />
-//     </Profile>
-//   )
-// }
-
 export default function Page() {
-  // provding handle for Redux
-  // const url = window.location.href
-  // let handle = url.split("/").pop()
-
   return (
     <Profile>
       <LinkCollection />
-      {/* <LinkCollectionEntries handle={handle} /> */}
     </Profile>
   )
 }
 
 function LinkCollection() {
-  const profileHandle = useContext(ProfileContext)
-  if (!profileHandle) {
+  const { handle } = useContext(ProfilePageContext)
+  if (!handle) {
     return <div>Loading...</div>
   }
 
+  // providing handle for Redux
   return (
     <>
-      <LinkCollectionEntries handle={profileHandle} />
+      <LinkCollectionEntries handle={handle} />
     </>
   )
 }

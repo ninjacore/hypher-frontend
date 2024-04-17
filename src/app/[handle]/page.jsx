@@ -1,13 +1,11 @@
 "use client"
-import React, { createContext, useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 
 // to derive handle
 import { usePathname } from "next/navigation"
-import { deriveProfileHandle } from "@/lib/utils/profileHandleDeriver"
-import path from "path"
 
-// creating context to use later and in child components
-export const ProfileContext = createContext(null)
+// importing context to use later and in child components
+import { ProfilePageContext } from "./ProfilePageContext"
 
 export default function Page() {
   return (
@@ -28,14 +26,12 @@ export function Profile({ children }) {
     setHandle(pathname.split("/").pop())
   }, [])
 
-  //   setHanlde(deriveProfileHandle(pathname))
-
   if (handle) {
     return (
       <>
-        <ProfileContext.Provider value={handle}>
+        <ProfilePageContext.Provider value={{ handle }}>
           {children}
-        </ProfileContext.Provider>
+        </ProfilePageContext.Provider>
       </>
     )
   }
