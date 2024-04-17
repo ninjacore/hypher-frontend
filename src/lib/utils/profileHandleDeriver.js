@@ -1,11 +1,11 @@
 export function deriveProfileHandle(pathname) {
   let handle
 
-  let pathWithoutBaseURL = pathname.split("/").pop()
+  // let pathWithoutBaseURL =
 
   // case: profile page
-  if (!pathWithoutBaseURL.includes("/")) {
-    handle = pathWithoutBaseURL
+  if (!pathname.includes("/")) {
+    handle = pathname.split("/").pop()
     return handle
   }
 

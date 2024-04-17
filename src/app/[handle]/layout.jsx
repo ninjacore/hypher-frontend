@@ -7,7 +7,7 @@ import { EditButton } from "@/components/ui/editButtonPen"
 import { Card, CardContent, CardSingleLineHeader } from "@/components/ui/card"
 
 // to be handled by token
-const pageOwner = false
+const pageOwner = true
 
 export default function Layout({
   name,
