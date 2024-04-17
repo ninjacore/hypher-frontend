@@ -7,7 +7,8 @@ import { deriveProfileHandle } from "@/lib/utils/profileHandleDeriver"
 import path from "path"
 
 // creating context to use later and in child components
-export const ProfileContext = createContext(null)
+// export const ProfileContext = createContext(null)
+import { ProfilePageContext } from "./ProfilePageContext"
 
 export default function Page() {
   return (
@@ -33,9 +34,9 @@ export function Profile({ children }) {
   if (handle) {
     return (
       <>
-        <ProfileContext.Provider value={handle}>
+        <ProfilePageContext.Provider value={{ handle }}>
           {children}
-        </ProfileContext.Provider>
+        </ProfilePageContext.Provider>
       </>
     )
   }

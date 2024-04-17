@@ -2,7 +2,9 @@
 
 import { useContext, useEffect, useState } from "react"
 // import { ProfilePageContext } from "../ProfilePageContext"
-import { ProfileContext, Profile } from "../page.jsx"
+import { Profile } from "../page.jsx"
+import { ProfilePageContext } from "../ProfilePageContext"
+
 import { IconMapper } from "@/components/iconMapper"
 
 // to define the handle
@@ -40,14 +42,14 @@ export default function Page() {
 }
 
 function LinkCollection() {
-  const profileHandle = useContext(ProfileContext)
-  if (!profileHandle) {
+  const { handle } = useContext(ProfilePageContext)
+  if (!handle) {
     return <div>Loading...</div>
   }
 
   return (
     <>
-      <LinkCollectionEntries handle={profileHandle} />
+      <LinkCollectionEntries handle={handle} />
     </>
   )
 }

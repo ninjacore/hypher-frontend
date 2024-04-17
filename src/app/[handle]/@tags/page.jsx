@@ -8,11 +8,7 @@ import { faAngleRight } from "@fortawesome/free-solid-svg-icons"
 // TODO: import main-profile-slice
 
 export default function Page() {
-  return (
-    <Profile>
-      <Tags />
-    </Profile>
-  )
+  return <Profile>{/* <Tags /> */}</Profile>
 }
 
 function Tags() {

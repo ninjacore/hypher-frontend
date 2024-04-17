@@ -1,7 +1,8 @@
 "use client"
 
 import { useContext } from "react"
-import { ProfileContext, Profile } from "../page.jsx"
+import { Profile } from "../page.jsx"
+import { ProfilePageContext } from "../ProfilePageContext"
 
 // TODO: import main-profile-slice
 
@@ -16,21 +17,19 @@ export default function Page() {
 function Name() {
   console.log("function Name() running...")
 
-  const profileHandle = useContext(ProfileContext)
-  console.log(
-    "typeof profile [useContext(ProfileContext)] =" + typeof profileHandle
-  )
+  const { handle } = useContext(ProfilePageContext)
+  console.log("typeof profile [useContext(ProfileContext)] =" + typeof handle)
   console.log("profile=")
-  console.table(profileHandle)
+  console.table(handle)
   // Check if profile or mainProfileData is not yet defined and return null or a loading state
-  if (!profileHandle) {
+  if (!handle) {
     // You can return a loading spinner, a placeholder, or null to avoid rendering this component prematurely
     return <div>Loading...</div> // or return null;
   }
   // // const { mainProfileData } = profileHandle
   // // const mainContent = mainProfileData.contentBox?.[0]
 
-  return <>{profileHandle}</>
+  return <>{handle}</>
 
   // return <>{mainContent.name}</>
 }

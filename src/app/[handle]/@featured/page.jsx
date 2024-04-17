@@ -7,11 +7,7 @@ import { IconMapper } from "@/components/iconMapper"
 import { Card } from "@/components/ui/card"
 
 export default function Page() {
-  return (
-    <Profile>
-      <Featured />
-    </Profile>
-  )
+  return <Profile>{/* <Featured /> */}</Profile>
 }
 
 function Featured() {
