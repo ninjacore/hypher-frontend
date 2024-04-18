@@ -33,7 +33,7 @@ import {
   deleteLink,
 } from "@/lib/features/profilePage/linkCollectionSlice"
 
-export const LinkCollectionEntries = ({ handle }) => {
+export const LinkCollectionEntries = ({ handle, mode }) => {
   const dispatch = useDispatch()
   // useSelector is a hook that allows you to extract data
   // from the Redux store state
@@ -56,16 +56,28 @@ export const LinkCollectionEntries = ({ handle }) => {
     contentOfLinkCollection = <div>Error!</div>
   } else if (linkCollectionStatus === "succeeded") {
     contentOfLinkCollection = links.map((link) => {
-      return (
-        <a href={link.url} target="_blank" key={"pos-" + link.position}>
-          <div className="my-4 mx-2 py-2 px-3 bg-konkikyou-blue">
-            <IconMapper url={link.url} />
-            <span className="mx-2">
-              {link.text.length > 0 ? link.text : link.url}
-            </span>
-          </div>
-        </a>
-      )
+      switch (mode) {
+        case "linked":
+          return (
+            <a href={link.url} target="_blank" key={"pos-" + link.position}>
+              <div className="my-4 mx-2 py-2 px-3 bg-konkikyou-blue">
+                <IconMapper url={link.url} />
+                <span className="mx-2">
+                  {link.text.length > 0 ? link.text : link.url}
+                </span>
+              </div>
+            </a>
+          )
+
+        case "editable":
+          return <></>
+
+        case "ineditable":
+          return <></>
+
+        default:
+          return <>link mode not covered.</>
+      }
     })
   }
 

@@ -20,7 +20,7 @@ export async function profileDataClient(
   switch (contentBoxPosition) {
     case 0:
       if (method === "GET") {
-        return await getLinkCollection(handle, method)
+        return await getLinkCollection(handle, contentBoxPosition, method)
       } else if (method === "PUT") {
         return await updateLinkWithinCollection(
           handle,
@@ -184,8 +184,9 @@ export async function profileDataClient(
     }
   }
 
-  async function getLinkCollection(handle, method) {
-    const endpoint = `${baseURL}/api/v1/linkCollection?handle=${handle}`
+  async function getLinkCollection(handle, contentBoxPosition, method) {
+    // const endpoint = `${baseURL}/api/v1/linkCollection?handle=${handle}`
+    const endpoint = `${baseURL}/api/v1/linkCollection?handle=${handle}&contentBoxPosition=${contentBoxPosition}`
 
     const config = {
       method: method,

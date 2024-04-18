@@ -2,7 +2,13 @@
 
 import { useId, useContext, useState, useEffect } from "react"
 
-import { ProfileContext, Profile } from "../page.jsx"
+// to define the handle
+import { ProfilePageContext } from "../ProfilePageContext"
+import { Profile } from "../page.jsx"
+
+// import state of link collection
+import { LinkCollectionEntries } from "@/lib/features/profilePage/linkCollectionEntries"
+
 import { IconMapper } from "@/components/iconMapper"
 import { EditButton } from "@/components/ui/editButtonPen"
 import {
@@ -40,7 +46,7 @@ import { SortableLinkNode } from "./SortableLinkNode/SortableLinkNode"
 // imports for sorting functionality ./
 
 // import state of link collection
-import { LinkCollectionEntries } from "@/lib/legacy/v1/features/profile/linkCollectionEntries"
+// import { LinkCollectionEntries } from "@/lib/legacy/v1/features/profile/linkCollectionEntries"
 
 export default function Page() {
   return (
@@ -51,21 +57,15 @@ export default function Page() {
 }
 
 function EditableLinkCollectionWithContext() {
-  const sectionTitle = "LET'S CONNECT"
+  const sectionTitle = "LET'S CONNECT V2 | Via Redux"
 
-  const profile = useContext(ProfileContext)
-  // Check if profile or mainProfileData is not yet defined and return null or a loading state
-  if (!profile || !profile.mainProfileData) {
-    // You can return a loading spinner, a placeholder, or null to avoid rendering this component prematurely
-    return <div>Loading...</div> // or return null;
+  const { handle } = useContext(ProfilePageContext)
+  if (!handle) {
+    return <div>Loading...</div>
   }
-  const { linkCollectionData } = profile
-  const linkedCollection = linkCollectionData
 
-  // sort by position to display it correctly
-  let linkCollectionByPosition = linkedCollection.contentBox.toSorted(
-    (a, b) => a.position - b.position
-  )
+  // const { linkCollectionData } = profile
+  // const linkedCollection = linkCollectionData
 
   console.log("linkedCollection.contentBox=")
   console.table(linkedCollection.contentBox)
