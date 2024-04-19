@@ -55,6 +55,9 @@ import {
 } from "@dnd-kit/sortable"
 // imports for sorting functionality ./
 
+// debug support function
+import { announce } from "@/lib/utils/debugTools/announce"
+
 // specificly for
 
 export const LinkCollectionEntries = ({ handle, mode }) => {
@@ -207,14 +210,12 @@ function DraggableLinkElements(givenObject) {
 
   return givenObject.links.map((link) => {
     return (
-      <>
-        <SortableLinkNode
-          key={link.position}
-          id={link.id}
-          text={link.text}
-          url={link.url}
-        />
-      </>
+      <SortableLinkNode
+        key={"linkNode-" + link.uniqueId + nanoid()}
+        id={link.uniqueId}
+        text={link.text}
+        url={link.url}
+      />
     )
   })
 }

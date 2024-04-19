@@ -27,11 +27,11 @@ function SortableLinkNode(props) {
     >
       {/* <span className="">{props.text + " :: " + props.url}</span> */}
       <div
-        key={"pos-" + props.position}
+        key={"containerOf-" + props.id}
         className="my-4 mx-2 py-2 px-3 bg-konkikyou-blue"
       >
-        <IconMapper url={props.url} />
-        <span className="mx-2">
+        <IconMapper url={props.url} key={"icon-" + props.id} />
+        <span className="mx-2" key={"contentOf-" + props.id}>
           {props.text.length > 0 ? props.text : props.url}
         </span>
       </div>
