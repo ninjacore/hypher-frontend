@@ -18,7 +18,7 @@ import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 // imports for UI ./
 
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState, useId } from "react"
 import { useDispatch } from "react-redux"
 import { nanoid } from "@reduxjs/toolkit"
 
@@ -32,6 +32,30 @@ import {
   updateLink,
   deleteLink,
 } from "@/lib/features/profilePage/linkCollectionSlice"
+
+// speficly for drag-and-drop functionality
+// import { useSortable } from "@dnd-kit/sortable"
+import { CSS } from "@dnd-kit/utilities"
+import { SortableLinkNode } from "@/lib/utils/SortableLinkNode/SortableLinkNode"
+
+// imports for sorting functionality /.
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core"
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable"
+// imports for sorting functionality ./
+
+// specificly for
 
 export const LinkCollectionEntries = ({ handle, mode }) => {
   const dispatch = useDispatch()
@@ -55,39 +79,147 @@ export const LinkCollectionEntries = ({ handle, mode }) => {
   } else if (linkCollectionStatus === "failed") {
     contentOfLinkCollection = <div>Error!</div>
   } else if (linkCollectionStatus === "succeeded") {
-    contentOfLinkCollection = links.map((link) => {
-      switch (mode) {
-        case "linked":
-          return (
-            <a href={link.url} target="_blank" key={"pos-" + link.position}>
-              <div className="my-4 mx-2 py-2 px-3 bg-konkikyou-blue">
-                <IconMapper url={link.url} />
-                <span className="mx-2">
-                  {link.text.length > 0 ? link.text : link.url}
-                </span>
-              </div>
-            </a>
-          )
+    switch (mode) {
+      case "linked":
+        contentOfLinkCollection = generateDefault(links)
+        break
 
-        case "editable":
-          return <></>
+      case "draggable":
+        contentOfLinkCollection = generateDraggable()
+        break
 
-        case "ineditable":
-          return <></>
-
-        default:
-          return <>link mode not covered.</>
-      }
-    })
+      case "editable":
+        contentOfLinkCollection = generateEditable(links)
+        break
+    }
   }
 
+  return <>{contentOfLinkCollection}</>
+}
+
+function generateDefault(links) {
+  return links.map((link) => {
+    return (
+      <a href={link.url} target="_blank" key={"pos-" + link.position}>
+        <div className="my-4 mx-2 py-2 px-3 bg-konkikyou-blue">
+          <IconMapper url={link.url} />
+          <span className="mx-2">
+            {link.text.length > 0 ? link.text : link.url}
+          </span>
+        </div>
+      </a>
+    )
+  })
+}
+
+function generateDraggable() {
   return (
     <>
-      <b>LET'S CONNECT | Links via Redux V2</b>
-      {/* {links.map((link) => updatableLink(link))} */}
-      {/* {renderedLinkCollection} */}
-      {contentOfLinkCollection}
-      {/* <AddLinkSection /> */}
+      <p>Pick up a link to change its position in the collection.</p>
+      <DndFrame />
+      <div className="flex justify-end gap-5">
+        <div>
+          <Button
+            id="cancelReorderedLinkCollectionButton"
+            variant="outline"
+            className="bg-white text-black"
+            onClick={() => {
+              cancelLinkCollectionUpdate(setLinkCollectionIsSortable)
+            }}
+          >
+            cancel
+          </Button>
+        </div>
+        <div>
+          <Button
+            id="saveReorderedLinkCollectionButton"
+            variant="outline"
+            className="bg-white text-black"
+            onClick={() => {
+              updateFullLinkCollection(
+                reorderedLinkCollection,
+                setLinkCollectionIsSortable
+              )
+            }}
+          >
+            save
+          </Button>
+        </div>
+      </div>
     </>
   )
+}
+
+function DndFrame() {
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
+  // TODO: see if this is needed
+  const uniqueId = useId()
+
+  // useSelector is a hook that allows you to extract data
+  // from the Redux store state
+  const links = useSelector((state) => state.linkCollection.links)
+
+  return (
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragEnd={handleDragEnd}
+      id={uniqueId}
+    >
+      <SortableContext items={links} strategy={verticalListSortingStrategy}>
+        <DraggableLinkElements links={links} />
+      </SortableContext>
+    </DndContext>
+  )
+
+  function handleDragEnd(event) {
+    announce("handleDragEnd", event)
+    announce("known Links:", linkCollection)
+
+    const { active, over } = event
+
+    console.log(`%c active.id => ${active.id}`, `color: green;`)
+    console.log(`%c over.id => ${over.id}`, `color: green;`)
+
+    if (active.id !== over.id) {
+      setLinkNodes((items) => {
+        const oldIndex = items.map((linkNode) => linkNode.id).indexOf(active.id)
+
+        const newIndex = items.map((linkNode) => linkNode.id).indexOf(over.id)
+
+        return arrayMove(items, oldIndex, newIndex)
+      })
+    }
+  }
+}
+
+function DraggableLinkElements(givenObject) {
+  console.log("links that will not map:")
+  console.table(givenObject.links)
+  // return givenObject.links.forEach((element) => {
+  //   console.table(element)
+  // })
+
+  return givenObjectlinks.map((link) => {
+    return (
+      <>
+        <SortableLinkNode
+          key={link.position}
+          id={link.id}
+          text={link.text}
+          url={link.url}
+        />
+        {link.text}
+      </>
+    )
+  })
+}
+
+function generateEditable(links) {
+  return <>to be implemented...</>
 }

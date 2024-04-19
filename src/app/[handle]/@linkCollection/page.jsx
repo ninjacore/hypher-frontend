@@ -4,7 +4,7 @@ import { useContext } from "react"
 import { Profile } from "../page.jsx"
 
 // to define the handle
-import { ProfilePageContext } from "../ProfilePageContext"
+import { ProfilePageContext } from "@/app/[handle]/utils/ProfilePageContext"
 
 // import state of link collection
 import { LinkCollectionEntries } from "@/lib/features/profilePage/linkCollectionEntries"

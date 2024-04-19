@@ -4,7 +4,7 @@ import "./globals.css"
 // shadcn
 import { cn } from "@/lib/utils"
 
-import StoreProvider from "./StoreProvider"
+import StoreProvider from "@/app/utils/StoreProvider"
 
 const inter = Inter({ subsets: ["latin"] })
 
