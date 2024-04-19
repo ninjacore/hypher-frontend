@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react"
 import { usePathname } from "next/navigation"
 
 // importing context to use later and in child components
-import { ProfilePageContext } from "./ProfilePageContext"
+import { ProfilePageContext } from "@/app/[handle]/utils/ProfilePageContext"
 
 export default function Page() {
   return (
@@ -24,6 +24,7 @@ export function Profile({ children }) {
   // to limit re-renders
   useEffect(() => {
     setHandle(pathname.split("/").pop())
+    console.log("setting handle: ", handle)
   }, [])
 
   if (handle) {

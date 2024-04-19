@@ -26,3 +26,12 @@ body {
 .bg-dark-midnight-blue {
   background-color: #003366;
 }
+
+.section-title {
+  /* tailwind text-2xl = */
+  font-size: 1.5rem;
+  line-height: 2rem;
+
+  /* tailwind font-bold = */
+  font-weight: 700;
+}

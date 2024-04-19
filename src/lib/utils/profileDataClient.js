@@ -1,8 +1,9 @@
 "use client"
 import { useState, useEffect } from "react"
 
-import { backendApiEndpointDeliverer } from "./backendApiEndpointDeliverer"
-
+// TODO: make 'profileDataClient' more generic:
+// 1. make 'getFeaturedContent', 'getLinkCollection' etc. not functions put options
+// 2. turn the actual fetch into one function that takes the endpoint and config
 export async function profileDataClient(
   handle,
   linkPosition = null,
@@ -20,7 +21,7 @@ export async function profileDataClient(
   switch (contentBoxPosition) {
     case 0:
       if (method === "GET") {
-        return await getLinkCollection(handle, method)
+        return await getLinkCollection(handle, contentBoxPosition, method)
       } else if (method === "PUT") {
         return await updateLinkWithinCollection(
           handle,
@@ -52,11 +53,7 @@ export async function profileDataClient(
 
   // client functions /.
   async function getAllProfileData(handle, method) {
-    const endpoint = backendApiEndpointDeliverer(
-      "profilePageData",
-      method,
-      handle
-    )
+    const endpoint = `${baseURL}/api/v1/profilePage/${handle}`
 
     const config = {
       method: method,
@@ -86,11 +83,7 @@ export async function profileDataClient(
   }
 
   async function getMainProfileData(handle, method) {
-    const endpoint = backendApiEndpointDeliverer(
-      "mainProfilePageData",
-      method,
-      handle
-    )
+    const endpoint = `${baseURL}/api/v1/profiles/handle/${handle}`
 
     const config = {
       method: method,
@@ -120,11 +113,7 @@ export async function profileDataClient(
   }
 
   async function getFeaturedContent(handle, method) {
-    const endpoint = backendApiEndpointDeliverer(
-      "featuredContent",
-      method,
-      handle
-    )
+    const endpoint = `${baseURL}/api/v1/featuredContent?handle=${handle}`
 
     const config = {
       method: method,
@@ -184,8 +173,9 @@ export async function profileDataClient(
     }
   }
 
-  async function getLinkCollection(handle, method) {
-    const endpoint = `${baseURL}/api/v1/linkCollection?handle=${handle}`
+  async function getLinkCollection(handle, contentBoxPosition, method) {
+    // const endpoint = `${baseURL}/api/v1/linkCollection?handle=${handle}`
+    const endpoint = `${baseURL}/api/v1/linkCollection?handle=${handle}&contentBoxPosition=${contentBoxPosition}`
 
     const config = {
       method: method,
