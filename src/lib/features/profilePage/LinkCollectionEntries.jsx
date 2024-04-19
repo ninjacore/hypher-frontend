@@ -159,18 +159,15 @@ function DndFrame() {
       coordinateGetter: sortableKeyboardCoordinates,
     })
   )
-  // TODO: see if this is needed
-  const uniqueId = useId()
 
   // useSelector is a hook that allows you to extract data
   // from the Redux store state
   const links = useSelector((state) => state.linkCollection.links)
 
-  // —— ** POSSIBLY OBSOLETE ** ——  /.
   // make a mutable copy of links
   const linkCollection = JSON.parse(JSON.stringify(links))
 
-  // link colllection buffer
+  // used for drag-and-drop (reorder and transition animation)
   const [linkNodes, setLinkNodes] = useState(
     linkCollection.map((linkNode) => {
       linkNode.id = linkNode.uniqueId
@@ -178,6 +175,8 @@ function DndFrame() {
     })
   )
 
+  // TODO: save via Redux instead (possibly one level higher, though...)
+  // —— ** POSSIBLY OBSOLETE ** ——  /.
   const [reorderedLinkCollection, setReorderedLinkCollection] = useState([
     linkCollection,
   ])
@@ -189,16 +188,17 @@ function DndFrame() {
     announce("linkCollection", linkCollection)
     announce("to be saved reorderedLinkCollection", reorderedLinkCollection)
   }, [linkNodes])
-
-  let counter = 0
   // —— ** POSSIBLY OBSOLETE ** ——  ./
+
+  // for debugging
+  let counter = 0
 
   return (
     <DndContext
       sensors={sensors}
       collisionDetection={closestCenter}
       onDragEnd={handleDragEnd}
-      id={uniqueId}
+      id={useId()}
     >
       <SortableContext items={linkNodes} strategy={verticalListSortingStrategy}>
         {/* <DraggableLinkElements links={links} /> */}
@@ -238,25 +238,6 @@ function DndFrame() {
       })
     }
   }
-}
-
-function DraggableLinkElements(givenObject) {
-  // console.log("links that will not map:")
-  // console.table(givenObject.links)
-  // return givenObject.links.forEach((element) => {
-  //   console.table(element)
-  // })
-
-  return givenObject.links.map((link) => {
-    return (
-      <SortableLinkNode
-        key={"linkNode-" + link.uniqueId + nanoid()}
-        id={link.uniqueId}
-        text={link.text}
-        url={link.url}
-      />
-    )
-  })
 }
 
 function generateEditable(links) {
