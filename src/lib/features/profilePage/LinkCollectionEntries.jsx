@@ -35,7 +35,6 @@ import {
 
 // speficly for drag-and-drop functionality
 // import { useSortable } from "@dnd-kit/sortable"
-import { CSS } from "@dnd-kit/utilities"
 import { SortableLinkNode } from "@/lib/utils/SortableLinkNode/SortableLinkNode"
 
 // imports for sorting functionality /.
@@ -167,6 +166,33 @@ function DndFrame() {
   // from the Redux store state
   const links = useSelector((state) => state.linkCollection.links)
 
+  // —— ** POSSIBLY OBSOLETE ** ——  /.
+  // make a mutable copy of links
+  const linkCollection = JSON.parse(JSON.stringify(links))
+
+  // link colllection buffer
+  const [linkNodes, setLinkNodes] = useState(
+    linkCollection.map((linkNode) => {
+      linkNode.id = linkNode.uniqueId
+      return linkNode
+    })
+  )
+
+  const [reorderedLinkCollection, setReorderedLinkCollection] = useState([
+    linkCollection,
+  ])
+
+  // used to up-drill every time reorder happens
+  useEffect(() => {
+    setReorderedLinkCollection(linkNodes)
+    // announce("to be saved linkNodes", linkNodes)
+    announce("linkCollection", linkCollection)
+    announce("to be saved reorderedLinkCollection", reorderedLinkCollection)
+  }, [linkNodes])
+
+  let counter = 0
+  // —— ** POSSIBLY OBSOLETE ** ——  ./
+
   return (
     <DndContext
       sensors={sensors}
@@ -174,15 +200,28 @@ function DndFrame() {
       onDragEnd={handleDragEnd}
       id={uniqueId}
     >
-      <SortableContext items={links} strategy={verticalListSortingStrategy}>
-        <DraggableLinkElements links={links} />
+      <SortableContext items={linkNodes} strategy={verticalListSortingStrategy}>
+        {/* <DraggableLinkElements links={links} /> */}
+        {linkNodes.map((linkNode) => {
+          console.log("round #" + counter + " id is: " + linkNode.id)
+          counter++
+
+          return (
+            <SortableLinkNode
+              key={linkNode.position}
+              id={linkNode.uniqueId}
+              text={linkNode.text}
+              url={linkNode.url}
+            />
+          )
+        })}
       </SortableContext>
     </DndContext>
   )
 
   function handleDragEnd(event) {
-    announce("handleDragEnd", event)
-    announce("known Links:", linkCollection)
+    // announce("handleDragEnd", event)
+    // announce("known Links:", linkCollection)
 
     const { active, over } = event
 
@@ -202,8 +241,8 @@ function DndFrame() {
 }
 
 function DraggableLinkElements(givenObject) {
-  console.log("links that will not map:")
-  console.table(givenObject.links)
+  // console.log("links that will not map:")
+  // console.table(givenObject.links)
   // return givenObject.links.forEach((element) => {
   //   console.table(element)
   // })
