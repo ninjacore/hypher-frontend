@@ -205,7 +205,7 @@ function DraggableLinkElements(givenObject) {
   //   console.table(element)
   // })
 
-  return givenObjectlinks.map((link) => {
+  return givenObject.links.map((link) => {
     return (
       <>
         <SortableLinkNode
@@ -214,7 +214,6 @@ function DraggableLinkElements(givenObject) {
           text={link.text}
           url={link.url}
         />
-        {link.text}
       </>
     )
   })
