@@ -1,13 +1,13 @@
 "use client"
 import { useState, useEffect } from "react"
 
-// TODO: make 'profileDataClient' more generic:
 // 1. make 'getFeaturedContent', 'getLinkCollection' etc. not functions put options
 // 2. turn the actual fetch into one function that takes the endpoint and config
 export async function profileDataClient(
   handle,
-  linkPosition = null,
+  itemPosition = null,
   contentBoxPosition = null,
+  contentType,
   method,
   body = null
 ) {
@@ -32,12 +32,12 @@ export async function profileDataClient(
       } else if (method === "POST") {
         return await addLinkToCollection(handle, method, body)
       } else if (method === "DELETE") {
-        if (linkPosition === null) {
+        if (itemPosition === null) {
           throw new Error("linkPosition is required for DELETE method.")
         }
         return await deleteLinkWithinCollection(
           handle,
-          linkPosition,
+          itemPosition,
           contentBoxPosition,
           method
         )

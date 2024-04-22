@@ -2,7 +2,8 @@ import { createSlice } from "@reduxjs/toolkit"
 
 // for data fetch
 import { nanoid, createAsyncThunk } from "@reduxjs/toolkit"
-import { profileDataClient } from "@/lib/utils/profileDataClient"
+import { profileDataClient } from "@/lib/utils/profileDataClients/profileDataClient"
+import { linkCollectionClient } from "@/lib/utils/profileDataClients/linkCollectionClient"
 
 const initialState = {
   links: [],
@@ -10,37 +11,63 @@ const initialState = {
   error: null,
 }
 
-// client interactions /.
+// monster client interactions /.
 export const fetchLinkCollection = createAsyncThunk(
   "linkCollection/fetchLinkCollection",
   async (handle) => {
-    // linkCollection box is at position 0
-    const response = await profileDataClient(handle, null, 0, "GET")
+    const response = await linkCollectionClient(handle)
     console.log("got something!! --> ", response.data)
+    return response.data
+  }
+)
+
+// TODO: save full link
+export const updateLinkCollection = createAsyncThunk(
+  "linkCollection/updateLinkCollection",
+  async (handle, links) => {
+    const response = await linkCollectionClient(
+      handle,
+      "linkCollection",
+      "PUT",
+      links
+    )
     return response.data
   }
 )
 
 export const addNewLink = createAsyncThunk(
   "linkCollection/addNewLink",
-  async (newLinkItem) => {
-    const response = await profileDataClient(newLinkItem.handle, 0, "POST", {
-      url: newLinkItem.url,
-      text: newLinkItem.text,
-      position: newLinkItem.position,
-    })
+  async (handle, newLinkItem) => {
+    // async (newLinkItem) => {
+    // const response = await profileDataClient(newLinkItem.handle, 0, "POST", {
+    //   url: newLinkItem.url,
+    //   text: newLinkItem.text,
+    //   position: newLinkItem.position,
+    // })
+    const response = await linkCollectionClient(
+      handle,
+      "link",
+      "POST",
+      newLinkItem
+    )
     return response.data
   }
 )
 
 export const updateLink = createAsyncThunk(
   "linkCollection/updateLink",
-  async (updatedLinkItem) => {
-    const response = await profileDataClient(updatedLinkItem.handle, 0, "PUT", {
-      url: updatedLinkItem.url,
-      text: updatedLinkItem.text,
-      position: updatedLinkItem.position,
-    })
+  async (handle, updatedLinkItem) => {
+    // const response = await profileDataClient(updatedLinkItem.handle, 0, "PUT", {
+    const response = await linkCollectionClient(
+      updatedLinkItem.handle,
+      0,
+      "PUT",
+      {
+        url: updatedLinkItem.url,
+        text: updatedLinkItem.text,
+        position: updatedLinkItem.position,
+      }
+    )
     return response.data
   }
 )
@@ -48,11 +75,18 @@ export const updateLink = createAsyncThunk(
 export const deleteLink = createAsyncThunk(
   "linkCollection/deleteLink",
   async (handle, linkPosition) => {
-    const response = await profileDataClient(handle, linkPosition, 0, "DELETE")
+    // const response = await profileDataClient(handle, linkPosition, 0, "DELETE")
+    const response = await linkCollectionClient(
+      handle,
+      "link",
+      "DELETE",
+      null,
+      linkPosition
+    )
     return response.data
   }
 )
-// client interactions ./
+// monster client interactions ./
 
 const linkCollectionSlice = createSlice({
   name: "linkCollection",
