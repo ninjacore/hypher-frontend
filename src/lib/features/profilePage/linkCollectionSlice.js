@@ -106,6 +106,17 @@ const linkCollectionSlice = createSlice({
         state.status = "failed"
         state.error = action.error.message
       })
+      .addCase(updateLinkCollection.pending, (state) => {
+        state.status = "loading"
+      })
+      .addCase(updateLinkCollection.fulfilled, (state, action) => {
+        state.status = "succeeded"
+        state.links = state.links.concat(action.payload)
+      })
+      .addCase(updateLinkCollection.rejected, (state, action) => {
+        state.status = "failed"
+        state.error = action.error.message
+      })
       .addCase(addNewLink.fulfilled, (state, action) => {
         state.status = "succeeded"
         state.links = state.links.concat(action.payload)
