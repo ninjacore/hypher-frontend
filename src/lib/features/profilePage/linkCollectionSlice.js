@@ -17,6 +17,11 @@ export const fetchLinkCollection = createAsyncThunk(
   async (handle) => {
     const response = await linkCollectionClient(handle)
     console.log("got something!! --> ", response.data)
+
+    // temp for mobile debugging
+    document.getElementById("mobileMessageOutput").innerHTML =
+      JSON.stringify(response)
+
     return response.data
   }
 )

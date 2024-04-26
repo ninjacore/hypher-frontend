@@ -88,6 +88,11 @@ async function apiHandler(endpoint, method, body = null) {
     // if not ok..
     throw new Error(response.statusText)
   } catch (error) {
+    // temp for mobile debugging
+    document.getElementById("mobileMessageOutput").innerHTML = JSON.stringify(
+      error.message ? error.message : data
+    )
+
     return Promise.reject(error.message ? error.message : data)
   }
 }

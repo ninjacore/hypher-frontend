@@ -115,10 +115,26 @@ function generateDefault(links) {
 }
 
 function generateDraggable() {
+  const dispatch = useDispatch()
+
+  // useSelector is a hook that allows you to extract data
+  // from the Redux store state
+  const links = useSelector((state) => state.linkCollection.links)
+
+  // make a mutable copy of links
+  const linkCollection = JSON.parse(JSON.stringify(links))
+
+  const [reorderedLinkCollection, setReorderedLinkCollection] = useState([
+    linkCollection,
+  ])
+
   return (
     <>
       <p>Pick up a link to change its position in the collection.</p>
-      <DndFrame />
+      <DndFrame
+        linkCollection={linkCollection}
+        setReorderedLinkCollection={setReorderedLinkCollection}
+      />
       <div className="flex justify-end gap-5">
         <div>
           <Button
@@ -152,7 +168,7 @@ function generateDraggable() {
   )
 }
 
-function DndFrame() {
+function DndFrame({ linkCollection, setReorderedLinkCollection }) {
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -160,12 +176,12 @@ function DndFrame() {
     })
   )
 
-  // useSelector is a hook that allows you to extract data
-  // from the Redux store state
-  const links = useSelector((state) => state.linkCollection.links)
+  // // useSelector is a hook that allows you to extract data
+  // // from the Redux store state
+  // const links = useSelector((state) => state.linkCollection.links)
 
-  // make a mutable copy of links
-  const linkCollection = JSON.parse(JSON.stringify(links))
+  // // make a mutable copy of links
+  // const linkCollection = JSON.parse(JSON.stringify(links))
 
   // used for drag-and-drop (reorder and transition animation)
   const [linkNodes, setLinkNodes] = useState(
@@ -177,13 +193,17 @@ function DndFrame() {
 
   // TODO: save via Redux instead (possibly one level higher, though...)
   // —— ** POSSIBLY OBSOLETE ** ——  /.
-  const [reorderedLinkCollection, setReorderedLinkCollection] = useState([
-    linkCollection,
-  ])
+  // const [reorderedLinkCollection, setReorderedLinkCollection] = useState([
+  //   linkCollection,
+  // ])
 
   // used to up-drill every time reorder happens
   useEffect(() => {
-    setReorderedLinkCollection(linkNodes)
+    setReorderedLinkCollection(linkNodes) // V1
+
+    // this should only happen if user clicks save.
+    // dispatch(updateLinkCollection(handle, linkNodes)) // V2
+
     // announce("to be saved linkNodes", linkNodes)
     announce("linkCollection", linkCollection)
     announce("to be saved reorderedLinkCollection", reorderedLinkCollection)
