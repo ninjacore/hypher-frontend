@@ -38,6 +38,12 @@ export default function Page() {
 const sectionTitle = "Links"
 
 function LinkCollection() {
+  // on top to solve "Error: React Hook "useState" is called conditionally.
+  // React Hooks must be called in the exact same order in every
+  // component render."
+  const [linkCollectionIsSortable, setLinkCollectionIsSortable] =
+    useState(false)
+
   const { handle } = useContext(ProfilePageContext)
   if (!handle) {
     return (
@@ -47,9 +53,6 @@ function LinkCollection() {
       </>
     )
   }
-
-  const [linkCollectionIsSortable, setLinkCollectionIsSortable] =
-    useState(false)
 
   if (linkCollectionIsSortable) {
     // drag-and-drop HTML
