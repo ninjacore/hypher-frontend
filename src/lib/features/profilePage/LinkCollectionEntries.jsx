@@ -28,10 +28,12 @@ import { useSelector } from "react-redux"
 // specific CRUD actions for this feature
 import {
   fetchLinkCollection,
+  updateLinkCollection,
   addNewLink,
   updateLink,
   deleteLink,
 } from "@/lib/features/profilePage/linkCollectionSlice"
+import { unwrapResult } from "@reduxjs/toolkit"
 
 // speficly for drag-and-drop functionality
 // import { useSortable } from "@dnd-kit/sortable"
@@ -87,7 +89,8 @@ export const LinkCollectionEntries = ({ handle, mode }) => {
         break
 
       case "draggable":
-        contentOfLinkCollection = generateDraggable()
+        // contentOfLinkCollection = generateDraggable()
+        contentOfLinkCollection = <DraggableLinkCollection handle={handle} />
         break
 
       case "editable":
@@ -114,7 +117,9 @@ function generateDefault(links) {
   })
 }
 
-function generateDraggable() {
+// function generateDraggable() {
+function DraggableLinkCollection({ handle }) {
+  const [updateRequestStatus, setUpdateRequestStatus] = useState("idle")
   const dispatch = useDispatch()
 
   // useSelector is a hook that allows you to extract data
@@ -153,12 +158,16 @@ function generateDraggable() {
             id="saveReorderedLinkCollectionButton"
             variant="outline"
             className="bg-white text-black"
-            onClick={() => {
-              updateFullLinkCollection(
-                reorderedLinkCollection,
-                setLinkCollectionIsSortable
-              )
-            }}
+            onClick={onSaveUpdateClicked}
+            // onClick={() => {
+            //   setLinkCollectionReadyToUpdate(true)
+            // }}
+            // onClick={() => {
+            //   updateFullLinkCollection(
+            //     reorderedLinkCollection,
+            //     setLinkCollectionIsSortable
+            //   )
+            // }}
           >
             save
           </Button>
@@ -166,6 +175,28 @@ function generateDraggable() {
       </div>
     </>
   )
+
+  async function onSaveUpdateClicked() {
+    try {
+      setUpdateRequestStatus("pending")
+      announce(
+        "sending reorderedLinkCollection to backend:",
+        reorderedLinkCollection
+      )
+
+      const updateData = {
+        handle,
+        links: reorderedLinkCollection,
+      }
+
+      const resultAction = await dispatch(updateLinkCollection(updateData))
+      unwrapResult(resultAction)
+    } catch (error) {
+      console.error("Failed to save the link collection: ", error)
+    } finally {
+      setUpdateRequestStatus("idle")
+    }
+  }
 }
 
 function DndFrame({ linkCollection, setReorderedLinkCollection }) {
@@ -206,7 +237,7 @@ function DndFrame({ linkCollection, setReorderedLinkCollection }) {
 
     // announce("to be saved linkNodes", linkNodes)
     announce("linkCollection", linkCollection)
-    announce("to be saved reorderedLinkCollection", reorderedLinkCollection)
+    // announce("to be saved reorderedLinkCollection", reorderedLinkCollection)
   }, [linkNodes])
   // —— ** POSSIBLY OBSOLETE ** ——  ./
 

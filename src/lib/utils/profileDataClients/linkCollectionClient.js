@@ -1,4 +1,5 @@
 import { create } from "domain"
+import { announce } from "../debugTools/announce"
 
 const baseURL = "http://localhost:5678"
 
@@ -18,7 +19,8 @@ export async function linkCollectionClient(
       } else if (method === "GET") {
         return await getLinkCollection(handle, contentBoxPosition, method)
       } else if (method === "PUT") {
-        return await updateLinkCollection() // required body: List<LinkWithinCollection>
+        announce("PUTTING this (reorderedLinkCollection):", body)
+        return await updateLinkCollection(handle, contentBoxPosition, body) // required body: List<LinkWithinCollection>
       } else if (method === "DELETE") {
         // TODO: return await deleteLinkCollection()
       }
@@ -112,7 +114,11 @@ async function getLinkCollection(handle, contentBoxPosition, method) {
 
 async function updateLinkCollection(handle, contentBoxPosition, body) {
   const endpoint = `${baseURL}/api/v1/linkCollection/update?handle=${handle}&contentBoxPosition=${contentBoxPosition}`
-
+  if (!body) {
+    throw new Error("Body is required for update.")
+  } else {
+    console.log("body: ", body)
+  }
   return await apiHandler(endpoint, "PUT", body)
 }
 // client functions for LinkCollection /.

@@ -4,6 +4,7 @@ import { createSlice } from "@reduxjs/toolkit"
 import { nanoid, createAsyncThunk } from "@reduxjs/toolkit"
 import { profileDataClient } from "@/lib/utils/profileDataClients/profileDataClient"
 import { linkCollectionClient } from "@/lib/utils/profileDataClients/linkCollectionClient"
+import { announce } from "@/lib/utils/debugTools/announce"
 
 const initialState = {
   links: [],
@@ -29,7 +30,9 @@ export const fetchLinkCollection = createAsyncThunk(
 // TODO: save full link
 export const updateLinkCollection = createAsyncThunk(
   "linkCollection/updateLinkCollection",
-  async (handle, links) => {
+  async (updateData) => {
+    const { handle, links } = updateData
+    announce("ASYNC sending reorderedLinkCollection to client:", links.links)
     const response = await linkCollectionClient(
       handle,
       "linkCollection",
