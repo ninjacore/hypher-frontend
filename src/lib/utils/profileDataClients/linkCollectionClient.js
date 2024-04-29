@@ -19,7 +19,6 @@ export async function linkCollectionClient(
       } else if (method === "GET") {
         return await getLinkCollection(handle, contentBoxPosition, method)
       } else if (method === "PUT") {
-        announce("PUTTING this (reorderedLinkCollection):", body)
         return await updateLinkCollection(handle, contentBoxPosition, body) // required body: List<LinkWithinCollection>
       } else if (method === "DELETE") {
         // TODO: return await deleteLinkCollection()

@@ -184,13 +184,13 @@ function DraggableLinkCollection({ handle }) {
         reorderedLinkCollection
       )
 
+      // createAsyncThunk only takes one argument
       const updateData = {
         handle,
         links: reorderedLinkCollection,
       }
 
-      const resultAction = await dispatch(updateLinkCollection(updateData))
-      unwrapResult(resultAction)
+      dispatch(updateLinkCollection(updateData))
     } catch (error) {
       console.error("Failed to save the link collection: ", error)
     } finally {

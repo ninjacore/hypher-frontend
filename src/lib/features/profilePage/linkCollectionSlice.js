@@ -32,7 +32,6 @@ export const updateLinkCollection = createAsyncThunk(
   "linkCollection/updateLinkCollection",
   async (updateData) => {
     const { handle, links } = updateData
-    announce("ASYNC sending reorderedLinkCollection to client:", links.links)
     const response = await linkCollectionClient(
       handle,
       "linkCollection",
@@ -119,7 +118,8 @@ const linkCollectionSlice = createSlice({
       })
       .addCase(updateLinkCollection.fulfilled, (state, action) => {
         state.status = "succeeded"
-        state.links = state.links.concat(action.payload)
+        // replace the entire link collection with the updated one
+        state.links = action.payload
       })
       .addCase(updateLinkCollection.rejected, (state, action) => {
         state.status = "failed"
