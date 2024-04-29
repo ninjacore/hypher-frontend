@@ -310,27 +310,30 @@ function CollectionOfEditableLinks({ handle }) {
 
   // return <>to be implemented...</>
   // just to be sure they are in order
-  const [linkCollectionByPosition, setLinkCollectionByPosition] = useState(
-    linkCollection.toSorted((a, b) => a.position - b.position)
+  const linkCollectionByPosition = linkCollection.toSorted(
+    (a, b) => a.position - b.position
   )
-  // const [linkElementState, setLinkElementState] = useState(
-  //   linkCollectionByPosition
+  // const [linkCollectionByPosition, setLinkCollectionByPosition] = useState(
+  //   linkCollection.toSorted((a, b) => a.position - b.position)
   // )
+  const [linkElementState, setLinkElementState] = useState(
+    linkCollectionByPosition
+  )
 
   // announce("linkElementState", linkElementState)
 
   return linkCollectionByPosition.map((link) => {
     // TODO: probably move these
-    // const [linkText, setLinkText] = useState(link.text)
-    // const [linkUrl, setLinkUrl] = useState(link.url)
+    const [linkText, setLinkText] = useState(link.text)
+    const [linkUrl, setLinkUrl] = useState(link.url)
     announce("link", link)
-    // announce(
-    //   `linkElementState at this position (${link.position})`,
-    //   linkElementState[link.position]
-    // )
+    announce(
+      `linkElementState at this position (${link.position})`,
+      linkElementState[link.position]
+    )
 
-    let linkUrl = link.url
-    let linkText = link.text
+    // let linkUrl = link.url
+    // let linkText = link.text
 
     return (
       <div key={"linkItem-" + link.position}>
@@ -369,7 +372,8 @@ function CollectionOfEditableLinks({ handle }) {
                   className="col-span-3"
                   value={linkText}
                   // value={linkElementState[link.position].text}
-                  // onChange={(e) => setLinkText(e.target.value)}
+                  // onChange={(e) => (linkText = e.target.value)}
+                  onChange={(e) => setLinkText(e.target.value)}
                   // onChange={(e) =>
                   //   setLinkElementState[link.position](
                   //     (linkElementState[link.position].text = e.target.value)
@@ -387,7 +391,8 @@ function CollectionOfEditableLinks({ handle }) {
                   className="col-span-3"
                   value={linkUrl}
                   // value={linkElementState[link.position].url}
-                  // onChange={(e) => setLinkUrl(e.target.value)}
+                  onChange={(e) => setLinkUrl(e.target.value)}
+                  // onChange={(e) => (linkUrl = e.target.value)}
                   // onChange={(e) =>
                   //   setLinkElementState(() => {
                   //     let copyArray = linkCollection
