@@ -18,9 +18,12 @@ import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 // imports for UI ./
 
-import React, { useEffect, useState, useId } from "react"
+import React, { useEffect, useState, useId, useContext } from "react"
 import { useDispatch } from "react-redux"
 import { nanoid } from "@reduxjs/toolkit"
+
+// to update the interactability status
+import { ProfilePageContext } from "@/app/[handle]/utils/ProfilePageContext"
 
 // to read data from the Redux store
 import { useSelector } from "react-redux"
@@ -133,6 +136,9 @@ function DraggableLinkCollection({ handle }) {
     linkCollection,
   ])
 
+  // to cancel the update
+  const { setLinkCollectionIsSortable } = useContext(ProfilePageContext)
+
   return (
     <>
       <p>Pick up a link to change its position in the collection.</p>
@@ -147,7 +153,7 @@ function DraggableLinkCollection({ handle }) {
             variant="outline"
             className="bg-white text-black"
             onClick={() => {
-              cancelLinkCollectionUpdate(setLinkCollectionIsSortable)
+              setLinkCollectionIsSortable(false)
             }}
           >
             cancel
@@ -159,15 +165,6 @@ function DraggableLinkCollection({ handle }) {
             variant="outline"
             className="bg-white text-black"
             onClick={onSaveUpdateClicked}
-            // onClick={() => {
-            //   setLinkCollectionReadyToUpdate(true)
-            // }}
-            // onClick={() => {
-            //   updateFullLinkCollection(
-            //     reorderedLinkCollection,
-            //     setLinkCollectionIsSortable
-            //   )
-            // }}
           >
             save
           </Button>
