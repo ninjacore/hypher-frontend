@@ -10,7 +10,7 @@ function SortableLinkNode(props) {
   const { attributes, listeners, setNodeRef, transform, transition } =
     useSortable({ id: props.id })
   // The argument passed to the id argument of useSortable should match
-  // the id passed in the items array of the parent SortableContext provider.
+  // the id passed in the 'items' prop of SortableContext.
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -25,13 +25,12 @@ function SortableLinkNode(props) {
       {...listeners}
       className=""
     >
-      {/* <span className="">{props.text + " :: " + props.url}</span> */}
       <div
         key={"pos-" + props.position}
         className="my-4 mx-2 py-2 px-3 bg-konkikyou-blue"
       >
-        <IconMapper url={props.url} />
-        <span className="mx-2">
+        <IconMapper url={props.url} key={"icon-" + props.id} />
+        <span className="mx-2" key={"contentOf-" + props.id}>
           {props.text.length > 0 ? props.text : props.url}
         </span>
       </div>

@@ -28,14 +28,15 @@ import { useSelector } from "react-redux"
 // specific CRUD actions for this feature
 import {
   fetchLinkCollection,
+  updateLinkCollection,
   addNewLink,
   updateLink,
   deleteLink,
 } from "@/lib/features/profilePage/linkCollectionSlice"
+import { unwrapResult } from "@reduxjs/toolkit"
 
 // speficly for drag-and-drop functionality
 // import { useSortable } from "@dnd-kit/sortable"
-import { CSS } from "@dnd-kit/utilities"
 import { SortableLinkNode } from "@/lib/utils/SortableLinkNode/SortableLinkNode"
 
 // imports for sorting functionality /.
@@ -54,6 +55,9 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable"
 // imports for sorting functionality ./
+
+// debug support function
+import { announce } from "@/lib/utils/debugTools/announce"
 
 // specificly for
 
@@ -85,7 +89,8 @@ export const LinkCollectionEntries = ({ handle, mode }) => {
         break
 
       case "draggable":
-        contentOfLinkCollection = generateDraggable()
+        // contentOfLinkCollection = generateDraggable()
+        contentOfLinkCollection = <DraggableLinkCollection handle={handle} />
         break
 
       case "editable":
@@ -112,11 +117,29 @@ function generateDefault(links) {
   })
 }
 
-function generateDraggable() {
+// function generateDraggable() {
+function DraggableLinkCollection({ handle }) {
+  const [updateRequestStatus, setUpdateRequestStatus] = useState("idle")
+  const dispatch = useDispatch()
+
+  // useSelector is a hook that allows you to extract data
+  // from the Redux store state
+  const links = useSelector((state) => state.linkCollection.links)
+
+  // make a mutable copy of links
+  const linkCollection = JSON.parse(JSON.stringify(links))
+
+  const [reorderedLinkCollection, setReorderedLinkCollection] = useState([
+    linkCollection,
+  ])
+
   return (
     <>
       <p>Pick up a link to change its position in the collection.</p>
-      <DndFrame />
+      <DndFrame
+        linkCollection={linkCollection}
+        setReorderedLinkCollection={setReorderedLinkCollection}
+      />
       <div className="flex justify-end gap-5">
         <div>
           <Button
@@ -135,12 +158,16 @@ function generateDraggable() {
             id="saveReorderedLinkCollectionButton"
             variant="outline"
             className="bg-white text-black"
-            onClick={() => {
-              updateFullLinkCollection(
-                reorderedLinkCollection,
-                setLinkCollectionIsSortable
-              )
-            }}
+            onClick={onSaveUpdateClicked}
+            // onClick={() => {
+            //   setLinkCollectionReadyToUpdate(true)
+            // }}
+            // onClick={() => {
+            //   updateFullLinkCollection(
+            //     reorderedLinkCollection,
+            //     setLinkCollectionIsSortable
+            //   )
+            // }}
           >
             save
           </Button>
@@ -148,38 +175,104 @@ function generateDraggable() {
       </div>
     </>
   )
+
+  async function onSaveUpdateClicked() {
+    try {
+      setUpdateRequestStatus("pending")
+      announce(
+        "sending reorderedLinkCollection to backend:",
+        reorderedLinkCollection
+      )
+
+      const updateData = {
+        handle,
+        links: reorderedLinkCollection,
+      }
+
+      const resultAction = await dispatch(updateLinkCollection(updateData))
+      unwrapResult(resultAction)
+    } catch (error) {
+      console.error("Failed to save the link collection: ", error)
+    } finally {
+      setUpdateRequestStatus("idle")
+    }
+  }
 }
 
-function DndFrame() {
+function DndFrame({ linkCollection, setReorderedLinkCollection }) {
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
     })
   )
-  // TODO: see if this is needed
-  const uniqueId = useId()
 
-  // useSelector is a hook that allows you to extract data
-  // from the Redux store state
-  const links = useSelector((state) => state.linkCollection.links)
+  // // useSelector is a hook that allows you to extract data
+  // // from the Redux store state
+  // const links = useSelector((state) => state.linkCollection.links)
+
+  // // make a mutable copy of links
+  // const linkCollection = JSON.parse(JSON.stringify(links))
+
+  // used for drag-and-drop (reorder and transition animation)
+  const [linkNodes, setLinkNodes] = useState(
+    linkCollection.map((linkNode) => {
+      linkNode.id = linkNode.uniqueId
+      return linkNode
+    })
+  )
+
+  // TODO: save via Redux instead (possibly one level higher, though...)
+  // —— ** POSSIBLY OBSOLETE ** ——  /.
+  // const [reorderedLinkCollection, setReorderedLinkCollection] = useState([
+  //   linkCollection,
+  // ])
+
+  // used to up-drill every time reorder happens
+  useEffect(() => {
+    setReorderedLinkCollection(linkNodes) // V1
+
+    // this should only happen if user clicks save.
+    // dispatch(updateLinkCollection(handle, linkNodes)) // V2
+
+    // announce("to be saved linkNodes", linkNodes)
+    announce("linkCollection", linkCollection)
+    // announce("to be saved reorderedLinkCollection", reorderedLinkCollection)
+  }, [linkNodes])
+  // —— ** POSSIBLY OBSOLETE ** ——  ./
+
+  // for debugging
+  let counter = 0
 
   return (
     <DndContext
       sensors={sensors}
       collisionDetection={closestCenter}
       onDragEnd={handleDragEnd}
-      id={uniqueId}
+      id={useId()}
     >
-      <SortableContext items={links} strategy={verticalListSortingStrategy}>
-        <DraggableLinkElements links={links} />
+      <SortableContext items={linkNodes} strategy={verticalListSortingStrategy}>
+        {/* <DraggableLinkElements links={links} /> */}
+        {linkNodes.map((linkNode) => {
+          console.log("round #" + counter + " id is: " + linkNode.id)
+          counter++
+
+          return (
+            <SortableLinkNode
+              key={linkNode.position}
+              id={linkNode.uniqueId}
+              text={linkNode.text}
+              url={linkNode.url}
+            />
+          )
+        })}
       </SortableContext>
     </DndContext>
   )
 
   function handleDragEnd(event) {
-    announce("handleDragEnd", event)
-    announce("known Links:", linkCollection)
+    // announce("handleDragEnd", event)
+    // announce("known Links:", linkCollection)
 
     const { active, over } = event
 
@@ -196,27 +289,6 @@ function DndFrame() {
       })
     }
   }
-}
-
-function DraggableLinkElements(givenObject) {
-  console.log("links that will not map:")
-  console.table(givenObject.links)
-  // return givenObject.links.forEach((element) => {
-  //   console.table(element)
-  // })
-
-  return givenObject.links.map((link) => {
-    return (
-      <>
-        <SortableLinkNode
-          key={link.position}
-          id={link.id}
-          text={link.text}
-          url={link.url}
-        />
-      </>
-    )
-  })
 }
 
 function generateEditable(links) {

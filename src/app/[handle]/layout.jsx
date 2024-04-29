@@ -50,7 +50,9 @@ export default function Layout({ linkCollection, editableLinkCollection }) {
           </CardContent>
         </Card>
         <Card className="mb-6">
-          <CardContent>{editableLinkCollection}</CardContent>
+          <CardContent className="no-scroll-on-mobile">
+            {editableLinkCollection}
+          </CardContent>
         </Card>
         <Card className="mb-6">
           <CardContent>
@@ -58,6 +60,8 @@ export default function Layout({ linkCollection, editableLinkCollection }) {
             Setting up editableFeatured...
           </CardContent>
         </Card>
+        <hr />
+        <div id="mobileMessageOutput"></div>
       </>
     )
   }
@@ -96,6 +100,8 @@ export default function Layout({ linkCollection, editableLinkCollection }) {
           Setting up featured...
         </CardContent>
       </Card>
+      <hr />
+      <div id="mobileMessageOutput"></div>
     </>
   )
 }
