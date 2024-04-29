@@ -44,35 +44,32 @@ export const updateLinkCollection = createAsyncThunk(
 
 export const addNewLink = createAsyncThunk(
   "linkCollection/addNewLink",
-  async (handle, newLinkItem) => {
+  async (newLinkData) => {
+    const { handle, newLinkItem: newLink } = newLinkData
     // async (newLinkItem) => {
     // const response = await profileDataClient(newLinkItem.handle, 0, "POST", {
     //   url: newLinkItem.url,
     //   text: newLinkItem.text,
     //   position: newLinkItem.position,
     // })
-    const response = await linkCollectionClient(
-      handle,
-      "link",
-      "POST",
-      newLinkItem
-    )
+    const response = await linkCollectionClient(handle, "link", "POST", newLink)
     return response.data
   }
 )
 
 export const updateLink = createAsyncThunk(
   "linkCollection/updateLink",
-  async (handle, updatedLinkItem) => {
+  async (updatedLinkData) => {
+    const { handle, updatedLink } = updatedLinkData
     // const response = await profileDataClient(updatedLinkItem.handle, 0, "PUT", {
     const response = await linkCollectionClient(
       updatedLinkItem.handle,
       0,
       "PUT",
       {
-        url: updatedLinkItem.url,
-        text: updatedLinkItem.text,
-        position: updatedLinkItem.position,
+        url: updatedLink.url,
+        text: updatedLink.text,
+        position: updatedLink.position,
       }
     )
     return response.data
@@ -81,7 +78,8 @@ export const updateLink = createAsyncThunk(
 
 export const deleteLink = createAsyncThunk(
   "linkCollection/deleteLink",
-  async (handle, linkPosition) => {
+  async (deletionData) => {
+    const { handle, linkPosition } = deletionData
     // const response = await profileDataClient(handle, linkPosition, 0, "DELETE")
     const response = await linkCollectionClient(
       handle,
