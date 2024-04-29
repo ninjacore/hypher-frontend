@@ -97,7 +97,8 @@ export const LinkCollectionEntries = ({ handle, mode }) => {
         break
 
       case "editable":
-        contentOfLinkCollection = generateEditable(links)
+        // contentOfLinkCollection = generateEditable(links)
+        contentOfLinkCollection = <CollectionOfEditableLinks handle={handle} />
         break
     }
   }
@@ -288,6 +289,128 @@ function DndFrame({ linkCollection, setReorderedLinkCollection }) {
   }
 }
 
-function generateEditable(links) {
-  return <>to be implemented...</>
+function CollectionOfEditableLinks({ handle }) {
+  // TODO: similar to const [updateRequestStatus, setUpdateRequestStatus] = useState("idle")
+  const dispatch = useDispatch()
+
+  // useSelector is a hook that allows you to extract data
+  // from the Redux store state
+  const links = useSelector((state) => state.linkCollection.links)
+
+  // make a mutable copy of links
+  const linkCollection = JSON.parse(JSON.stringify(links))
+
+  // TODO: perhaps something like:
+  // const [updatedLinkCollection, setUpdatedLinkCollection] = useState([
+  //   linkCollection,
+  // ])
+
+  // to cancel the update
+  // TODO: similar to const { setLinkCollectionIsSortable } = useContext(ProfilePageContext)
+
+  // return <>to be implemented...</>
+  // just to be sure they are in order
+  const [linkCollectionByPosition, setLinkCollectionByPosition] = useState(
+    linkCollection.toSorted((a, b) => a.position - b.position)
+  )
+  // const [linkElementState, setLinkElementState] = useState(
+  //   linkCollectionByPosition
+  // )
+
+  // announce("linkElementState", linkElementState)
+
+  return linkCollectionByPosition.map((link) => {
+    // TODO: probably move these
+    // const [linkText, setLinkText] = useState(link.text)
+    // const [linkUrl, setLinkUrl] = useState(link.url)
+    announce("link", link)
+    // announce(
+    //   `linkElementState at this position (${link.position})`,
+    //   linkElementState[link.position]
+    // )
+
+    let linkUrl = link.url
+    let linkText = link.text
+
+    return (
+      <div key={"linkItem-" + link.position}>
+        <Dialog>
+          <DialogTrigger asChild>
+            <div className="group/edit">
+              <div
+                key={"pos-" + link.position + "-editable"}
+                className="my-4 mx-2 py-0.5 px-3 bg-konkikyou-blue group/edit"
+              >
+                <a>
+                  <IconMapper url={link.url} />
+                  <span id={"linkText-" + link.position} className="mx-2">
+                    {link.text.length > 0 ? link.text : link.url}
+                  </span>
+                </a>
+                <EditButton />
+              </div>
+            </div>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Edit Link</DialogTitle>
+              <DialogDescription>
+                Make changes to your link here. Click save when you're done.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="linkText" className="text-right">
+                  Text
+                </Label>
+                <Input
+                  id={"linkTextInput-" + link.position}
+                  type="text"
+                  className="col-span-3"
+                  value={linkText}
+                  // value={linkElementState[link.position].text}
+                  // onChange={(e) => setLinkText(e.target.value)}
+                  // onChange={(e) =>
+                  //   setLinkElementState[link.position](
+                  //     (linkElementState[link.position].text = e.target.value)
+                  //   )
+                  // }
+                />
+              </div>
+              <div className="grid grid-cols-4 items-center gap-4">
+                <Label htmlFor="linkUrl" className="text-right">
+                  Link
+                </Label>
+                <Input
+                  id={"linkUrlInput-" + link.position}
+                  type="text"
+                  className="col-span-3"
+                  value={linkUrl}
+                  // value={linkElementState[link.position].url}
+                  // onChange={(e) => setLinkUrl(e.target.value)}
+                  // onChange={(e) =>
+                  //   setLinkElementState(() => {
+                  //     let copyArray = linkCollection
+                  //     copyArray.splice(link.position, 1, e.target.value)
+                  //     return copyArray
+                  //   })
+                  // }
+                />
+              </div>
+            </div>
+            <DialogFooter>
+              <DialogClose>
+                <Button
+                  type="submit"
+                  // onClick={() => sendLinkInputToUpdate(link.position)}
+                >
+                  Save changes
+                </Button>
+              </DialogClose>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+      </div>
+    )
+  })
 }
