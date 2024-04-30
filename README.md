@@ -16,7 +16,23 @@ To run the app in development mode:
 npm run dev
 ```
 
+To build a deployable app:
+
+```shell
+npm run build
+```
+
 ## Developer Notes
+
+### Environment Variables
+
+TODO: once available
+
+### State Management
+
+TODO: explain what's managed by React Context API (ProfilePage: handle, linkCollectionIsSortable, setLinkCollectionIsSortable)
+
+TODO: explain what's managed by Redux (linkCollection)
 
 ### Used Libraries
 

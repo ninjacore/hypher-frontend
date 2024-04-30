@@ -3,7 +3,7 @@
 import { useContext, useState } from "react"
 import { Profile } from "../page.jsx"
 
-// to define the handle
+// to define the handle and linkCollectionIsSortable
 import { ProfilePageContext } from "@/app/[handle]/utils/ProfilePageContext"
 
 // import state of link collection
@@ -41,8 +41,12 @@ function LinkCollection() {
   // on top to solve "Error: React Hook "useState" is called conditionally.
   // React Hooks must be called in the exact same order in every
   // component render."
-  const [linkCollectionIsSortable, setLinkCollectionIsSortable] =
-    useState(false)
+
+  // const [linkCollectionIsSortable, setLinkCollectionIsSortable] =
+  //   useState(false)
+
+  const { linkCollectionIsSortable, setLinkCollectionIsSortable } =
+    useContext(ProfilePageContext)
 
   const { handle } = useContext(ProfilePageContext)
   if (!handle) {
@@ -53,6 +57,8 @@ function LinkCollection() {
       </>
     )
   }
+
+  // TODO: const {linkCollectionIsSortable} = useContext(ProfilePageContext)
 
   if (linkCollectionIsSortable) {
     // drag-and-drop HTML

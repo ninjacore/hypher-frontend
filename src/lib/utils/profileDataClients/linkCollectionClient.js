@@ -135,7 +135,7 @@ async function updateLinkWithinCollection(
   method,
   body
 ) {
-  const endpoint = `${baseURL}/api/v1/linkCollection/update?handle=${handle}&contentBoxPosition=${contentBoxPosition}`
+  const endpoint = `${baseURL}/api/v1/linkCollection/link/update?handle=${handle}&contentBoxPosition=${contentBoxPosition}`
 
   return await apiHandler(endpoint, method, body)
 }

@@ -24,6 +24,11 @@ export default function Layout({ linkCollection, editableLinkCollection }) {
               {/* {name} */}
               Setting up name...
             </h1>
+            <ProfilePageButton
+              isOwner={pageOwner}
+              editMode={editMode}
+              setEditMode={setEditMode}
+            />
           </CardSingleLineHeader>
           <CardContent>
             <div className="px-1 py-2 group/edit">
@@ -75,7 +80,11 @@ export default function Layout({ linkCollection, editableLinkCollection }) {
             {/* {name} */}
             Setting up name...
           </h1>
-          <ProfilePageButton isOwner={pageOwner} setEditMode={setEditMode} />
+          <ProfilePageButton
+            isOwner={pageOwner}
+            editMode={editMode}
+            setEditMode={setEditMode}
+          />
         </CardSingleLineHeader>
         <CardContent>
           <div className="px-1 py-2">
@@ -106,7 +115,19 @@ export default function Layout({ linkCollection, editableLinkCollection }) {
   )
 }
 
-function ProfilePageButton({ isOwner, setEditMode }) {
+function ProfilePageButton({ isOwner, editMode, setEditMode }) {
+  if (isOwner && editMode) {
+    return (
+      <Button
+        variant="outline"
+        className="bg-white text-black"
+        onClick={() => setEditMode(false)}
+      >
+        {"exit editing"}
+      </Button>
+    )
+  }
+
   if (isOwner) {
     return (
       <Button
