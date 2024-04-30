@@ -309,31 +309,48 @@ function CollectionOfEditableLinks({ handle }) {
 
   // return <>to be implemented...</>
   // just to be sure they are in order
-  const linkCollectionByPosition = linkCollection.toSorted(
-    (a, b) => a.position - b.position
-  )
+  // const linkNodes = linkCollection.toSorted((a, b) => a.position - b.position)
   // const [linkCollectionByPosition, setLinkCollectionByPosition] = useState(
   //   linkCollection.toSorted((a, b) => a.position - b.position)
   // )
-  const [linkElementState, setLinkElementState] = useState(
-    linkCollectionByPosition
+  // 'updrill' but on same level
+  const [adaptableLinkCollection, setAdaptableLinkCollection] = useState(
+    linkCollection.toSorted((a, b) => a.position - b.position)
   )
+  // 'shadow copy' for updrill
+  const [linkNodes, setLinkNodes] = useState(
+    adaptableLinkCollection.map((linkNode) => {
+      return linkNode
+    })
+  )
+  // used to up-drill every time reorder happens
+  useEffect(() => {
+    setAdaptableLinkCollection(linkNodes) // V1
+
+    // this should only happen if user clicks save.
+    // dispatch(updateLinkCollection(handle, linkNodes)) // V2
+
+    // announce("to be saved linkNodes", linkNodes)
+    announce("linkCollection", adaptableLinkCollection)
+    // announce("to be saved reorderedLinkCollection", reorderedLinkCollection)
+  }, [linkNodes])
 
   // announce("linkElementState", linkElementState)
 
-  return linkCollectionByPosition.map((link) => {
-    const [linkText, setLinkText] = useState(link.text)
-    const [linkUrl, setLinkUrl] = useState(link.url)
-    const linkPosition = link.position
+  return linkNodes.map((link) => {
+    // const [linkText, setLinkText] = useState(link.text)
+    // const [linkUrl, setLinkUrl] = useState(link.url)
+    // const linkPosition = link.position
+
+    let linkUrl = link.url
+    let linkText = link.text
+    let linkPosition = link.position
 
     announce("link", link)
     announce(
       `linkElementState at this position (${link.position})`,
-      linkElementState[link.position]
+      adaptableLinkCollection[link.position]
     )
-
-    // let linkUrl = link.url
-    // let linkText = link.text
 
     return (
       <div key={"linkItem-" + link.position}>
@@ -361,48 +378,11 @@ function CollectionOfEditableLinks({ handle }) {
                 Make changes to your link here. Click save when you're done.
               </DialogDescription>
             </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="linkText" className="text-right">
-                  Text
-                </Label>
-                <Input
-                  id={"linkTextInput-" + link.position}
-                  type="text"
-                  className="col-span-3"
-                  value={linkText}
-                  // value={linkElementState[link.position].text}
-                  // onChange={(e) => (linkText = e.target.value)}
-                  onChange={(e) => setLinkText(e.target.value)}
-                  // onChange={(e) =>
-                  //   setLinkElementState[link.position](
-                  //     (linkElementState[link.position].text = e.target.value)
-                  //   )
-                  // }
-                />
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="linkUrl" className="text-right">
-                  Link
-                </Label>
-                <Input
-                  id={"linkUrlInput-" + link.position}
-                  type="text"
-                  className="col-span-3"
-                  value={linkUrl}
-                  // value={linkElementState[link.position].url}
-                  onChange={(e) => setLinkUrl(e.target.value)}
-                  // onChange={(e) => (linkUrl = e.target.value)}
-                  // onChange={(e) =>
-                  //   setLinkElementState(() => {
-                  //     let copyArray = linkCollection
-                  //     copyArray.splice(link.position, 1, e.target.value)
-                  //     return copyArray
-                  //   })
-                  // }
-                />
-              </div>
-            </div>
+            <EditableLinkInput
+              text={link.text}
+              url={link.url}
+              position={link.position}
+            />
             <DialogFooter>
               <DialogClose>
                 <Button
@@ -451,4 +431,55 @@ function CollectionOfEditableLinks({ handle }) {
       setUpdateRequestStatus("idle")
     }
   }
+}
+
+function EditableLinkInput({ text, url, position }) {
+  const [linkText, setLinkText] = useState(text)
+  const [linkUrl, setLinkUrl] = useState(url)
+  const linkPosition = position
+
+  return (
+    <div className="grid gap-4 py-4">
+      <div className="grid grid-cols-4 items-center gap-4">
+        <Label htmlFor="linkText" className="text-right">
+          Text
+        </Label>
+        <Input
+          id={"linkTextInput-" + linkPosition}
+          type="text"
+          className="col-span-3"
+          value={linkText}
+          // value={linkElementState[link.position].text}
+          // onChange={(e) => (linkText = e.target.value)}
+          onChange={(e) => setLinkText(e.target.value)}
+          // onChange={(e) =>
+          //   setLinkElementState[link.position](
+          //     (linkElementState[link.position].text = e.target.value)
+          //   )
+          // }
+        />
+      </div>
+      <div className="grid grid-cols-4 items-center gap-4">
+        <Label htmlFor="linkUrl" className="text-right">
+          Link
+        </Label>
+        <Input
+          id={"linkUrlInput-" + linkPosition}
+          type="text"
+          className="col-span-3"
+          value={linkUrl}
+          // value={linkElementState[link.position].url}
+          onChange={(e) => setLinkUrl(e.target.value)}
+          // onChange={(e) => (linkUrl = e.target.value)}
+          // onChange={(e) =>
+          //   setLinkElementState(() => {
+          //     let copyArray = linkCollection
+          //     copyArray.splice(link.position, 1, e.target.value)
+          //     return copyArray
+          //   })
+          // }
+        />
+      </div>
+    </div>
+  )
 }
