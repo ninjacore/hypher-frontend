@@ -134,6 +134,7 @@ const linkCollectionSlice = createSlice({
         state.status = "succeeded"
 
         // replace the link with the updated one
+        // state.links = state.links.map((link) => {
         state.links = state.links.map((link) => {
           if (link.position === action.payload.position) {
             // unique id must be persisted for FE
@@ -148,6 +149,7 @@ const linkCollectionSlice = createSlice({
           }
         })
         // state.links = state.links.concat(action.payload)
+        // state.links = [...newLinks]
       })
       .addCase(deleteLink.fulfilled, (state, action) => {
         state.links = state.links.filter(

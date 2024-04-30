@@ -289,7 +289,8 @@ function DndFrame({ linkCollection, setReorderedLinkCollection }) {
 }
 
 function CollectionOfEditableLinks({ handle }) {
-  // const [updateRequestStatus, setUpdateRequestStatus] = useState("idle")
+  // to re-render
+  const [updateRequestStatus, setUpdateRequestStatus] = useState("idle")
   // const dispatch = useDispatch()
 
   // useSelector is a hook that allows you to extract data
@@ -333,7 +334,8 @@ function CollectionOfEditableLinks({ handle }) {
     // announce("to be saved linkNodes", linkNodes)
     announce("linkCollection", adaptableLinkCollection)
     // announce("to be saved reorderedLinkCollection", reorderedLinkCollection)
-  }, [linkNodes])
+    announce("updateRequestStatus:", updateRequestStatus)
+  }, [linkNodes, updateRequestStatus])
 
   // announce("linkElementState", linkElementState)
 
@@ -375,6 +377,7 @@ function CollectionOfEditableLinks({ handle }) {
             text={link.text}
             url={link.url}
             position={link.position}
+            setUpdateRequestStatus={setUpdateRequestStatus}
           />
         </Dialog>
       </div>
@@ -382,7 +385,7 @@ function CollectionOfEditableLinks({ handle }) {
   })
 }
 
-function EditableLinkInput({ text, url, position }) {
+function EditableLinkInput({ text, url, position, setUpdateRequestStatus }) {
   // component-internal state
   const [linkText, setLinkText] = useState(text)
   const [linkUrl, setLinkUrl] = useState(url)
@@ -390,7 +393,7 @@ function EditableLinkInput({ text, url, position }) {
 
   // used for network and Redux state-management
   const dispatch = useDispatch()
-  const [updateRequestStatus, setUpdateRequestStatus] = useState("idle")
+  // const [updateRequestStatus, setUpdateRequestStatus] = useState("idle")
   const { handle } = useContext(ProfilePageContext)
 
   return (
@@ -477,6 +480,8 @@ async function onSaveUpdatedLinkClicked(
   setUpdateRequestStatus,
   dispatch
 ) {
+  console.log(`onSaveUpdatedLinkClicked!!`, "color: green; font-size: 1.5em;")
+
   try {
     setUpdateRequestStatus("pending")
 
@@ -495,6 +500,8 @@ async function onSaveUpdatedLinkClicked(
     */
 
     dispatch(updateLink(updateData))
+    // { myArrayOfObjects: [...myArrayOfObjects] }
+    // dispatch(updateLink({ updateData: [...updateData] }))
   } catch (error) {
     console.error("Failed to save link: ", error)
   } finally {
