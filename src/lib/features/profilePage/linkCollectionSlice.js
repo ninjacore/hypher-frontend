@@ -61,16 +61,19 @@ export const updateLink = createAsyncThunk(
   "linkCollection/updateLink",
   async (updatedLinkData) => {
     const { handle, updatedLink } = updatedLinkData
+    announce("updateData that was dispatched", updatedLinkData)
+
     // const response = await profileDataClient(updatedLinkItem.handle, 0, "PUT", {
     const response = await linkCollectionClient(
-      updatedLinkItem.handle,
-      0,
+      handle,
+      "link",
       "PUT",
       {
         url: updatedLink.url,
         text: updatedLink.text,
         position: updatedLink.position,
-      }
+      },
+      updatedLink.position
     )
     return response.data
   }

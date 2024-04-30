@@ -187,7 +187,6 @@ function DraggableLinkCollection({ handle }) {
         handle,
         links: reorderedLinkCollection,
       }
-
       dispatch(updateLinkCollection(updateData))
     } catch (error) {
       console.error("Failed to save the link collection: ", error)
@@ -290,7 +289,7 @@ function DndFrame({ linkCollection, setReorderedLinkCollection }) {
 }
 
 function CollectionOfEditableLinks({ handle }) {
-  // TODO: similar to const [updateRequestStatus, setUpdateRequestStatus] = useState("idle")
+  const [updateRequestStatus, setUpdateRequestStatus] = useState("idle")
   const dispatch = useDispatch()
 
   // useSelector is a hook that allows you to extract data
@@ -323,9 +322,10 @@ function CollectionOfEditableLinks({ handle }) {
   // announce("linkElementState", linkElementState)
 
   return linkCollectionByPosition.map((link) => {
-    // TODO: probably move these
     const [linkText, setLinkText] = useState(link.text)
     const [linkUrl, setLinkUrl] = useState(link.url)
+    const linkPosition = link.position
+
     announce("link", link)
     announce(
       `linkElementState at this position (${link.position})`,
@@ -408,6 +408,13 @@ function CollectionOfEditableLinks({ handle }) {
                 <Button
                   type="submit"
                   // onClick={() => sendLinkInputToUpdate(link.position)}
+                  onClick={() =>
+                    onSaveUpdatedLinkClicked({
+                      url: linkUrl,
+                      text: linkText,
+                      position: linkPosition,
+                    })
+                  }
                 >
                   Save changes
                 </Button>
@@ -418,4 +425,30 @@ function CollectionOfEditableLinks({ handle }) {
       </div>
     )
   })
+
+  async function onSaveUpdatedLinkClicked(updatedLink) {
+    try {
+      setUpdateRequestStatus("pending")
+
+      // createAsyncThunk only takes one argument
+      const updateData = {
+        handle,
+        updatedLink,
+      }
+
+      /*
+            {
+        url: updatedLink.url,
+        text: updatedLink.text,
+        position: updatedLink.position,
+      }
+      */
+
+      dispatch(updateLink(updateData))
+    } catch (error) {
+      console.error("Failed to save link: ", error)
+    } finally {
+      setUpdateRequestStatus("idle")
+    }
+  }
 }
