@@ -289,8 +289,8 @@ function DndFrame({ linkCollection, setReorderedLinkCollection }) {
 }
 
 function CollectionOfEditableLinks({ handle }) {
-  const [updateRequestStatus, setUpdateRequestStatus] = useState("idle")
-  const dispatch = useDispatch()
+  // const [updateRequestStatus, setUpdateRequestStatus] = useState("idle")
+  // const dispatch = useDispatch()
 
   // useSelector is a hook that allows you to extract data
   // from the Redux store state
@@ -371,115 +371,134 @@ function CollectionOfEditableLinks({ handle }) {
               </div>
             </div>
           </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>Edit Link</DialogTitle>
-              <DialogDescription>
-                Make changes to your link here. Click save when you're done.
-              </DialogDescription>
-            </DialogHeader>
-            <EditableLinkInput
-              text={link.text}
-              url={link.url}
-              position={link.position}
-            />
-            <DialogFooter>
-              <DialogClose>
-                <Button
-                  type="submit"
-                  // onClick={() => sendLinkInputToUpdate(link.position)}
-                  onClick={() =>
-                    onSaveUpdatedLinkClicked({
-                      url: linkUrl,
-                      text: linkText,
-                      position: linkPosition,
-                    })
-                  }
-                >
-                  Save changes
-                </Button>
-              </DialogClose>
-            </DialogFooter>
-          </DialogContent>
+          <EditableLinkInput
+            text={link.text}
+            url={link.url}
+            position={link.position}
+          />
         </Dialog>
       </div>
     )
   })
-
-  async function onSaveUpdatedLinkClicked(updatedLink) {
-    try {
-      setUpdateRequestStatus("pending")
-
-      // createAsyncThunk only takes one argument
-      const updateData = {
-        handle,
-        updatedLink,
-      }
-
-      /*
-            {
-        url: updatedLink.url,
-        text: updatedLink.text,
-        position: updatedLink.position,
-      }
-      */
-
-      dispatch(updateLink(updateData))
-    } catch (error) {
-      console.error("Failed to save link: ", error)
-    } finally {
-      setUpdateRequestStatus("idle")
-    }
-  }
 }
 
 function EditableLinkInput({ text, url, position }) {
+  // component-internal state
   const [linkText, setLinkText] = useState(text)
   const [linkUrl, setLinkUrl] = useState(url)
   const linkPosition = position
 
+  // used for network and Redux state-management
+  const dispatch = useDispatch()
+  const [updateRequestStatus, setUpdateRequestStatus] = useState("idle")
+  const { handle } = useContext(ProfilePageContext)
+
   return (
-    <div className="grid gap-4 py-4">
-      <div className="grid grid-cols-4 items-center gap-4">
-        <Label htmlFor="linkText" className="text-right">
-          Text
-        </Label>
-        <Input
-          id={"linkTextInput-" + linkPosition}
-          type="text"
-          className="col-span-3"
-          value={linkText}
-          // value={linkElementState[link.position].text}
-          // onChange={(e) => (linkText = e.target.value)}
-          onChange={(e) => setLinkText(e.target.value)}
-          // onChange={(e) =>
-          //   setLinkElementState[link.position](
-          //     (linkElementState[link.position].text = e.target.value)
-          //   )
-          // }
-        />
+    <DialogContent className="sm:max-w-[425px]">
+      <DialogHeader>
+        <DialogTitle>Edit Link</DialogTitle>
+        <DialogDescription>
+          Make changes to your link here. Click save when you're done.
+        </DialogDescription>
+      </DialogHeader>
+
+      <div className="grid gap-4 py-4">
+        <div className="grid grid-cols-4 items-center gap-4">
+          <Label htmlFor="linkText" className="text-right">
+            Text
+          </Label>
+          <Input
+            id={"linkTextInput-" + linkPosition}
+            type="text"
+            className="col-span-3"
+            value={linkText}
+            // value={linkElementState[link.position].text}
+            // onChange={(e) => (linkText = e.target.value)}
+            onChange={(e) => setLinkText(e.target.value)}
+            // onChange={(e) =>
+            //   setLinkElementState[link.position](
+            //     (linkElementState[link.position].text = e.target.value)
+            //   )
+            // }
+          />
+        </div>
+        <div className="grid grid-cols-4 items-center gap-4">
+          <Label htmlFor="linkUrl" className="text-right">
+            Link
+          </Label>
+          <Input
+            id={"linkUrlInput-" + linkPosition}
+            type="text"
+            className="col-span-3"
+            value={linkUrl}
+            // value={linkElementState[link.position].url}
+            onChange={(e) => setLinkUrl(e.target.value)}
+            // onChange={(e) => (linkUrl = e.target.value)}
+            // onChange={(e) =>
+            //   setLinkElementState(() => {
+            //     let copyArray = linkCollection
+            //     copyArray.splice(link.position, 1, e.target.value)
+            //     return copyArray
+            //   })
+            // }
+          />
+        </div>
       </div>
-      <div className="grid grid-cols-4 items-center gap-4">
-        <Label htmlFor="linkUrl" className="text-right">
-          Link
-        </Label>
-        <Input
-          id={"linkUrlInput-" + linkPosition}
-          type="text"
-          className="col-span-3"
-          value={linkUrl}
-          // value={linkElementState[link.position].url}
-          onChange={(e) => setLinkUrl(e.target.value)}
-          // onChange={(e) => (linkUrl = e.target.value)}
-          // onChange={(e) =>
-          //   setLinkElementState(() => {
-          //     let copyArray = linkCollection
-          //     copyArray.splice(link.position, 1, e.target.value)
-          //     return copyArray
-          //   })
-          // }
-        />
-      </div>
-    </div>
+      <DialogFooter>
+        <DialogClose>
+          <Button
+            type="submit"
+            // onClick={() => sendLinkInputToUpdate(link.position)}
+            onClick={() =>
+              onSaveUpdatedLinkClicked(
+                handle,
+                {
+                  url: linkUrl,
+                  text: linkText,
+                  position: linkPosition,
+                },
+                setUpdateRequestStatus,
+                dispatch
+              )
+            }
+          >
+            Save changes
+          </Button>
+        </DialogClose>
+      </DialogFooter>
+    </DialogContent>
   )
 }
+
+// Network and State-Management functions /.
+async function onSaveUpdatedLinkClicked(
+  handle,
+  updatedLink,
+  setUpdateRequestStatus,
+  dispatch
+) {
+  try {
+    setUpdateRequestStatus("pending")
+
+    // createAsyncThunk only takes one argument
+    const updateData = {
+      handle,
+      updatedLink,
+    }
+
+    /*
+          {
+      url: updatedLink.url,
+      text: updatedLink.text,
+      position: updatedLink.position,
+    }
+    */
+
+    dispatch(updateLink(updateData))
+  } catch (error) {
+    console.error("Failed to save link: ", error)
+  } finally {
+    setUpdateRequestStatus("idle")
+  }
+}
+// Network and State-Management functions ./
