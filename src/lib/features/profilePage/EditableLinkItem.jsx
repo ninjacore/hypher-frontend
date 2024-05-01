@@ -24,15 +24,19 @@ function EditableLinkItem({ linkPosition, linkUrl, linkText }) {
 
       <div
         key={"pos-" + linkPosition + "-editable"}
-        className="my-4 mx-2 py-0.5 px-3 bg-konkikyou-blue group/edit"
+        className="group/edit flex my-4 mx-2"
       >
-        <a>
-          <IconMapper url={linkUrl} />
-          <span id={"linkText-" + linkPosition} className="mx-2">
-            {linkText.length > 0 ? linkText : linkUrl}
-          </span>
-        </a>
-        <EditButton />
+        <div className="w-3/4 bg-konkikyou-blue py-0.5 px-3 mx-2">
+          <a>
+            <IconMapper url={linkUrl} />
+            <span id={"linkText-" + linkPosition} className="mx-2">
+              {linkText.length > 0 ? linkText : linkUrl}
+            </span>
+          </a>
+        </div>
+        <div className="bg-konkikyou-blue">
+          <PenIconButton />
+        </div>
       </div>
     </>
   )

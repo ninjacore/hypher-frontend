@@ -7,7 +7,7 @@ function PenIconButton() {
   return (
     <span
       // variant="default"
-      className="rounded p-0.5 bg-konkikyou-blue"
+      className=""
     >
       <FontAwesomeIcon
         icon={faPenToSquare}
