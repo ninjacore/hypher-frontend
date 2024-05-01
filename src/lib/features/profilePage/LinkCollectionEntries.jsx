@@ -419,6 +419,13 @@ function EditableLinkInput({ text, url, position, setUpdateRequestStatus }) {
   // const [updateRequestStatus, setUpdateRequestStatus] = useState("idle")
   const { handle } = useContext(ProfilePageContext)
 
+  // update view independent of the backend
+  useEffect(() => {
+    announce("value changed -> linkText", linkText)
+    let element = document.getElementById("linkText-" + linkPosition)
+    element.innerHTML = linkText
+  }, [linkText])
+
   return (
     <DialogContent className="sm:max-w-[425px]">
       <DialogHeader>
@@ -503,7 +510,10 @@ async function onSaveUpdatedLinkClicked(
   setUpdateRequestStatus,
   dispatch
 ) {
-  console.log(`onSaveUpdatedLinkClicked!!`, "color: green; font-size: 1.5em;")
+  console.log(
+    `%c onSaveUpdatedLinkClicked!!`,
+    "color: green; font-size: 1.5em;"
+  )
 
   try {
     setUpdateRequestStatus("pending")
