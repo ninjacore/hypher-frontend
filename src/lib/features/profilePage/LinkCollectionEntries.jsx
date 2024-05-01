@@ -74,6 +74,13 @@ export const LinkCollectionEntries = ({ handle, mode }) => {
     (state) => state.linkCollection.status
   )
 
+  // to be used for all 3 modes
+  const linkCollection = JSON.parse(JSON.stringify(links))
+  const linkCollectionByPosition = linkCollection.toSorted(
+    (a, b) => a.position - b.position
+  )
+  announce("TOP LEVEL linkCollectionByPosition", linkCollectionByPosition)
+
   useEffect(() => {
     if (linkCollectionStatus === "idle") {
       dispatch(fetchLinkCollection(handle))
@@ -88,17 +95,27 @@ export const LinkCollectionEntries = ({ handle, mode }) => {
   } else if (linkCollectionStatus === "succeeded") {
     switch (mode) {
       case "linked":
-        contentOfLinkCollection = generateDefault(links)
+        // contentOfLinkCollection = generateDefault(links)
+        contentOfLinkCollection = generateDefault(linkCollectionByPosition)
         break
 
       case "draggable":
         // contentOfLinkCollection = generateDraggable()
-        contentOfLinkCollection = <DraggableLinkCollection handle={handle} />
+        contentOfLinkCollection = (
+          <DraggableLinkCollection
+            handle={handle}
+            linkCollectionByPosition={linkCollectionByPosition}
+          />
+        )
         break
 
       case "editable":
         // contentOfLinkCollection = generateEditable(links)
-        contentOfLinkCollection = <CollectionOfEditableLinks handle={handle} />
+        contentOfLinkCollection = (
+          <CollectionOfEditableLinks
+            linkCollectionByPosition={linkCollectionByPosition}
+          />
+        )
         break
     }
   }
@@ -106,8 +123,8 @@ export const LinkCollectionEntries = ({ handle, mode }) => {
   return <>{contentOfLinkCollection}</>
 }
 
-function generateDefault(links) {
-  return links.map((link) => {
+function generateDefault(linkCollectionByPosition) {
+  return linkCollectionByPosition.map((link) => {
     return (
       <a href={link.url} target="_blank" key={"pos-" + link.position}>
         <div className="my-4 mx-2 py-2 px-3 bg-konkikyou-blue">
@@ -119,26 +136,43 @@ function generateDefault(links) {
       </a>
     )
   })
+  // return links.map((link) => {
+  //   return (
+  //     <a href={link.url} target="_blank" key={"pos-" + link.position}>
+  //       <div className="my-4 mx-2 py-2 px-3 bg-konkikyou-blue">
+  //         <IconMapper url={link.url} />
+  //         <span className="mx-2">
+  //           {link.text.length > 0 ? link.text : link.url}
+  //         </span>
+  //       </div>
+  //     </a>
+  //   )
+  // })
 }
 
 // function generateDraggable() {
-function DraggableLinkCollection({ handle }) {
+function DraggableLinkCollection({ handle, linkCollectionByPosition }) {
   const [updateRequestStatus, setUpdateRequestStatus] = useState("idle")
   const dispatch = useDispatch()
 
-  // useSelector is a hook that allows you to extract data
-  // from the Redux store state
-  const links = useSelector((state) => state.linkCollection.links)
+  // // useSelector is a hook that allows you to extract data
+  // // from the Redux store state
+  // const links = useSelector((state) => state.linkCollection.links)
 
-  announce("links within DraggableLinkCollection", links)
+  // announce("links within DraggableLinkCollection", links)
 
-  // make a mutable copy of links
-  const linkCollection = JSON.parse(JSON.stringify(links))
+  // // make a mutable copy of links
+  // const linkCollection = JSON.parse(JSON.stringify(links))
 
-  announce("calibrating linkCollection", linkCollection)
+  // announce("calibrating linkCollection", linkCollection)
 
+  // const [reorderedLinkCollection, setReorderedLinkCollection] = useState([
+  //   linkCollection,
+  // ])
+
+  announce("calibrating linkCollectionByPosition", linkCollectionByPosition)
   const [reorderedLinkCollection, setReorderedLinkCollection] = useState([
-    linkCollection,
+    linkCollectionByPosition,
   ])
 
   // to cancel the update
@@ -148,7 +182,8 @@ function DraggableLinkCollection({ handle }) {
     <>
       <p>Pick up a link to change its position in the collection.</p>
       <DndFrame
-        linkCollection={linkCollection}
+        // linkCollection={linkCollection}
+        linkCollectionByPosition={linkCollectionByPosition}
         setReorderedLinkCollection={setReorderedLinkCollection}
       />
       <div className="flex justify-end gap-5">
@@ -209,7 +244,7 @@ function DraggableLinkCollection({ handle }) {
   }
 }
 
-function DndFrame({ linkCollection, setReorderedLinkCollection }) {
+function DndFrame({ linkCollectionByPosition, setReorderedLinkCollection }) {
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -226,9 +261,9 @@ function DndFrame({ linkCollection, setReorderedLinkCollection }) {
 
   // used for drag-and-drop (reorder and transition animation)
   const [linkNodes, setLinkNodes] = useState(
-    linkCollection.map((linkNode) => {
+    linkCollectionByPosition.map((linkNode) => {
       console.log("assigning linkNode.id based on uniqueId", linkNode.uniqueId)
-      announce("linkCollection for linkNode", linkCollection)
+      announce("linkCollection for linkNode", linkCollectionByPosition)
       linkNode.id = linkNode.uniqueId
       return linkNode
     })
@@ -248,7 +283,7 @@ function DndFrame({ linkCollection, setReorderedLinkCollection }) {
     // dispatch(updateLinkCollection(handle, linkNodes)) // V2
 
     // announce("to be saved linkNodes", linkNodes)
-    announce("linkCollection within useEffect", linkCollection)
+    announce("linkCollection within useEffect", linkCollectionByPosition)
     // announce("to be saved reorderedLinkCollection", reorderedLinkCollection)
   }, [linkNodes])
   // —— ** POSSIBLY OBSOLETE ** ——  ./
@@ -311,36 +346,28 @@ function DndFrame({ linkCollection, setReorderedLinkCollection }) {
   }
 }
 
-function CollectionOfEditableLinks({ handle }) {
+function CollectionOfEditableLinks({ linkCollectionByPosition }) {
   // to re-render
   const [updateRequestStatus, setUpdateRequestStatus] = useState("idle")
   // const dispatch = useDispatch()
 
-  // useSelector is a hook that allows you to extract data
-  // from the Redux store state
-  const links = useSelector((state) => state.linkCollection.links)
+  // // useSelector is a hook that allows you to extract data
+  // // from the Redux store state
+  // const links = useSelector((state) => state.linkCollection.links)
 
-  // make a mutable copy of links
-  const linkCollection = JSON.parse(JSON.stringify(links))
+  // // make a mutable copy of links
+  // const linkCollection = JSON.parse(JSON.stringify(links))
 
-  // TODO: perhaps something like:
-  // const [updatedLinkCollection, setUpdatedLinkCollection] = useState([
-  //   linkCollection,
-  // ])
-
-  // to cancel the update
-  // TODO: similar to const { setLinkCollectionIsSortable } = useContext(ProfilePageContext)
-
-  // return <>to be implemented...</>
-  // just to be sure they are in order
-  // const linkNodes = linkCollection.toSorted((a, b) => a.position - b.position)
-  // const [linkCollectionByPosition, setLinkCollectionByPosition] = useState(
+  // // 'updrill' but on same level
+  // const [adaptableLinkCollection, setAdaptableLinkCollection] = useState(
   //   linkCollection.toSorted((a, b) => a.position - b.position)
   // )
-  // 'updrill' but on same level
+
+  // served by parent component
   const [adaptableLinkCollection, setAdaptableLinkCollection] = useState(
-    linkCollection.toSorted((a, b) => a.position - b.position)
+    linkCollectionByPosition
   )
+
   // 'shadow copy' for updrill
   const [linkNodes, setLinkNodes] = useState(
     adaptableLinkCollection.map((linkNode) => {
