@@ -95,12 +95,10 @@ export const LinkCollectionEntries = ({ handle, mode }) => {
   } else if (linkCollectionStatus === "succeeded") {
     switch (mode) {
       case "linked":
-        // contentOfLinkCollection = generateDefault(links)
         contentOfLinkCollection = generateDefault(linkCollectionByPosition)
         break
 
       case "draggable":
-        // contentOfLinkCollection = generateDraggable()
         contentOfLinkCollection = (
           <DraggableLinkCollection
             handle={handle}
@@ -110,7 +108,6 @@ export const LinkCollectionEntries = ({ handle, mode }) => {
         break
 
       case "editable":
-        // contentOfLinkCollection = generateEditable(links)
         contentOfLinkCollection = (
           <CollectionOfEditableLinks
             linkCollectionByPosition={linkCollectionByPosition}
@@ -136,39 +133,12 @@ function generateDefault(linkCollectionByPosition) {
       </a>
     )
   })
-  // return links.map((link) => {
-  //   return (
-  //     <a href={link.url} target="_blank" key={"pos-" + link.position}>
-  //       <div className="my-4 mx-2 py-2 px-3 bg-konkikyou-blue">
-  //         <IconMapper url={link.url} />
-  //         <span className="mx-2">
-  //           {link.text.length > 0 ? link.text : link.url}
-  //         </span>
-  //       </div>
-  //     </a>
-  //   )
-  // })
 }
 
 // function generateDraggable() {
 function DraggableLinkCollection({ handle, linkCollectionByPosition }) {
   const [updateRequestStatus, setUpdateRequestStatus] = useState("idle")
   const dispatch = useDispatch()
-
-  // // useSelector is a hook that allows you to extract data
-  // // from the Redux store state
-  // const links = useSelector((state) => state.linkCollection.links)
-
-  // announce("links within DraggableLinkCollection", links)
-
-  // // make a mutable copy of links
-  // const linkCollection = JSON.parse(JSON.stringify(links))
-
-  // announce("calibrating linkCollection", linkCollection)
-
-  // const [reorderedLinkCollection, setReorderedLinkCollection] = useState([
-  //   linkCollection,
-  // ])
 
   announce("calibrating linkCollectionByPosition", linkCollectionByPosition)
   const [reorderedLinkCollection, setReorderedLinkCollection] = useState([
@@ -220,11 +190,6 @@ function DraggableLinkCollection({ handle, linkCollectionByPosition }) {
         "sending reorderedLinkCollection to backend (default positions):",
         reorderedLinkCollection
       )
-      // // asign new positons to linkNodes
-      // reorderedLinkCollection.forEach((linkNode, index) => {
-      //   linkNode.position = index
-      //   linkNode.uniqueId = nanoid()
-      // })
       announce(
         "sending reorderedLinkCollection to backend (updated positions):",
         reorderedLinkCollection
@@ -252,13 +217,6 @@ function DndFrame({ linkCollectionByPosition, setReorderedLinkCollection }) {
     })
   )
 
-  // // useSelector is a hook that allows you to extract data
-  // // from the Redux store state
-  // const links = useSelector((state) => state.linkCollection.links)
-
-  // // make a mutable copy of links
-  // const linkCollection = JSON.parse(JSON.stringify(links))
-
   // used for drag-and-drop (reorder and transition animation)
   const [linkNodes, setLinkNodes] = useState(
     linkCollectionByPosition.map((linkNode) => {
@@ -269,24 +227,12 @@ function DndFrame({ linkCollectionByPosition, setReorderedLinkCollection }) {
     })
   )
 
-  // TODO: save via Redux instead (possibly one level higher, though...)
-  // —— ** POSSIBLY OBSOLETE ** ——  /.
-  // const [reorderedLinkCollection, setReorderedLinkCollection] = useState([
-  //   linkCollection,
-  // ])
-
   // used to up-drill every time reorder happens
   useEffect(() => {
-    setReorderedLinkCollection(linkNodes) // V1
+    setReorderedLinkCollection(linkNodes)
 
-    // this should only happen if user clicks save.
-    // dispatch(updateLinkCollection(handle, linkNodes)) // V2
-
-    // announce("to be saved linkNodes", linkNodes)
     announce("linkCollection within useEffect", linkCollectionByPosition)
-    // announce("to be saved reorderedLinkCollection", reorderedLinkCollection)
   }, [linkNodes])
-  // —— ** POSSIBLY OBSOLETE ** ——  ./
 
   // for debugging
   let counter = 0
@@ -318,9 +264,6 @@ function DndFrame({ linkCollectionByPosition, setReorderedLinkCollection }) {
   )
 
   function handleDragEnd(event) {
-    // announce("handleDragEnd", event)
-    // announce("known Links:", linkCollection)
-
     const { active, over } = event
 
     console.log(`%c active.id => ${active.id}`, `color: green;`)
@@ -331,9 +274,6 @@ function DndFrame({ linkCollectionByPosition, setReorderedLinkCollection }) {
         const oldIndex = items.map((linkNode) => linkNode.id).indexOf(active.id)
 
         const newIndex = items.map((linkNode) => linkNode.id).indexOf(over.id)
-
-        // old way (not swapping 'position' attribute)
-        // return arrayMove(items, oldIndex, newIndex)
 
         // swap positions (including the 'position' attribute)
         const newlySortedItems = arrayMove(items, oldIndex, newIndex)
@@ -349,19 +289,6 @@ function DndFrame({ linkCollectionByPosition, setReorderedLinkCollection }) {
 function CollectionOfEditableLinks({ linkCollectionByPosition }) {
   // to re-render
   const [updateRequestStatus, setUpdateRequestStatus] = useState("idle")
-  // const dispatch = useDispatch()
-
-  // // useSelector is a hook that allows you to extract data
-  // // from the Redux store state
-  // const links = useSelector((state) => state.linkCollection.links)
-
-  // // make a mutable copy of links
-  // const linkCollection = JSON.parse(JSON.stringify(links))
-
-  // // 'updrill' but on same level
-  // const [adaptableLinkCollection, setAdaptableLinkCollection] = useState(
-  //   linkCollection.toSorted((a, b) => a.position - b.position)
-  // )
 
   // served by parent component
   const [adaptableLinkCollection, setAdaptableLinkCollection] = useState(
@@ -376,24 +303,13 @@ function CollectionOfEditableLinks({ linkCollectionByPosition }) {
   )
   // used to up-drill every time reorder happens
   useEffect(() => {
-    setAdaptableLinkCollection(linkNodes) // V1
+    setAdaptableLinkCollection(linkNodes)
 
-    // this should only happen if user clicks save.
-    // dispatch(updateLinkCollection(handle, linkNodes)) // V2
-
-    // announce("to be saved linkNodes", linkNodes)
     announce("linkCollection", adaptableLinkCollection)
-    // announce("to be saved reorderedLinkCollection", reorderedLinkCollection)
     announce("updateRequestStatus:", updateRequestStatus)
   }, [linkNodes, updateRequestStatus])
 
-  // announce("linkElementState", linkElementState)
-
   return linkNodes.map((link) => {
-    // const [linkText, setLinkText] = useState(link.text)
-    // const [linkUrl, setLinkUrl] = useState(link.url)
-    // const linkPosition = link.position
-
     let linkUrl = link.url
     let linkText = link.text
     let linkPosition = link.position
@@ -443,7 +359,8 @@ function EditableLinkInput({ text, url, position, setUpdateRequestStatus }) {
 
   // used for network and Redux state-management
   const dispatch = useDispatch()
-  // const [updateRequestStatus, setUpdateRequestStatus] = useState("idle")
+
+  // reading from context
   const { handle } = useContext(ProfilePageContext)
 
   // update view independent of the backend
@@ -472,14 +389,7 @@ function EditableLinkInput({ text, url, position, setUpdateRequestStatus }) {
             type="text"
             className="col-span-3"
             value={linkText}
-            // value={linkElementState[link.position].text}
-            // onChange={(e) => (linkText = e.target.value)}
             onChange={(e) => setLinkText(e.target.value)}
-            // onChange={(e) =>
-            //   setLinkElementState[link.position](
-            //     (linkElementState[link.position].text = e.target.value)
-            //   )
-            // }
           />
         </div>
         <div className="grid grid-cols-4 items-center gap-4">
@@ -491,16 +401,7 @@ function EditableLinkInput({ text, url, position, setUpdateRequestStatus }) {
             type="text"
             className="col-span-3"
             value={linkUrl}
-            // value={linkElementState[link.position].url}
             onChange={(e) => setLinkUrl(e.target.value)}
-            // onChange={(e) => (linkUrl = e.target.value)}
-            // onChange={(e) =>
-            //   setLinkElementState(() => {
-            //     let copyArray = linkCollection
-            //     copyArray.splice(link.position, 1, e.target.value)
-            //     return copyArray
-            //   })
-            // }
           />
         </div>
       </div>
@@ -508,7 +409,6 @@ function EditableLinkInput({ text, url, position, setUpdateRequestStatus }) {
         <DialogClose>
           <Button
             type="submit"
-            // onClick={() => sendLinkInputToUpdate(link.position)}
             onClick={() =>
               onSaveUpdatedLinkClicked(
                 handle,
@@ -551,17 +451,7 @@ async function onSaveUpdatedLinkClicked(
       updatedLink,
     }
 
-    /*
-          {
-      url: updatedLink.url,
-      text: updatedLink.text,
-      position: updatedLink.position,
-    }
-    */
-
     dispatch(updateLink(updateData))
-    // { myArrayOfObjects: [...myArrayOfObjects] }
-    // dispatch(updateLink({ updateData: [...updateData] }))
   } catch (error) {
     console.error("Failed to save link: ", error)
   } finally {

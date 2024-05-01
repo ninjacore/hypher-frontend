@@ -12,7 +12,7 @@ const initialState = {
   error: null,
 }
 
-// monster client interactions /.
+// client interactions /.
 export const fetchLinkCollection = createAsyncThunk(
   "linkCollection/fetchLinkCollection",
   async (handle) => {
@@ -27,7 +27,6 @@ export const fetchLinkCollection = createAsyncThunk(
   }
 )
 
-// TODO: save full link
 export const updateLinkCollection = createAsyncThunk(
   "linkCollection/updateLinkCollection",
   async (updateData) => {
@@ -47,12 +46,6 @@ export const addNewLink = createAsyncThunk(
   "linkCollection/addNewLink",
   async (newLinkData) => {
     const { handle, newLinkItem: newLink } = newLinkData
-    // async (newLinkItem) => {
-    // const response = await profileDataClient(newLinkItem.handle, 0, "POST", {
-    //   url: newLinkItem.url,
-    //   text: newLinkItem.text,
-    //   position: newLinkItem.position,
-    // })
     const response = await linkCollectionClient(handle, "link", "POST", newLink)
     return response.data
   }
@@ -64,7 +57,6 @@ export const updateLink = createAsyncThunk(
     const { handle, updatedLink } = updatedLinkData
     announce("updateData that was dispatched", updatedLinkData)
 
-    // const response = await profileDataClient(updatedLinkItem.handle, 0, "PUT", {
     const response = await linkCollectionClient(
       handle,
       "link",
@@ -84,7 +76,6 @@ export const deleteLink = createAsyncThunk(
   "linkCollection/deleteLink",
   async (deletionData) => {
     const { handle, linkPosition } = deletionData
-    // const response = await profileDataClient(handle, linkPosition, 0, "DELETE")
     const response = await linkCollectionClient(
       handle,
       "link",
@@ -139,25 +130,6 @@ const linkCollectionSlice = createSlice({
       .addCase(updateLink.fulfilled, (state, action) => {
         state.status = "succeeded"
 
-        // replace the link with the updated one
-        // state.links = state.links.map((link) => {
-
-        // state.links = state.links.concat(action.payload)
-        // state.links = [...newLinks]
-        // state.links = state.links.map((link) => {
-        //   if (link.position === action.payload.position) {
-        //     // unique id must be persisted for FE
-        //     return {
-        //       uniqueId: link.uniqueId,
-        //       text: action.payload.text,
-        //       url: action.payload.url,
-        //       position: action.payload.position,
-        //     }
-        //   } else {
-        //     return link
-        //   }
-        // })
-
         announce(
           "action.payload within updateLink case (slice): ",
           action.payload
@@ -175,8 +147,3 @@ const linkCollectionSlice = createSlice({
 })
 
 export default linkCollectionSlice.reducer
-
-// // for these selectors 'state' is the root Redux state object
-// export const selectAllLinks = (state) => state.linkCollection.links
-// export const selectLinkById = (state, linkId) =>
-//   state.linkCollection.links.find((link) => link.id === linkId)
