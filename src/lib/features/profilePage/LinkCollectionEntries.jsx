@@ -113,7 +113,6 @@ export const LinkCollectionEntries = ({ handle, mode }) => {
         // contentOfLinkCollection = generateEditable(links)
         contentOfLinkCollection = (
           <CollectionOfEditableLinks
-            handle={handle}
             linkCollectionByPosition={linkCollectionByPosition}
           />
         )
@@ -347,7 +346,7 @@ function DndFrame({ linkCollectionByPosition, setReorderedLinkCollection }) {
   }
 }
 
-function CollectionOfEditableLinks({ handle, linkCollectionByPosition }) {
+function CollectionOfEditableLinks({ linkCollectionByPosition }) {
   // to re-render
   const [updateRequestStatus, setUpdateRequestStatus] = useState("idle")
   // const dispatch = useDispatch()
