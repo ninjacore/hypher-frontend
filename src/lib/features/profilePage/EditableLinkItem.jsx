@@ -2,6 +2,7 @@ import { IconMapper } from "@/components/iconMapper"
 
 import { EditButton } from "@/components/ui/editButtonPen"
 import { PenIconButton } from "@/components/ui/penIconButton"
+import { DeleteCrossIconButton } from "@/components/ui/DeleteCrossIconButton"
 
 function EditableLinkItem({ linkPosition, linkUrl, linkText }) {
   return (
@@ -36,6 +37,9 @@ function EditableLinkItem({ linkPosition, linkUrl, linkText }) {
         </div>
         <div className="bg-konkikyou-blue">
           <PenIconButton />
+        </div>
+        <div className="bg-konkikyou-blue mx-2">
+          <DeleteCrossIconButton />
         </div>
       </div>
     </>
