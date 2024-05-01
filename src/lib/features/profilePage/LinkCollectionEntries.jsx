@@ -38,7 +38,10 @@ import {
 } from "@/lib/features/profilePage/linkCollectionSlice"
 import { unwrapResult } from "@reduxjs/toolkit"
 
-// speficly for drag-and-drop functionality
+// specificly for edit-links functionality
+import { EditableLinkItem } from "@/lib/features/profilePage/EditableLinkItem"
+
+// specificly for drag-and-drop functionality
 // import { useSortable } from "@dnd-kit/sortable"
 import { SortableLinkNode } from "@/lib/utils/SortableLinkNode/SortableLinkNode"
 
@@ -324,7 +327,8 @@ function CollectionOfEditableLinks({ linkCollectionByPosition }) {
       <div key={"linkItem-" + link.position}>
         <Dialog>
           <DialogTrigger asChild>
-            <div className="group/edit">
+            {/* old component /. */}
+            {/* <div className="group/edit">
               <div
                 key={"pos-" + link.position + "-editable"}
                 className="my-4 mx-2 py-0.5 px-3 bg-konkikyou-blue group/edit"
@@ -337,7 +341,18 @@ function CollectionOfEditableLinks({ linkCollectionByPosition }) {
                 </a>
                 <EditButton />
               </div>
+            </div> */}
+            {/* old component ./ */}
+
+            {/* new component /. */}
+            <div className="group/edit">
+              <EditableLinkItem
+                linkPosition={link.position}
+                linkUrl={link.url}
+                linkText={link.text}
+              />
             </div>
+            {/* new component ./ */}
           </DialogTrigger>
           <EditableLinkInput
             text={link.text}
