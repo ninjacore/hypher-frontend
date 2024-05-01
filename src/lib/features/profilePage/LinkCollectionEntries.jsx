@@ -297,7 +297,15 @@ function DndFrame({ linkCollection, setReorderedLinkCollection }) {
 
         const newIndex = items.map((linkNode) => linkNode.id).indexOf(over.id)
 
-        return arrayMove(items, oldIndex, newIndex)
+        // old way (not swapping 'position' attribute)
+        // return arrayMove(items, oldIndex, newIndex)
+
+        // swap positions (including the 'position' attribute)
+        const newlySortedItems = arrayMove(items, oldIndex, newIndex)
+        newlySortedItems.forEach((linkNode, index) => {
+          linkNode.position = index
+        })
+        return newlySortedItems
       })
     }
   }
