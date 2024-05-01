@@ -130,8 +130,12 @@ function DraggableLinkCollection({ handle }) {
   // from the Redux store state
   const links = useSelector((state) => state.linkCollection.links)
 
+  announce("links within DraggableLinkCollection", links)
+
   // make a mutable copy of links
   const linkCollection = JSON.parse(JSON.stringify(links))
+
+  announce("calibrating linkCollection", linkCollection)
 
   const [reorderedLinkCollection, setReorderedLinkCollection] = useState([
     linkCollection,
@@ -178,7 +182,16 @@ function DraggableLinkCollection({ handle }) {
     try {
       setUpdateRequestStatus("pending")
       announce(
-        "sending reorderedLinkCollection to backend:",
+        "sending reorderedLinkCollection to backend (default positions):",
+        reorderedLinkCollection
+      )
+      // // asign new positons to linkNodes
+      // reorderedLinkCollection.forEach((linkNode, index) => {
+      //   linkNode.position = index
+      //   linkNode.uniqueId = nanoid()
+      // })
+      announce(
+        "sending reorderedLinkCollection to backend (updated positions):",
         reorderedLinkCollection
       )
 
@@ -214,6 +227,8 @@ function DndFrame({ linkCollection, setReorderedLinkCollection }) {
   // used for drag-and-drop (reorder and transition animation)
   const [linkNodes, setLinkNodes] = useState(
     linkCollection.map((linkNode) => {
+      console.log("assigning linkNode.id based on uniqueId", linkNode.uniqueId)
+      announce("linkCollection for linkNode", linkCollection)
       linkNode.id = linkNode.uniqueId
       return linkNode
     })
@@ -233,7 +248,7 @@ function DndFrame({ linkCollection, setReorderedLinkCollection }) {
     // dispatch(updateLinkCollection(handle, linkNodes)) // V2
 
     // announce("to be saved linkNodes", linkNodes)
-    announce("linkCollection", linkCollection)
+    announce("linkCollection within useEffect", linkCollection)
     // announce("to be saved reorderedLinkCollection", reorderedLinkCollection)
   }, [linkNodes])
   // —— ** POSSIBLY OBSOLETE ** ——  ./
