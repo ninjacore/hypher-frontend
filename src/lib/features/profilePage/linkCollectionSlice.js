@@ -38,6 +38,7 @@ export const updateLinkCollection = createAsyncThunk(
       "PUT",
       links
     )
+    announce("response.data within updateLinkCollection: ", response.data)
     return response.data
   }
 )
@@ -119,6 +120,11 @@ const linkCollectionSlice = createSlice({
       })
       .addCase(updateLinkCollection.fulfilled, (state, action) => {
         state.status = "succeeded"
+
+        announce(
+          "action.payload within updateLinkCollection case (slice): ",
+          action.payload
+        )
         // replace the entire link collection with the updated one
         state.links = action.payload
       })
@@ -132,7 +138,33 @@ const linkCollectionSlice = createSlice({
       })
       .addCase(updateLink.fulfilled, (state, action) => {
         state.status = "succeeded"
-        state.links = state.links.concat(action.payload)
+
+        // replace the link with the updated one
+        // state.links = state.links.map((link) => {
+
+        // state.links = state.links.concat(action.payload)
+        // state.links = [...newLinks]
+        // state.links = state.links.map((link) => {
+        //   if (link.position === action.payload.position) {
+        //     // unique id must be persisted for FE
+        //     return {
+        //       uniqueId: link.uniqueId,
+        //       text: action.payload.text,
+        //       url: action.payload.url,
+        //       position: action.payload.position,
+        //     }
+        //   } else {
+        //     return link
+        //   }
+        // })
+
+        announce(
+          "action.payload within updateLink case (slice): ",
+          action.payload
+        )
+
+        // save updated links
+        state.links = action.payload
       })
       .addCase(deleteLink.fulfilled, (state, action) => {
         state.links = state.links.filter(
