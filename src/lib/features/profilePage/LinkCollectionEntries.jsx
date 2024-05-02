@@ -289,8 +289,10 @@ function DndFrame({ linkCollectionByPosition, setReorderedLinkCollection }) {
 }
 
 function CollectionOfEditableLinks({ linkCollectionByPosition }) {
-  // to re-render
+  // to trigger re-render in effect
   const [updateRequestStatus, setUpdateRequestStatus] = useState("idle")
+  const [deleteLinkRequestStatus, setDeleteLinkRequestStatus] = useState("idle")
+  // TODO: this doesn't trigger... why?
 
   // served by parent component
   const [adaptableLinkCollection, setAdaptableLinkCollection] = useState(
@@ -307,9 +309,19 @@ function CollectionOfEditableLinks({ linkCollectionByPosition }) {
   useEffect(() => {
     setAdaptableLinkCollection(linkNodes)
 
-    announce("linkCollection", adaptableLinkCollection)
+    announce("adaptableLinkCollection", adaptableLinkCollection)
+
+    announce("linkCollectionByPosition", linkCollectionByPosition) // this is the updated one
+    // setAdaptableLinkCollection(linkCollectionByPosition)
+    setLinkNodes(linkCollectionByPosition)
+
     announce("updateRequestStatus:", updateRequestStatus)
-  }, [linkNodes, updateRequestStatus])
+  }, [
+    linkNodes,
+    updateRequestStatus,
+    deleteLinkRequestStatus,
+    linkCollectionByPosition,
+  ])
 
   return linkNodes.map((link) => {
     let linkUrl = link.url
@@ -332,6 +344,7 @@ function CollectionOfEditableLinks({ linkCollectionByPosition }) {
             linkText={link.text}
             setUpdateRequestStatus={setUpdateRequestStatus}
             onSaveUpdatedLinkClicked={onSaveUpdatedLinkClicked}
+            setDeleteLinkRequestStatus={setDeleteLinkRequestStatus}
           />
         </div>
         {/* new component ./ */}
@@ -377,6 +390,7 @@ function EditableLinkItem({
   linkText,
   setUpdateRequestStatus,
   onSaveUpdatedLinkClicked,
+  setDeleteLinkRequestStatus,
 }) {
   return (
     <>
@@ -411,7 +425,10 @@ function EditableLinkItem({
               <DeleteCrossIconButton />
             </div>
           </DialogTrigger>
-          <DeleteLinkDialog linkPosition={linkPosition} />
+          <DeleteLinkDialog
+            linkPosition={linkPosition}
+            setDeleteLinkRequestStatus={setDeleteLinkRequestStatus}
+          />
         </Dialog>
       </div>
     </>
@@ -505,16 +522,16 @@ function EditableLinkInput({
 }
 
 // Dialog to delete a link
-function DeleteLinkDialog({ linkPosition }) {
+function DeleteLinkDialog({ linkPosition, setDeleteLinkRequestStatus }) {
   // Hooks can only be called inside of the body of a function component.
   const { handle } = useContext(ProfilePageContext)
 
   // used for network and Redux state-management
   const dispatch = useDispatch()
 
-  // TOOD: check if needed (or can be deleted)
-  // to re-render
-  const [deleteLinkRequestStatus, setDeleteLinkRequestStatus] = useState("idle")
+  // // TOOD: check if needed (or can be deleted)
+  // // to re-render
+  // const [deleteLinkRequestStatus, setDeleteLinkRequestStatus] = useState("idle")
 
   return (
     <DialogContent className="sm:max-w-[425px]">
