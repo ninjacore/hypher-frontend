@@ -3,6 +3,8 @@
 // imports for UI /.
 import { IconMapper } from "@/components/iconMapper"
 import { EditButton } from "@/components/ui/editButtonPen"
+import { PenIconButton } from "@/components/ui/penIconButton"
+import { DeleteCrossIconButton } from "@/components/ui/DeleteCrossIconButton"
 import {
   Dialog,
   DialogContent,
@@ -39,7 +41,7 @@ import {
 import { unwrapResult } from "@reduxjs/toolkit"
 
 // specificly for edit-links functionality
-import { EditableLinkItem } from "@/lib/features/profilePage/EditableLinkItem"
+// import { EditableLinkItem } from "@/lib/features/profilePage/EditableLinkItem"
 
 // specificly for drag-and-drop functionality
 // import { useSortable } from "@dnd-kit/sortable"
@@ -323,50 +325,169 @@ function CollectionOfEditableLinks({ linkCollectionByPosition }) {
       adaptableLinkCollection[link.position]
     )
 
+    // TODO: 2 Dialogs, one for edit and one for delete -> envelop each icon in a dialog
+
+    // V1 approach (old and new) /.
+    // return (
+    // <div key={"linkItem-" + link.position}>
+    //   <Dialog>
+    //     <DialogTrigger asChild>
+    //       {/* old component /. */}
+    //       {/* <div className="group/edit">
+    //         <div
+    //           key={"pos-" + link.position + "-editable"}
+    //           className="my-4 mx-2 py-0.5 px-3 bg-konkikyou-blue group/edit"
+    //         >
+    //           <a>
+    //             <IconMapper url={link.url} />
+    //             <span id={"linkText-" + link.position} className="mx-2">
+    //               {link.text.length > 0 ? link.text : link.url}
+    //             </span>
+    //           </a>
+    //           <EditButton />
+    //         </div>
+    //       </div> */}
+    //       {/* old component ./ */}
+
+    //       {/* new component /. */}
+    //       <div className="group/edit">
+    //         <EditableLinkItem
+    //           linkPosition={link.position}
+    //           linkUrl={link.url}
+    //           linkText={link.text}
+    //         />
+    //       </div>
+    //       {/* new component ./ */}
+    //     </DialogTrigger>
+    //     <EditableLinkInput
+    //       text={link.text}
+    //       url={link.url}
+    //       position={link.position}
+    //       setUpdateRequestStatus={setUpdateRequestStatus}
+    //     />
+    //   </Dialog>
+    // </div>
+    // )
+    // V1 approach (old and new) ./
+
     return (
       <div key={"linkItem-" + link.position}>
-        <Dialog>
-          <DialogTrigger asChild>
-            {/* old component /. */}
-            {/* <div className="group/edit">
-              <div
-                key={"pos-" + link.position + "-editable"}
-                className="my-4 mx-2 py-0.5 px-3 bg-konkikyou-blue group/edit"
-              >
-                <a>
-                  <IconMapper url={link.url} />
-                  <span id={"linkText-" + link.position} className="mx-2">
-                    {link.text.length > 0 ? link.text : link.url}
-                  </span>
-                </a>
-                <EditButton />
-              </div>
-            </div> */}
-            {/* old component ./ */}
-
-            {/* new component /. */}
-            <div className="group/edit">
-              <EditableLinkItem
-                linkPosition={link.position}
-                linkUrl={link.url}
-                linkText={link.text}
-              />
-            </div>
-            {/* new component ./ */}
-          </DialogTrigger>
-          <EditableLinkInput
-            text={link.text}
-            url={link.url}
-            position={link.position}
+        {/* new component /. */}
+        <div className="">
+          <EditableLinkItem
+            linkPosition={link.position}
+            linkUrl={link.url}
+            linkText={link.text}
             setUpdateRequestStatus={setUpdateRequestStatus}
+            onSaveUpdatedLinkClicked={onSaveUpdatedLinkClicked}
           />
-        </Dialog>
+        </div>
+        {/* new component ./ */}
       </div>
     )
   })
 }
 
-function EditableLinkInput({ text, url, position, setUpdateRequestStatus }) {
+// Network and State-Management functions /.
+async function onSaveUpdatedLinkClicked(
+  handle,
+  updatedLink,
+  setUpdateRequestStatus,
+  dispatch
+) {
+  console.log(
+    `%c onSaveUpdatedLinkClicked!!`,
+    "color: green; font-size: 1.5em;"
+  )
+
+  try {
+    setUpdateRequestStatus("pending")
+
+    // createAsyncThunk only takes one argument
+    const updateData = {
+      handle,
+      updatedLink,
+    }
+
+    dispatch(updateLink(updateData))
+  } catch (error) {
+    console.error("Failed to save link: ", error)
+  } finally {
+    setUpdateRequestStatus("idle")
+  }
+}
+// Network and State-Management functions ./
+
+// UI interactions /.
+function EditableLinkItem({
+  linkPosition,
+  linkUrl,
+  linkText,
+  setUpdateRequestStatus,
+  onSaveUpdatedLinkClicked,
+}) {
+  return (
+    <>
+      {/* <div
+        key={"pos-" + linkPosition + "-editable"}
+        className="group/edit flex my-4 mx-2"
+      >
+        <div className="w-3/4 bg-konkikyou-blue py-0.5 px-3 mx-2">
+          <LinkDisplay
+            linkPosition={linkPosition}
+            linkUrl={linkUrl}
+            linkText={linkText}
+          />
+        </div>
+        <div className="bg-konkikyou-blue">
+          <PenIconButton />
+        </div>
+        <div className="bg-konkikyou-blue mx-2">
+          <DeleteCrossIconButton />
+        </div>
+      </div> */}
+
+      <div
+        key={"pos-" + linkPosition + "-editable"}
+        className="group/edit flex my-4 mx-2"
+      >
+        <div className="w-3/4 bg-konkikyou-blue py-0.5 px-3 mx-2">
+          <LinkDisplay
+            linkPosition={linkPosition}
+            linkUrl={linkUrl}
+            linkText={linkText}
+          />
+        </div>
+        <Dialog>
+          <DialogTrigger asChild>
+            <div className="bg-konkikyou-blue">
+              <PenIconButton />
+            </div>
+          </DialogTrigger>
+          <EditableLinkInput
+            text={linkText}
+            url={linkUrl}
+            position={linkPosition}
+            setUpdateRequestStatus={setUpdateRequestStatus}
+            onSaveUpdatedLinkClicked={onSaveUpdatedLinkClicked}
+          />
+        </Dialog>
+
+        <div className="bg-konkikyou-blue mx-2">
+          <DeleteCrossIconButton />
+        </div>
+      </div>
+    </>
+  )
+}
+
+function EditableLinkInput({
+  text,
+  url,
+  position,
+  setUpdateRequestStatus,
+  onSaveUpdatedLinkClicked,
+}) {
   // component-internal state
   const [linkText, setLinkText] = useState(text)
   const [linkUrl, setLinkUrl] = useState(url)
@@ -445,32 +566,17 @@ function EditableLinkInput({ text, url, position, setUpdateRequestStatus }) {
   )
 }
 
-// Network and State-Management functions /.
-async function onSaveUpdatedLinkClicked(
-  handle,
-  updatedLink,
-  setUpdateRequestStatus,
-  dispatch
-) {
-  console.log(
-    `%c onSaveUpdatedLinkClicked!!`,
-    "color: green; font-size: 1.5em;"
+function LinkDisplay({ linkPosition, linkUrl, linkText }) {
+  return (
+    <>
+      <a>
+        <IconMapper url={linkUrl} />
+        <span id={"linkText-" + linkPosition} className="mx-2">
+          {linkText.length > 0 ? linkText : linkUrl}
+        </span>
+      </a>
+    </>
   )
-
-  try {
-    setUpdateRequestStatus("pending")
-
-    // createAsyncThunk only takes one argument
-    const updateData = {
-      handle,
-      updatedLink,
-    }
-
-    dispatch(updateLink(updateData))
-  } catch (error) {
-    console.error("Failed to save link: ", error)
-  } finally {
-    setUpdateRequestStatus("idle")
-  }
 }
-// Network and State-Management functions ./
+
+// UI interactions ./
