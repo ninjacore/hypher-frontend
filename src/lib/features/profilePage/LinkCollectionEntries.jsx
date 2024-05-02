@@ -40,9 +40,6 @@ import {
 } from "@/lib/features/profilePage/linkCollectionSlice"
 import { unwrapResult } from "@reduxjs/toolkit"
 
-// specificly for edit-links functionality
-// import { EditableLinkItem } from "@/lib/features/profilePage/EditableLinkItem"
-
 // specificly for drag-and-drop functionality
 // import { useSortable } from "@dnd-kit/sortable"
 import { SortableLinkNode } from "@/lib/utils/SortableLinkNode/SortableLinkNode"
@@ -325,51 +322,6 @@ function CollectionOfEditableLinks({ linkCollectionByPosition }) {
       adaptableLinkCollection[link.position]
     )
 
-    // TODO: 2 Dialogs, one for edit and one for delete -> envelop each icon in a dialog
-
-    // V1 approach (old and new) /.
-    // return (
-    // <div key={"linkItem-" + link.position}>
-    //   <Dialog>
-    //     <DialogTrigger asChild>
-    //       {/* old component /. */}
-    //       {/* <div className="group/edit">
-    //         <div
-    //           key={"pos-" + link.position + "-editable"}
-    //           className="my-4 mx-2 py-0.5 px-3 bg-konkikyou-blue group/edit"
-    //         >
-    //           <a>
-    //             <IconMapper url={link.url} />
-    //             <span id={"linkText-" + link.position} className="mx-2">
-    //               {link.text.length > 0 ? link.text : link.url}
-    //             </span>
-    //           </a>
-    //           <EditButton />
-    //         </div>
-    //       </div> */}
-    //       {/* old component ./ */}
-
-    //       {/* new component /. */}
-    //       <div className="group/edit">
-    //         <EditableLinkItem
-    //           linkPosition={link.position}
-    //           linkUrl={link.url}
-    //           linkText={link.text}
-    //         />
-    //       </div>
-    //       {/* new component ./ */}
-    //     </DialogTrigger>
-    //     <EditableLinkInput
-    //       text={link.text}
-    //       url={link.url}
-    //       position={link.position}
-    //       setUpdateRequestStatus={setUpdateRequestStatus}
-    //     />
-    //   </Dialog>
-    // </div>
-    // )
-    // V1 approach (old and new) ./
-
     return (
       <div key={"linkItem-" + link.position}>
         {/* new component /. */}
@@ -428,25 +380,6 @@ function EditableLinkItem({
 }) {
   return (
     <>
-      {/* <div
-        key={"pos-" + linkPosition + "-editable"}
-        className="group/edit flex my-4 mx-2"
-      >
-        <div className="w-3/4 bg-konkikyou-blue py-0.5 px-3 mx-2">
-          <LinkDisplay
-            linkPosition={linkPosition}
-            linkUrl={linkUrl}
-            linkText={linkText}
-          />
-        </div>
-        <div className="bg-konkikyou-blue">
-          <PenIconButton />
-        </div>
-        <div className="bg-konkikyou-blue mx-2">
-          <DeleteCrossIconButton />
-        </div>
-      </div> */}
-
       <div
         key={"pos-" + linkPosition + "-editable"}
         className="group/edit flex my-4 mx-2"
@@ -472,15 +405,20 @@ function EditableLinkItem({
             onSaveUpdatedLinkClicked={onSaveUpdatedLinkClicked}
           />
         </Dialog>
-
-        <div className="bg-konkikyou-blue mx-2">
-          <DeleteCrossIconButton />
-        </div>
+        <Dialog>
+          <DialogTrigger asChild>
+            <div className="bg-konkikyou-blue mx-2">
+              <DeleteCrossIconButton />
+            </div>
+          </DialogTrigger>
+          <DeleteLinkDialog linkPosition={linkPosition} />
+        </Dialog>
       </div>
     </>
   )
 }
 
+// Dialog to update a link
 function EditableLinkInput({
   text,
   url,
@@ -564,6 +502,39 @@ function EditableLinkInput({
       </DialogFooter>
     </DialogContent>
   )
+}
+
+// Dialog to delete a link
+function DeleteLinkDialog({ linkPosition }) {
+  return (
+    <DialogContent className="sm:max-w-[425px]">
+      <DialogHeader>
+        <DialogTitle>Delete Link</DialogTitle>
+        <DialogDescription>
+          Are you sure you want to delete this link?
+        </DialogDescription>
+      </DialogHeader>
+      {/* TODO: add dialog options */}
+      <DialogFooter>
+        <DialogClose>
+          <Button
+            type="submit"
+            id="confirmLinkDeletion-Button"
+            onClick={() => onDeleteLinkClicked()}
+          >
+            YES
+          </Button>
+          <Button type="submit" id="cancelLinkDeletion-Button">
+            NO
+          </Button>
+        </DialogClose>
+      </DialogFooter>
+    </DialogContent>
+  )
+}
+
+function onDeleteLinkClicked() {
+  console.log(`%c onDeleteLinkClicked`, "color:green;font-size:1.5em;")
 }
 
 function LinkDisplay({ linkPosition, linkUrl, linkText }) {
