@@ -506,6 +506,9 @@ function EditableLinkInput({
 
 // Dialog to delete a link
 function DeleteLinkDialog({ linkPosition }) {
+  // Hooks can only be called inside of the body of a function component.
+  const { handle } = useContext(ProfilePageContext)
+
   return (
     <DialogContent className="sm:max-w-[425px]">
       <DialogHeader>
@@ -514,13 +517,12 @@ function DeleteLinkDialog({ linkPosition }) {
           Are you sure you want to delete this link?
         </DialogDescription>
       </DialogHeader>
-      {/* TODO: add dialog options */}
       <DialogFooter>
         <DialogClose>
           <Button
             type="submit"
             id="confirmLinkDeletion-Button"
-            onClick={() => onDeleteLinkClicked()}
+            onClick={() => onDeleteLinkClicked(linkPosition, handle)}
           >
             YES
           </Button>
@@ -533,8 +535,11 @@ function DeleteLinkDialog({ linkPosition }) {
   )
 }
 
-function onDeleteLinkClicked() {
-  console.log(`%c onDeleteLinkClicked`, "color:green;font-size:1.5em;")
+function onDeleteLinkClicked(linkPosition, handle) {
+  console.log(
+    `%c onDeleteLinkClicked for link at position '${linkPosition}', handle '${handle}'`,
+    "color:green;font-size:1.5em;"
+  )
 }
 
 function LinkDisplay({ linkPosition, linkUrl, linkText }) {
