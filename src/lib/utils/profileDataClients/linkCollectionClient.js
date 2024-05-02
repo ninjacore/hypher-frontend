@@ -124,7 +124,7 @@ async function updateLinkCollection(handle, contentBoxPosition, body) {
 
 // client functions for Link /.
 async function addLinkToCollection(handle, method, body) {
-  const endpoint = `${baseurl}/api/v1/linkCollection/link?handle=${handle}&position=${contentBoxPosition}`
+  const endpoint = `${baseURL}/api/v1/linkCollection/link?handle=${handle}&position=${contentBoxPosition}`
 
   return await apiHandler(endpoint, method, body)
 }
@@ -154,7 +154,7 @@ async function deleteLinkWithinCollection(
   })
 
   // atm only contentBoxPosition of 0 is supported
-  let endpoint = `${baseurl}/api/v1/linkCollection/link?handle=${handle}&position=${linkPosition}`
+  let endpoint = `${baseURL}/api/v1/linkCollection/link?handle=${handle}&position=${linkPosition}`
 
   return await apiHandler(endpoint, method)
 }

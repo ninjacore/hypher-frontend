@@ -138,6 +138,11 @@ const linkCollectionSlice = createSlice({
         // save updated links
         state.links = action.payload
       })
+      .addCase(deleteLink.rejected, (state, action) => {
+        state.status = "failed"
+        state.error = action.error.message
+      })
+
       .addCase(deleteLink.fulfilled, (state, action) => {
         state.links = state.links.filter(
           (link) => link.position !== action.payload.position
