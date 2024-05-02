@@ -509,6 +509,13 @@ function DeleteLinkDialog({ linkPosition }) {
   // Hooks can only be called inside of the body of a function component.
   const { handle } = useContext(ProfilePageContext)
 
+  // used for network and Redux state-management
+  const dispatch = useDispatch()
+
+  // TOOD: check if needed (or can be deleted)
+  // to re-render
+  const [deleteLinkRequestStatus, setDeleteLinkRequestStatus] = useState("idle")
+
   return (
     <DialogContent className="sm:max-w-[425px]">
       <DialogHeader>
@@ -522,7 +529,14 @@ function DeleteLinkDialog({ linkPosition }) {
           <Button
             type="submit"
             id="confirmLinkDeletion-Button"
-            onClick={() => onDeleteLinkClicked(linkPosition, handle)}
+            onClick={() =>
+              onDeleteLinkClicked(
+                linkPosition,
+                handle,
+                dispatch,
+                setDeleteLinkRequestStatus
+              )
+            }
           >
             YES
           </Button>
@@ -535,11 +549,32 @@ function DeleteLinkDialog({ linkPosition }) {
   )
 }
 
-function onDeleteLinkClicked(linkPosition, handle) {
+function onDeleteLinkClicked(
+  linkPosition,
+  handle,
+  dispatch,
+  setDeleteLinkRequestStatus
+) {
   console.log(
     `%c onDeleteLinkClicked for link at position '${linkPosition}', handle '${handle}'`,
     "color:green;font-size:1.5em;"
   )
+
+  try {
+    setDeleteLinkRequestStatus("pending")
+
+    // createAsyncThunk only takes one argument
+    const deletionData = {
+      handle,
+      linkPosition,
+    }
+
+    dispatch(deleteLink(deletionData))
+  } catch (error) {
+    console.error("Failed to delete link: ", error)
+  } finally {
+    setDeleteLinkRequestStatus("idle")
+  }
 }
 
 function LinkDisplay({ linkPosition, linkUrl, linkText }) {

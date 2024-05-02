@@ -146,6 +146,13 @@ async function deleteLinkWithinCollection(
   contentBoxPosition = 0,
   method
 ) {
+  announce("deleteLinkWithinCollection", {
+    handle,
+    linkPosition,
+    contentBoxPosition,
+    method,
+  })
+
   // atm only contentBoxPosition of 0 is supported
   let endpoint = `${baseurl}/api/v1/linkCollection/link?handle=${handle}&position=${linkPosition}`
 
