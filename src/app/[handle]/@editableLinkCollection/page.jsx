@@ -72,8 +72,21 @@ function LinkCollection() {
     // default HTML
     return (
       <>
-        <h2 className="section-title">{sectionTitle}</h2>
+        {/* should be within the same component */}
+        <div className="flex justify-between">
+          <h2 className="section-title">{sectionTitle}</h2>
+          <Button
+            variant="outline"
+            className="bg-white text-black"
+            // onClick={() => setEditMode(true)}
+          >
+            {"ADD"}
+          </Button>
+        </div>
+
         <LinkCollectionEntries handle={handle} mode={"editable"} />
+        {/* should be within the same component */}
+
         <div className="flex justify-end">
           <Button
             id="activateReorderLinkCollectionButton"
