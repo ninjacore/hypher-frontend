@@ -45,7 +45,7 @@ export const updateLinkCollection = createAsyncThunk(
 export const addNewLink = createAsyncThunk(
   "linkCollection/addNewLink",
   async (newLinkData) => {
-    const { handle, newLinkItem: newLink } = newLinkData
+    const { handle, newLink } = newLinkData
     const response = await linkCollectionClient(handle, "link", "POST", newLink)
     return response.data
   }
@@ -125,7 +125,10 @@ const linkCollectionSlice = createSlice({
       })
       .addCase(addNewLink.fulfilled, (state, action) => {
         state.status = "succeeded"
-        state.links = state.links.concat(action.payload)
+        let newLink = action.payload
+        newLink.uniqueId = nanoid()
+        // state.links = state.links.concat(action.payload)
+        state.links = state.links.concat(newLink)
       })
       .addCase(updateLink.fulfilled, (state, action) => {
         state.status = "succeeded"

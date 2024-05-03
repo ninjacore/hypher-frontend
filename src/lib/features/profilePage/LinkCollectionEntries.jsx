@@ -64,9 +64,12 @@ import {
 // debug support function
 import { announce } from "@/lib/utils/debugTools/announce"
 
-// specificly for
-
 export const LinkCollectionEntries = ({ handle, mode, sectionTitle }) => {
+  // for adding links
+  const [addRequestStatus, setAddRequestStatus] = useState("idle")
+  let editableLinkText = ""
+  let editableLinkUrl = ""
+
   const dispatch = useDispatch()
   // useSelector is a hook that allows you to extract data
   // from the Redux store state
@@ -146,13 +149,25 @@ export const LinkCollectionEntries = ({ handle, mode, sectionTitle }) => {
           <>
             <div className="flex justify-between">
               <h2 className="section-title">{sectionTitle}</h2>
-              <Button
-                variant="outline"
-                className="bg-white text-black"
-                // onClick={() => setEditMode(true)}
-              >
-                {"ADD"}
-              </Button>
+
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="bg-white text-black"
+                    // onClick={() => setEditMode(true)}
+                  >
+                    {"ADD"}
+                  </Button>
+                </DialogTrigger>
+                <CreateLinkDialog
+                  text={editableLinkText}
+                  url={editableLinkUrl}
+                  position={linkCollectionByPosition.length}
+                  setAddRequestStatus={setAddRequestStatus}
+                  onAddLinkClicked={onAddLinkClicked}
+                />
+              </Dialog>
             </div>
 
             <CollectionOfEditableLinks
@@ -399,6 +414,29 @@ function CollectionOfEditableLinks({ linkCollectionByPosition }) {
 }
 
 // Network and State-Management functions /.
+async function onAddLinkClicked(
+  handle,
+  newLink,
+  setAddRequestStatus,
+  dispatch
+) {
+  try {
+    setAddRequestStatus("pending")
+
+    // createAsyncThunk only takes one argument
+    const addData = {
+      handle,
+      newLink,
+    }
+
+    dispatch(addNewLink(addData))
+  } catch (error) {
+    console.error("Failed to add link: ", error)
+  } finally {
+    setAddRequestStatus("idle")
+  }
+}
+
 async function onSaveUpdatedLinkClicked(
   handle,
   updatedLink,
@@ -475,6 +513,106 @@ function EditableLinkItem({
         />
       </Dialog>
     </div>
+  )
+}
+
+// Dialog for adding a link
+function CreateLinkDialog({
+  text,
+  url,
+  position,
+  setAddRequestStatus,
+  onAddLinkClicked,
+}) {
+  // component-internal state
+  const [linkText, setLinkText] = useState(text)
+  const [linkUrl, setLinkUrl] = useState(url)
+  const linkPosition = position
+
+  // used for network and Redux state-management
+  const dispatch = useDispatch()
+
+  // reading from context
+  const { handle } = useContext(ProfilePageContext)
+
+  // this won't work
+  // TODO: see if there GUI is refreshing after creating a link
+  // // update view independent of the backend
+  // useEffect(() => {
+  //   announce("value changed -> linkText", linkText)
+  //   let element = document.getElementById("linkText-" + linkPosition)
+  //   element.innerHTML = linkText
+  // }, [linkText])
+
+  return (
+    <DialogContent className="sm:max-w-[425px]">
+      <DialogHeader>
+        <DialogTitle>Add Link</DialogTitle>
+        <DialogDescription>
+          Define your link here. Click save when you're done.
+        </DialogDescription>
+      </DialogHeader>
+
+      <div className="grid gap-4 py-4">
+        <div className="grid grid-cols-4 items-center gap-4">
+          <Label htmlFor="linkText" className="text-right">
+            Text
+          </Label>
+          <Input
+            id={"linkTextInput-" + linkPosition}
+            type="text"
+            className="col-span-3"
+            value={linkText}
+            onChange={(e) => setLinkText(e.target.value)}
+          />
+        </div>
+        <div className="grid grid-cols-4 items-center gap-4">
+          <Label htmlFor="linkUrl" className="text-right">
+            Link
+          </Label>
+          <Input
+            id={"linkUrlInput-" + linkPosition}
+            type="text"
+            className="col-span-3"
+            value={linkUrl}
+            onChange={(e) => setLinkUrl(e.target.value)}
+          />
+        </div>
+      </div>
+      <DialogFooter>
+        <DialogClose>
+          <Button
+            type="submit"
+            onClick={() => {
+              onAddLinkClicked(
+                handle,
+                {
+                  url: linkUrl,
+                  text: linkText,
+                  position: linkPosition,
+                },
+                setAddRequestStatus,
+                dispatch
+              )
+            }}
+            // onClick={() =>
+            //   onSaveUpdatedLinkClicked(
+            //     handle,
+            //     {
+            //       url: linkUrl,
+            //       text: linkText,
+            //       position: linkPosition,
+            //     },
+            //     setUpdateRequestStatus,
+            //     dispatch
+            //   )
+            // }
+          >
+            Save changes
+          </Button>
+        </DialogClose>
+      </DialogFooter>
+    </DialogContent>
   )
 }
 

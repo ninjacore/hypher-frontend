@@ -27,7 +27,12 @@ export async function linkCollectionClient(
 
     case "link":
       if (method === "POST") {
-        return await addLinkToCollection(handle, method, body)
+        return await addLinkToCollection(
+          handle,
+          contentBoxPosition,
+          method,
+          body
+        )
       } else if (method === "GET") {
         throw new Error(
           "GET method is not supported for a single link. Ask for the whole link collection instead."
@@ -123,8 +128,8 @@ async function updateLinkCollection(handle, contentBoxPosition, body) {
 // client functions for LinkCollection /.
 
 // client functions for Link /.
-async function addLinkToCollection(handle, method, body) {
-  const endpoint = `${baseURL}/api/v1/linkCollection/link?handle=${handle}&position=${contentBoxPosition}`
+async function addLinkToCollection(handle, contentBoxPosition, method, body) {
+  const endpoint = `${baseURL}/api/v1/linkCollection/link?handle=${handle}&contentBoxPosition=${contentBoxPosition}`
 
   return await apiHandler(endpoint, method, body)
 }
