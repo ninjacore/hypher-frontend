@@ -11,7 +11,8 @@ function PenIconButton() {
     >
       <FontAwesomeIcon
         icon={faPenToSquare}
-        className="fas fa-pen-to-square text-xs px-1.5 my-auto my-2.45 ml-1 py-0"
+        className="fas fa-pen-to-square text-xs"
+        // px-1.5 my-auto my-2.45 ml-1 py-0
       ></FontAwesomeIcon>
     </span>
   )

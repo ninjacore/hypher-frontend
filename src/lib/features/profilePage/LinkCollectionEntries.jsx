@@ -185,7 +185,7 @@ function DraggableLinkCollection({ handle, linkCollectionByPosition }) {
             variant="outline"
             className="bg-white text-black"
             onClick={() => {
-              setLinkCollectionIsSortable(false)
+              setLinkCollectionIsSortable(false) // exit dnd-mode
             }}
           >
             cancel
@@ -198,7 +198,7 @@ function DraggableLinkCollection({ handle, linkCollectionByPosition }) {
             className="bg-white text-black"
             onClick={() => {
               onSaveUpdateClicked()
-              setLinkCollectionIsSortable(false) // reset view
+              setLinkCollectionIsSortable(false) // exit dnd-mode
             }}
           >
             save
@@ -418,45 +418,43 @@ function EditableLinkItem({
   setDeleteLinkRequestStatus,
 }) {
   return (
-    <>
-      <div
-        key={"pos-" + linkPosition + "-editable"}
-        className="group/edit flex my-4 mx-2"
-      >
-        <div className="w-3/4 bg-konkikyou-blue py-0.5 px-3 mx-2">
-          <LinkDisplay
-            linkPosition={linkPosition}
-            linkUrl={linkUrl}
-            linkText={linkText}
-          />
-        </div>
-        <Dialog>
-          <DialogTrigger asChild>
-            <div className="bg-konkikyou-blue">
-              <PenIconButton />
-            </div>
-          </DialogTrigger>
-          <EditLinkDialog
-            text={linkText}
-            url={linkUrl}
-            position={linkPosition}
-            setUpdateRequestStatus={setUpdateRequestStatus}
-            onSaveUpdatedLinkClicked={onSaveUpdatedLinkClicked}
-          />
-        </Dialog>
-        <Dialog>
-          <DialogTrigger asChild>
-            <div className="bg-konkikyou-blue mx-2">
-              <DeleteCrossIconButton />
-            </div>
-          </DialogTrigger>
-          <DeleteLinkDialog
-            linkPosition={linkPosition}
-            setDeleteLinkRequestStatus={setDeleteLinkRequestStatus}
-          />
-        </Dialog>
+    <div
+      key={"pos-" + linkPosition + "-editable"}
+      className="group/edit flex my-4"
+    >
+      <div className="w-full bg-konkikyou-blue py-2 px-3 mx-2">
+        <LinkDisplay
+          linkPosition={linkPosition}
+          linkUrl={linkUrl}
+          linkText={linkText}
+        />
       </div>
-    </>
+      <Dialog>
+        <DialogTrigger asChild>
+          <div className="bg-konkikyou-blue pt-2 px-4">
+            <PenIconButton />
+          </div>
+        </DialogTrigger>
+        <EditLinkDialog
+          text={linkText}
+          url={linkUrl}
+          position={linkPosition}
+          setUpdateRequestStatus={setUpdateRequestStatus}
+          onSaveUpdatedLinkClicked={onSaveUpdatedLinkClicked}
+        />
+      </Dialog>
+      <Dialog>
+        <DialogTrigger asChild>
+          <div className="bg-konkikyou-blue mx-2 py-2 px-4">
+            <DeleteCrossIconButton />
+          </div>
+        </DialogTrigger>
+        <DeleteLinkDialog
+          linkPosition={linkPosition}
+          setDeleteLinkRequestStatus={setDeleteLinkRequestStatus}
+        />
+      </Dialog>
+    </div>
   )
 }
 
