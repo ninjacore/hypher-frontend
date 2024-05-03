@@ -167,7 +167,6 @@ export const LinkCollectionEntries = ({ handle, mode, sectionTitle }) => {
   return <>{contentOfLinkCollection}</>
 }
 
-// function generateDefault(linkCollectionByPosition) {
 function ClickableLInkCollection({ linkCollectionByPosition }) {
   return linkCollectionByPosition.map((link) => {
     return (
@@ -183,7 +182,6 @@ function ClickableLInkCollection({ linkCollectionByPosition }) {
   })
 }
 
-// function generateDraggable() {
 function DraggableLinkCollection({ handle, linkCollectionByPosition }) {
   const [updateRequestStatus, setUpdateRequestStatus] = useState("idle")
   const dispatch = useDispatch()
@@ -375,10 +373,6 @@ function CollectionOfEditableLinks({ linkCollectionByPosition }) {
   ])
 
   return linkNodes.map((link) => {
-    let linkUrl = link.url
-    let linkText = link.text
-    let linkPosition = link.position
-
     announce("link", link)
     announce(
       `linkElementState at this position (${link.position})`,
