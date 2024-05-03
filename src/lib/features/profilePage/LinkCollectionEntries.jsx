@@ -196,7 +196,10 @@ function DraggableLinkCollection({ handle, linkCollectionByPosition }) {
             id="saveReorderedLinkCollectionButton"
             variant="outline"
             className="bg-white text-black"
-            onClick={onSaveUpdateClicked}
+            onClick={() => {
+              onSaveUpdateClicked()
+              setLinkCollectionIsSortable(false) // reset view
+            }}
           >
             save
           </Button>
