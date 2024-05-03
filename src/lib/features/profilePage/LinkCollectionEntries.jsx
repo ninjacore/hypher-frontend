@@ -78,9 +78,29 @@ export const LinkCollectionEntries = ({ handle, mode }) => {
 
   // to be used for all 3 modes
   const linkCollection = JSON.parse(JSON.stringify(links))
-  const linkCollectionByPosition = linkCollection.toSorted(
+  // data gets sorted but position number can be anything
+  const linkCollectionByPositionUnclean = linkCollection.toSorted(
     (a, b) => a.position - b.position
   )
+  // TODO: check if skipping this solves the 'position' errors
+  // to make sure the position always starts counting from 0
+  const linkCollectionByPosition = linkCollectionByPositionUnclean
+  // .map(
+  //   (link, index) => {
+  //     link.position = index
+  //     return link
+  //   }
+  // )
+  announce("[xPOSITION I]: linkCollection", linkCollection)
+  announce(
+    "[xPOSITION II]: linkCollectionByPositionUnclean",
+    linkCollectionByPositionUnclean
+  )
+  announce(
+    "[xPOSITION III]: linkCollectionByPosition",
+    linkCollectionByPosition
+  )
+
   announce("TOP LEVEL linkCollectionByPosition", linkCollectionByPosition)
 
   useEffect(() => {
@@ -307,13 +327,15 @@ function CollectionOfEditableLinks({ linkCollectionByPosition }) {
   )
   // used to up-drill every time reorder happens
   useEffect(() => {
-    setAdaptableLinkCollection(linkNodes)
+    // setAdaptableLinkCollection(linkNodes) // TODO: check if this causes overwrite of positions
 
     announce("adaptableLinkCollection", adaptableLinkCollection)
 
     announce("linkCollectionByPosition", linkCollectionByPosition) // this is the updated one
     // setAdaptableLinkCollection(linkCollectionByPosition)
-    setLinkNodes(linkCollectionByPosition)
+    setLinkNodes(linkCollectionByPosition) // causes re-render after deletion
+    // TODO: position needs to be re-assigned, too!
+    // TODO: check if 'update' still works
 
     announce("updateRequestStatus:", updateRequestStatus)
   }, [
@@ -411,7 +433,7 @@ function EditableLinkItem({
               <PenIconButton />
             </div>
           </DialogTrigger>
-          <EditableLinkInput
+          <EditLinkDialog
             text={linkText}
             url={linkUrl}
             position={linkPosition}
@@ -436,7 +458,7 @@ function EditableLinkItem({
 }
 
 // Dialog to update a link
-function EditableLinkInput({
+function EditLinkDialog({
   text,
   url,
   position,
