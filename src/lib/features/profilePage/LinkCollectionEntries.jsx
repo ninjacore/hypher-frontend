@@ -66,7 +66,7 @@ import { announce } from "@/lib/utils/debugTools/announce"
 
 // specificly for
 
-export const LinkCollectionEntries = ({ handle, mode }) => {
+export const LinkCollectionEntries = ({ handle, mode, sectionTitle }) => {
   const dispatch = useDispatch()
   // useSelector is a hook that allows you to extract data
   // from the Redux store state
@@ -117,23 +117,48 @@ export const LinkCollectionEntries = ({ handle, mode }) => {
   } else if (linkCollectionStatus === "succeeded") {
     switch (mode) {
       case "linked":
-        contentOfLinkCollection = generateDefault(linkCollectionByPosition)
+        contentOfLinkCollection = (
+          <>
+            <h2 className="section-title">{sectionTitle}</h2>
+
+            <ClickableLInkCollection
+              linkCollectionByPosition={linkCollectionByPosition}
+            />
+          </>
+        )
+
         break
 
       case "draggable":
         contentOfLinkCollection = (
-          <DraggableLinkCollection
-            handle={handle}
-            linkCollectionByPosition={linkCollectionByPosition}
-          />
+          <>
+            <h2 className="section-title">{sectionTitle}</h2>
+            <DraggableLinkCollection
+              handle={handle}
+              linkCollectionByPosition={linkCollectionByPosition}
+            />
+          </>
         )
         break
 
       case "editable":
         contentOfLinkCollection = (
-          <CollectionOfEditableLinks
-            linkCollectionByPosition={linkCollectionByPosition}
-          />
+          <>
+            <div className="flex justify-between">
+              <h2 className="section-title">{sectionTitle}</h2>
+              <Button
+                variant="outline"
+                className="bg-white text-black"
+                // onClick={() => setEditMode(true)}
+              >
+                {"ADD"}
+              </Button>
+            </div>
+
+            <CollectionOfEditableLinks
+              linkCollectionByPosition={linkCollectionByPosition}
+            />
+          </>
         )
         break
     }
@@ -142,7 +167,8 @@ export const LinkCollectionEntries = ({ handle, mode }) => {
   return <>{contentOfLinkCollection}</>
 }
 
-function generateDefault(linkCollectionByPosition) {
+// function generateDefault(linkCollectionByPosition) {
+function ClickableLInkCollection({ linkCollectionByPosition }) {
   return linkCollectionByPosition.map((link) => {
     return (
       <a href={link.url} target="_blank" key={"pos-" + link.position}>

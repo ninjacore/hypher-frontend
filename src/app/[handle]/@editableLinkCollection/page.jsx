@@ -64,8 +64,12 @@ function LinkCollection() {
     // drag-and-drop HTML
     return (
       <>
-        <h2 className="section-title">{sectionTitle}</h2>
-        <LinkCollectionEntries handle={handle} mode={"draggable"} />
+        {/* <h2 className="section-title">{sectionTitle}</h2> */}
+        <LinkCollectionEntries
+          handle={handle}
+          mode={"draggable"}
+          sectionTitle={sectionTitle}
+        />
       </>
     )
   } else {
@@ -73,7 +77,7 @@ function LinkCollection() {
     return (
       <>
         {/* should be within the same component */}
-        <div className="flex justify-between">
+        {/* <div className="flex justify-between">
           <h2 className="section-title">{sectionTitle}</h2>
           <Button
             variant="outline"
@@ -82,9 +86,13 @@ function LinkCollection() {
           >
             {"ADD"}
           </Button>
-        </div>
+        </div> */}
 
-        <LinkCollectionEntries handle={handle} mode={"editable"} />
+        <LinkCollectionEntries
+          handle={handle}
+          mode={"editable"}
+          sectionTitle={sectionTitle}
+        />
         {/* should be within the same component */}
 
         <div className="flex justify-end">
