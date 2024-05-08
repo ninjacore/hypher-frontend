@@ -46,8 +46,8 @@ export async function linkCollectionClient(
           body
         )
       } else if (method === "DELETE") {
-        if (linkPosition === null) {
-          throw new Error("linkPosition is required for DELETE method.")
+        if (frontendId === null) {
+          throw new Error("frontendId is required for DELETE method.")
         }
         return await deleteLinkWithinCollection(
           handle,
