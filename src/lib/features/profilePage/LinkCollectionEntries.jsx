@@ -286,9 +286,12 @@ function DndFrame({ linkCollectionByPosition, setReorderedLinkCollection }) {
   // used for drag-and-drop (reorder and transition animation)
   const [linkNodes, setLinkNodes] = useState(
     linkCollectionByPosition.map((linkNode) => {
-      console.log("assigning linkNode.id based on uniqueId", linkNode.uniqueId)
+      console.log(
+        "assigning linkNode.id based on frontendId",
+        linkNode.frontendId
+      )
       announce("linkCollection for linkNode", linkCollectionByPosition)
-      linkNode.id = linkNode.uniqueId
+      linkNode.id = linkNode.frontendId
       return linkNode
     })
   )
@@ -319,7 +322,7 @@ function DndFrame({ linkCollectionByPosition, setReorderedLinkCollection }) {
           return (
             <SortableLinkNode
               key={linkNode.position}
-              id={linkNode.uniqueId}
+              id={linkNode.frontendId}
               text={linkNode.text}
               url={linkNode.url}
             />
@@ -459,6 +462,7 @@ async function onSaveUpdatedLinkClicked(
       handle,
       updatedLink,
     }
+    announce("updateData to dispatch", updateData)
 
     dispatch(updateLink(updateData))
   } catch (error) {
@@ -501,6 +505,7 @@ function EditableLinkItem({
           text={linkText}
           url={linkUrl}
           position={linkPosition}
+          frontendId={frontendId}
           setUpdateRequestStatus={setUpdateRequestStatus}
           onSaveUpdatedLinkClicked={onSaveUpdatedLinkClicked}
         />
@@ -625,6 +630,7 @@ function EditLinkDialog({
   text,
   url,
   position,
+  frontendId,
   setUpdateRequestStatus,
   onSaveUpdatedLinkClicked,
 }) {
@@ -689,6 +695,7 @@ function EditLinkDialog({
               onSaveUpdatedLinkClicked(
                 handle,
                 {
+                  frontendId: frontendId,
                   url: linkUrl,
                   text: linkText,
                   position: linkPosition,
@@ -758,7 +765,7 @@ function onDeleteLinkClicked(
   setDeleteLinkRequestStatus
 ) {
   console.log(
-    `%c onDeleteLinkClicked for link at position '${linkPosition}', handle '${handle}'`,
+    `%c onDeleteLinkClicked for link with frontendId '${frontendId}', handle '${handle}'`,
     "color:green;font-size:1.5em;"
   )
 

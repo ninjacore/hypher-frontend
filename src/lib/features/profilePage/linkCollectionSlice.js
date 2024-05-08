@@ -62,6 +62,7 @@ export const updateLink = createAsyncThunk(
       "link",
       "PUT",
       {
+        frontendId: updatedLink.frontendId,
         url: updatedLink.url,
         text: updatedLink.text,
         position: updatedLink.position,
@@ -82,6 +83,7 @@ export const deleteLink = createAsyncThunk(
       "DELETE",
       null,
       null,
+      0,
       frontendId
     )
     return response.data
@@ -127,7 +129,8 @@ const linkCollectionSlice = createSlice({
       .addCase(addNewLink.fulfilled, (state, action) => {
         state.status = "succeeded"
         let newLink = action.payload
-        newLink.uniqueId = nanoid()
+        newLink.frontendId = nanoid()
+        // newLink.uniqueId = nanoid()
         // state.links = state.links.concat(action.payload)
         state.links = state.links.concat(newLink)
       })
