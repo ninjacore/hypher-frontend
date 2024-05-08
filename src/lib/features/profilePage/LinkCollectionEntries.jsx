@@ -606,6 +606,8 @@ function CreateLinkDialog({
                 setAddRequestStatus,
                 dispatch
               )
+              setLinkText("")
+              setLinkUrl("")
             }}
             // onClick={() =>
             //   onSaveUpdatedLinkClicked(
