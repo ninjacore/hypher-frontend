@@ -166,6 +166,7 @@ export const LinkCollectionEntries = ({ handle, mode, sectionTitle }) => {
                   text={editableLinkText}
                   url={editableLinkUrl}
                   position={linkCollectionByPosition.length}
+                  frontendId={nanoid()}
                   setAddRequestStatus={setAddRequestStatus}
                   onAddLinkClicked={onAddLinkClicked}
                 />
@@ -530,6 +531,7 @@ function CreateLinkDialog({
   text,
   url,
   position,
+  frontendId,
   setAddRequestStatus,
   onAddLinkClicked,
 }) {
@@ -596,6 +598,7 @@ function CreateLinkDialog({
               onAddLinkClicked(
                 handle,
                 {
+                  frontendId: frontendId,
                   url: linkUrl,
                   text: linkText,
                   position: linkPosition,
