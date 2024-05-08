@@ -9,7 +9,8 @@ export async function linkCollectionClient(
   method = "GET",
   body = null,
   linkPosition = null,
-  contentBoxPosition = 0
+  contentBoxPosition = 0,
+  frontendId = null
 ) {
   // 'CRUD' style
   switch (contentType) {
@@ -50,7 +51,7 @@ export async function linkCollectionClient(
         }
         return await deleteLinkWithinCollection(
           handle,
-          linkPosition,
+          frontendId,
           contentBoxPosition,
           method
         )
@@ -147,19 +148,20 @@ async function updateLinkWithinCollection(
 
 async function deleteLinkWithinCollection(
   handle,
-  linkPosition,
+  frontendId,
   contentBoxPosition = 0,
   method
 ) {
   announce("deleteLinkWithinCollection", {
     handle,
-    linkPosition,
+    frontendId,
     contentBoxPosition,
     method,
   })
 
   // atm only contentBoxPosition of 0 is supported
-  let endpoint = `${baseURL}/api/v1/linkCollection/link?handle=${handle}&position=${linkPosition}`
+  // let endpoint = `${baseURL}/api/v1/linkCollection/link?handle=${handle}&position=${linkPosition}`
+  let endpoint = `${baseURL}/api/v1/linkCollection/link/delete?handle=${handle}&frontendId=${frontendId}`
 
   return await apiHandler(endpoint, method)
 }

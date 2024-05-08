@@ -87,13 +87,12 @@ export const LinkCollectionEntries = ({ handle, mode, sectionTitle }) => {
   )
   // TODO: check if skipping this solves the 'position' errors
   // to make sure the position always starts counting from 0
-  const linkCollectionByPosition = linkCollectionByPositionUnclean
-  // .map(
-  //   (link, index) => {
-  //     link.position = index
-  //     return link
-  //   }
-  // )
+  const linkCollectionByPosition = linkCollectionByPositionUnclean.map(
+    (link, index) => {
+      link.position = index
+      return link
+    }
+  )
   announce("[xPOSITION I]: linkCollection", linkCollection)
   announce(
     "[xPOSITION II]: linkCollectionByPositionUnclean",
@@ -107,6 +106,9 @@ export const LinkCollectionEntries = ({ handle, mode, sectionTitle }) => {
   announce("TOP LEVEL linkCollectionByPosition", linkCollectionByPosition)
 
   useEffect(() => {
+    // only for debugging 'position' issue
+    announce("linkCollectionStatus is :", linkCollectionStatus)
+
     if (linkCollectionStatus === "idle") {
       dispatch(fetchLinkCollection(handle))
     }
@@ -405,6 +407,7 @@ function CollectionOfEditableLinks({ linkCollectionByPosition }) {
             setUpdateRequestStatus={setUpdateRequestStatus}
             onSaveUpdatedLinkClicked={onSaveUpdatedLinkClicked}
             setDeleteLinkRequestStatus={setDeleteLinkRequestStatus}
+            frontendId={link.frontendId}
           />
         </div>
         {/* new component ./ */}
@@ -474,6 +477,7 @@ function EditableLinkItem({
   setUpdateRequestStatus,
   onSaveUpdatedLinkClicked,
   setDeleteLinkRequestStatus,
+  frontendId,
 }) {
   return (
     <div
@@ -508,7 +512,7 @@ function EditableLinkItem({
           </div>
         </DialogTrigger>
         <DeleteLinkDialog
-          linkPosition={linkPosition}
+          frontendId={frontendId}
           setDeleteLinkRequestStatus={setDeleteLinkRequestStatus}
         />
       </Dialog>
@@ -703,7 +707,7 @@ function EditLinkDialog({
 }
 
 // Dialog to delete a link
-function DeleteLinkDialog({ linkPosition, setDeleteLinkRequestStatus }) {
+function DeleteLinkDialog({ frontendId, setDeleteLinkRequestStatus }) {
   // Hooks can only be called inside of the body of a function component.
   const { handle } = useContext(ProfilePageContext)
 
@@ -729,7 +733,7 @@ function DeleteLinkDialog({ linkPosition, setDeleteLinkRequestStatus }) {
             id="confirmLinkDeletion-Button"
             onClick={() =>
               onDeleteLinkClicked(
-                linkPosition,
+                frontendId,
                 handle,
                 dispatch,
                 setDeleteLinkRequestStatus
@@ -748,7 +752,7 @@ function DeleteLinkDialog({ linkPosition, setDeleteLinkRequestStatus }) {
 }
 
 function onDeleteLinkClicked(
-  linkPosition,
+  frontendId,
   handle,
   dispatch,
   setDeleteLinkRequestStatus
@@ -764,7 +768,7 @@ function onDeleteLinkClicked(
     // createAsyncThunk only takes one argument
     const deletionData = {
       handle,
-      linkPosition,
+      frontendId,
     }
 
     dispatch(deleteLink(deletionData))

@@ -75,13 +75,14 @@ export const updateLink = createAsyncThunk(
 export const deleteLink = createAsyncThunk(
   "linkCollection/deleteLink",
   async (deletionData) => {
-    const { handle, linkPosition } = deletionData
+    const { handle, frontendId } = deletionData
     const response = await linkCollectionClient(
       handle,
       "link",
       "DELETE",
       null,
-      linkPosition
+      null,
+      frontendId
     )
     return response.data
   }
