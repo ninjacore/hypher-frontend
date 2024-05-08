@@ -501,6 +501,7 @@ function EditableLinkItem({
           linkPosition={linkPosition}
           linkUrl={linkUrl}
           linkText={linkText}
+          frontendId={frontendId}
         />
       </div>
       <Dialog>
@@ -657,10 +658,13 @@ function EditLinkDialog({
   // reading from context
   const { handle } = useContext(ProfilePageContext)
 
+  // this is why it can display the wrong text if mixed up position values
   // update view independent of the backend
   useEffect(() => {
     announce("value changed -> linkText", linkText)
-    let element = document.getElementById("linkText-" + linkPosition)
+    let element = document.getElementById(
+      "linkText-" + linkPosition + frontendId
+    )
     element.innerHTML = linkText
   }, [linkText])
 
@@ -798,13 +802,13 @@ function onDeleteLinkClicked(
   }
 }
 
-function LinkDisplay({ linkPosition, linkUrl, linkText }) {
+function LinkDisplay({ linkPosition, linkUrl, linkText, frontendId }) {
   announce("LinkDisplay", { linkPosition, linkUrl, linkText })
   return (
     <>
       <a>
         <IconMapper url={linkUrl} />
-        <span id={"linkText-" + linkPosition} className="mx-2">
+        <span id={"linkText-" + linkPosition + frontendId} className="mx-2">
           {linkText.length > 0 ? linkText : linkUrl}
         </span>
       </a>
