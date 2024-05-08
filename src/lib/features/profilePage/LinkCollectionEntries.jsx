@@ -82,17 +82,19 @@ export const LinkCollectionEntries = ({ handle, mode, sectionTitle }) => {
   // to be used for all 3 modes
   const linkCollection = JSON.parse(JSON.stringify(links))
   // data gets sorted but position number can be anything
-  const linkCollectionByPositionUnclean = linkCollection.toSorted(
-    (a, b) => a.position - b.position
-  )
+  const linkCollectionByPositionUnclean = linkCollection
+  // .toSorted(
+  //   (a, b) => a.position - b.position
+  // )
   // TODO: check if skipping this solves the 'position' errors
   // to make sure the position always starts counting from 0
-  const linkCollectionByPosition = linkCollectionByPositionUnclean.map(
-    (link, index) => {
-      link.position = index
-      return link
-    }
-  )
+  const linkCollectionByPosition = linkCollectionByPositionUnclean
+  // .map(
+  //   (link, index) => {
+  //     link.position = index
+  //     return link
+  //   }
+  // )
   announce("[xPOSITION I]: linkCollection", linkCollection)
   announce(
     "[xPOSITION II]: linkCollectionByPositionUnclean",
@@ -188,7 +190,11 @@ export const LinkCollectionEntries = ({ handle, mode, sectionTitle }) => {
 function ClickableLInkCollection({ linkCollectionByPosition }) {
   return linkCollectionByPosition.map((link) => {
     return (
-      <a href={link.url} target="_blank" key={"pos-" + link.position}>
+      <a
+        href={link.url}
+        target="_blank"
+        key={"pos-" + link.position + link.frontendId}
+      >
         <div className="my-4 mx-2 py-2 px-3 bg-konkikyou-blue">
           <IconMapper url={link.url} />
           <span className="mx-2">
@@ -284,6 +290,9 @@ function DndFrame({ linkCollectionByPosition, setReorderedLinkCollection }) {
     })
   )
 
+  // ******************************************************************** //
+  // this is the key to the 'position' issue /.
+
   // used for drag-and-drop (reorder and transition animation)
   const [linkNodes, setLinkNodes] = useState(
     linkCollectionByPosition.map((linkNode) => {
@@ -303,6 +312,9 @@ function DndFrame({ linkCollectionByPosition, setReorderedLinkCollection }) {
 
     announce("linkCollection within useEffect", linkCollectionByPosition)
   }, [linkNodes])
+
+  // this is the key to the 'position' issue ./
+  // ******************************************************************** //
 
   // for debugging
   let counter = 0
@@ -386,12 +398,7 @@ function CollectionOfEditableLinks({ linkCollectionByPosition }) {
     // TODO: check if 'update' still works
 
     announce("updateRequestStatus:", updateRequestStatus)
-  }, [
-    linkNodes,
-    updateRequestStatus,
-    deleteLinkRequestStatus,
-    linkCollectionByPosition,
-  ])
+  }, [updateRequestStatus, deleteLinkRequestStatus, linkCollectionByPosition])
 
   return linkNodes.map((link) => {
     announce("link", link)
@@ -486,7 +493,7 @@ function EditableLinkItem({
 }) {
   return (
     <div
-      key={"pos-" + linkPosition + "-editable"}
+      key={"pos-" + linkPosition + frontendId + "-editable"}
       className="group/edit flex my-4"
     >
       <div className="w-full bg-konkikyou-blue py-2 px-3 mx-2">
@@ -494,6 +501,7 @@ function EditableLinkItem({
           linkPosition={linkPosition}
           linkUrl={linkUrl}
           linkText={linkText}
+          frontendId={frontendId}
         />
       </div>
       <Dialog>
@@ -650,10 +658,13 @@ function EditLinkDialog({
   // reading from context
   const { handle } = useContext(ProfilePageContext)
 
+  // this is why it can display the wrong text if mixed up position values
   // update view independent of the backend
   useEffect(() => {
     announce("value changed -> linkText", linkText)
-    let element = document.getElementById("linkText-" + linkPosition)
+    let element = document.getElementById(
+      "linkText-" + linkPosition + frontendId
+    )
     element.innerHTML = linkText
   }, [linkText])
 
@@ -791,12 +802,13 @@ function onDeleteLinkClicked(
   }
 }
 
-function LinkDisplay({ linkPosition, linkUrl, linkText }) {
+function LinkDisplay({ linkPosition, linkUrl, linkText, frontendId }) {
+  announce("LinkDisplay", { linkPosition, linkUrl, linkText })
   return (
     <>
       <a>
         <IconMapper url={linkUrl} />
-        <span id={"linkText-" + linkPosition} className="mx-2">
+        <span id={"linkText-" + linkPosition + frontendId} className="mx-2">
           {linkText.length > 0 ? linkText : linkUrl}
         </span>
       </a>
