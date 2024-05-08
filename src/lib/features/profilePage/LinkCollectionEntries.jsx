@@ -3,6 +3,8 @@
 // imports for UI /.
 import { IconMapper } from "@/components/iconMapper"
 import { EditButton } from "@/components/ui/editButtonPen"
+import { PenIconButton } from "@/components/ui/penIconButton"
+import { DeleteCrossIconButton } from "@/components/ui/DeleteCrossIconButton"
 import {
   Dialog,
   DialogContent,
@@ -38,7 +40,7 @@ import {
 } from "@/lib/features/profilePage/linkCollectionSlice"
 import { unwrapResult } from "@reduxjs/toolkit"
 
-// speficly for drag-and-drop functionality
+// specificly for drag-and-drop functionality
 // import { useSortable } from "@dnd-kit/sortable"
 import { SortableLinkNode } from "@/lib/utils/SortableLinkNode/SortableLinkNode"
 
@@ -62,9 +64,12 @@ import {
 // debug support function
 import { announce } from "@/lib/utils/debugTools/announce"
 
-// specificly for
+export const LinkCollectionEntries = ({ handle, mode, sectionTitle }) => {
+  // for adding links
+  const [addRequestStatus, setAddRequestStatus] = useState("idle")
+  let editableLinkText = ""
+  let editableLinkUrl = ""
 
-export const LinkCollectionEntries = ({ handle, mode }) => {
   const dispatch = useDispatch()
   // useSelector is a hook that allows you to extract data
   // from the Redux store state
@@ -76,12 +81,34 @@ export const LinkCollectionEntries = ({ handle, mode }) => {
 
   // to be used for all 3 modes
   const linkCollection = JSON.parse(JSON.stringify(links))
-  const linkCollectionByPosition = linkCollection.toSorted(
+  // data gets sorted but position number can be anything
+  const linkCollectionByPositionUnclean = linkCollection.toSorted(
     (a, b) => a.position - b.position
   )
+  // TODO: check if skipping this solves the 'position' errors
+  // to make sure the position always starts counting from 0
+  const linkCollectionByPosition = linkCollectionByPositionUnclean.map(
+    (link, index) => {
+      link.position = index
+      return link
+    }
+  )
+  announce("[xPOSITION I]: linkCollection", linkCollection)
+  announce(
+    "[xPOSITION II]: linkCollectionByPositionUnclean",
+    linkCollectionByPositionUnclean
+  )
+  announce(
+    "[xPOSITION III]: linkCollectionByPosition",
+    linkCollectionByPosition
+  )
+
   announce("TOP LEVEL linkCollectionByPosition", linkCollectionByPosition)
 
   useEffect(() => {
+    // only for debugging 'position' issue
+    announce("linkCollectionStatus is :", linkCollectionStatus)
+
     if (linkCollectionStatus === "idle") {
       dispatch(fetchLinkCollection(handle))
     }
@@ -95,26 +122,60 @@ export const LinkCollectionEntries = ({ handle, mode }) => {
   } else if (linkCollectionStatus === "succeeded") {
     switch (mode) {
       case "linked":
-        // contentOfLinkCollection = generateDefault(links)
-        contentOfLinkCollection = generateDefault(linkCollectionByPosition)
+        contentOfLinkCollection = (
+          <>
+            <h2 className="section-title">{sectionTitle}</h2>
+
+            <ClickableLInkCollection
+              linkCollectionByPosition={linkCollectionByPosition}
+            />
+          </>
+        )
+
         break
 
       case "draggable":
-        // contentOfLinkCollection = generateDraggable()
         contentOfLinkCollection = (
-          <DraggableLinkCollection
-            handle={handle}
-            linkCollectionByPosition={linkCollectionByPosition}
-          />
+          <>
+            <h2 className="section-title">{sectionTitle}</h2>
+            <DraggableLinkCollection
+              handle={handle}
+              linkCollectionByPosition={linkCollectionByPosition}
+            />
+          </>
         )
         break
 
       case "editable":
-        // contentOfLinkCollection = generateEditable(links)
         contentOfLinkCollection = (
-          <CollectionOfEditableLinks
-            linkCollectionByPosition={linkCollectionByPosition}
-          />
+          <>
+            <div className="flex justify-between">
+              <h2 className="section-title">{sectionTitle}</h2>
+
+              <Dialog>
+                <DialogTrigger asChild>
+                  <Button
+                    variant="outline"
+                    className="bg-white text-black"
+                    // onClick={() => setEditMode(true)}
+                  >
+                    {"ADD"}
+                  </Button>
+                </DialogTrigger>
+                <CreateLinkDialog
+                  text={editableLinkText}
+                  url={editableLinkUrl}
+                  position={linkCollectionByPosition.length}
+                  setAddRequestStatus={setAddRequestStatus}
+                  onAddLinkClicked={onAddLinkClicked}
+                />
+              </Dialog>
+            </div>
+
+            <CollectionOfEditableLinks
+              linkCollectionByPosition={linkCollectionByPosition}
+            />
+          </>
         )
         break
     }
@@ -123,7 +184,7 @@ export const LinkCollectionEntries = ({ handle, mode }) => {
   return <>{contentOfLinkCollection}</>
 }
 
-function generateDefault(linkCollectionByPosition) {
+function ClickableLInkCollection({ linkCollectionByPosition }) {
   return linkCollectionByPosition.map((link) => {
     return (
       <a href={link.url} target="_blank" key={"pos-" + link.position}>
@@ -136,39 +197,11 @@ function generateDefault(linkCollectionByPosition) {
       </a>
     )
   })
-  // return links.map((link) => {
-  //   return (
-  //     <a href={link.url} target="_blank" key={"pos-" + link.position}>
-  //       <div className="my-4 mx-2 py-2 px-3 bg-konkikyou-blue">
-  //         <IconMapper url={link.url} />
-  //         <span className="mx-2">
-  //           {link.text.length > 0 ? link.text : link.url}
-  //         </span>
-  //       </div>
-  //     </a>
-  //   )
-  // })
 }
 
-// function generateDraggable() {
 function DraggableLinkCollection({ handle, linkCollectionByPosition }) {
   const [updateRequestStatus, setUpdateRequestStatus] = useState("idle")
   const dispatch = useDispatch()
-
-  // // useSelector is a hook that allows you to extract data
-  // // from the Redux store state
-  // const links = useSelector((state) => state.linkCollection.links)
-
-  // announce("links within DraggableLinkCollection", links)
-
-  // // make a mutable copy of links
-  // const linkCollection = JSON.parse(JSON.stringify(links))
-
-  // announce("calibrating linkCollection", linkCollection)
-
-  // const [reorderedLinkCollection, setReorderedLinkCollection] = useState([
-  //   linkCollection,
-  // ])
 
   announce("calibrating linkCollectionByPosition", linkCollectionByPosition)
   const [reorderedLinkCollection, setReorderedLinkCollection] = useState([
@@ -193,7 +226,7 @@ function DraggableLinkCollection({ handle, linkCollectionByPosition }) {
             variant="outline"
             className="bg-white text-black"
             onClick={() => {
-              setLinkCollectionIsSortable(false)
+              setLinkCollectionIsSortable(false) // exit dnd-mode
             }}
           >
             cancel
@@ -204,7 +237,10 @@ function DraggableLinkCollection({ handle, linkCollectionByPosition }) {
             id="saveReorderedLinkCollectionButton"
             variant="outline"
             className="bg-white text-black"
-            onClick={onSaveUpdateClicked}
+            onClick={() => {
+              onSaveUpdateClicked()
+              setLinkCollectionIsSortable(false) // exit dnd-mode
+            }}
           >
             save
           </Button>
@@ -220,11 +256,6 @@ function DraggableLinkCollection({ handle, linkCollectionByPosition }) {
         "sending reorderedLinkCollection to backend (default positions):",
         reorderedLinkCollection
       )
-      // // asign new positons to linkNodes
-      // reorderedLinkCollection.forEach((linkNode, index) => {
-      //   linkNode.position = index
-      //   linkNode.uniqueId = nanoid()
-      // })
       announce(
         "sending reorderedLinkCollection to backend (updated positions):",
         reorderedLinkCollection
@@ -252,13 +283,6 @@ function DndFrame({ linkCollectionByPosition, setReorderedLinkCollection }) {
     })
   )
 
-  // // useSelector is a hook that allows you to extract data
-  // // from the Redux store state
-  // const links = useSelector((state) => state.linkCollection.links)
-
-  // // make a mutable copy of links
-  // const linkCollection = JSON.parse(JSON.stringify(links))
-
   // used for drag-and-drop (reorder and transition animation)
   const [linkNodes, setLinkNodes] = useState(
     linkCollectionByPosition.map((linkNode) => {
@@ -269,24 +293,12 @@ function DndFrame({ linkCollectionByPosition, setReorderedLinkCollection }) {
     })
   )
 
-  // TODO: save via Redux instead (possibly one level higher, though...)
-  // —— ** POSSIBLY OBSOLETE ** ——  /.
-  // const [reorderedLinkCollection, setReorderedLinkCollection] = useState([
-  //   linkCollection,
-  // ])
-
   // used to up-drill every time reorder happens
   useEffect(() => {
-    setReorderedLinkCollection(linkNodes) // V1
+    setReorderedLinkCollection(linkNodes)
 
-    // this should only happen if user clicks save.
-    // dispatch(updateLinkCollection(handle, linkNodes)) // V2
-
-    // announce("to be saved linkNodes", linkNodes)
     announce("linkCollection within useEffect", linkCollectionByPosition)
-    // announce("to be saved reorderedLinkCollection", reorderedLinkCollection)
   }, [linkNodes])
-  // —— ** POSSIBLY OBSOLETE ** ——  ./
 
   // for debugging
   let counter = 0
@@ -318,9 +330,6 @@ function DndFrame({ linkCollectionByPosition, setReorderedLinkCollection }) {
   )
 
   function handleDragEnd(event) {
-    // announce("handleDragEnd", event)
-    // announce("known Links:", linkCollection)
-
     const { active, over } = event
 
     console.log(`%c active.id => ${active.id}`, `color: green;`)
@@ -331,9 +340,6 @@ function DndFrame({ linkCollectionByPosition, setReorderedLinkCollection }) {
         const oldIndex = items.map((linkNode) => linkNode.id).indexOf(active.id)
 
         const newIndex = items.map((linkNode) => linkNode.id).indexOf(over.id)
-
-        // old way (not swapping 'position' attribute)
-        // return arrayMove(items, oldIndex, newIndex)
 
         // swap positions (including the 'position' attribute)
         const newlySortedItems = arrayMove(items, oldIndex, newIndex)
@@ -347,21 +353,10 @@ function DndFrame({ linkCollectionByPosition, setReorderedLinkCollection }) {
 }
 
 function CollectionOfEditableLinks({ linkCollectionByPosition }) {
-  // to re-render
+  // to trigger re-render in effect
   const [updateRequestStatus, setUpdateRequestStatus] = useState("idle")
-  // const dispatch = useDispatch()
-
-  // // useSelector is a hook that allows you to extract data
-  // // from the Redux store state
-  // const links = useSelector((state) => state.linkCollection.links)
-
-  // // make a mutable copy of links
-  // const linkCollection = JSON.parse(JSON.stringify(links))
-
-  // // 'updrill' but on same level
-  // const [adaptableLinkCollection, setAdaptableLinkCollection] = useState(
-  //   linkCollection.toSorted((a, b) => a.position - b.position)
-  // )
+  const [deleteLinkRequestStatus, setDeleteLinkRequestStatus] = useState("idle")
+  // TODO: this doesn't trigger... why?
 
   // served by parent component
   const [adaptableLinkCollection, setAdaptableLinkCollection] = useState(
@@ -376,28 +371,25 @@ function CollectionOfEditableLinks({ linkCollectionByPosition }) {
   )
   // used to up-drill every time reorder happens
   useEffect(() => {
-    setAdaptableLinkCollection(linkNodes) // V1
+    // setAdaptableLinkCollection(linkNodes) // TODO: check if this causes overwrite of positions
 
-    // this should only happen if user clicks save.
-    // dispatch(updateLinkCollection(handle, linkNodes)) // V2
+    announce("adaptableLinkCollection", adaptableLinkCollection)
 
-    // announce("to be saved linkNodes", linkNodes)
-    announce("linkCollection", adaptableLinkCollection)
-    // announce("to be saved reorderedLinkCollection", reorderedLinkCollection)
+    announce("linkCollectionByPosition", linkCollectionByPosition) // this is the updated one
+    // setAdaptableLinkCollection(linkCollectionByPosition)
+    setLinkNodes(linkCollectionByPosition) // causes re-render after deletion
+    // TODO: position needs to be re-assigned, too!
+    // TODO: check if 'update' still works
+
     announce("updateRequestStatus:", updateRequestStatus)
-  }, [linkNodes, updateRequestStatus])
-
-  // announce("linkElementState", linkElementState)
+  }, [
+    linkNodes,
+    updateRequestStatus,
+    deleteLinkRequestStatus,
+    linkCollectionByPosition,
+  ])
 
   return linkNodes.map((link) => {
-    // const [linkText, setLinkText] = useState(link.text)
-    // const [linkUrl, setLinkUrl] = useState(link.url)
-    // const linkPosition = link.position
-
-    let linkUrl = link.url
-    let linkText = link.text
-    let linkPosition = link.position
-
     announce("link", link)
     announce(
       `linkElementState at this position (${link.position})`,
@@ -406,36 +398,136 @@ function CollectionOfEditableLinks({ linkCollectionByPosition }) {
 
     return (
       <div key={"linkItem-" + link.position}>
-        <Dialog>
-          <DialogTrigger asChild>
-            <div className="group/edit">
-              <div
-                key={"pos-" + link.position + "-editable"}
-                className="my-4 mx-2 py-0.5 px-3 bg-konkikyou-blue group/edit"
-              >
-                <a>
-                  <IconMapper url={link.url} />
-                  <span id={"linkText-" + link.position} className="mx-2">
-                    {link.text.length > 0 ? link.text : link.url}
-                  </span>
-                </a>
-                <EditButton />
-              </div>
-            </div>
-          </DialogTrigger>
-          <EditableLinkInput
-            text={link.text}
-            url={link.url}
-            position={link.position}
+        {/* new component /. */}
+        <div className="">
+          <EditableLinkItem
+            linkPosition={link.position}
+            linkUrl={link.url}
+            linkText={link.text}
             setUpdateRequestStatus={setUpdateRequestStatus}
+            onSaveUpdatedLinkClicked={onSaveUpdatedLinkClicked}
+            setDeleteLinkRequestStatus={setDeleteLinkRequestStatus}
+            frontendId={link.frontendId}
           />
-        </Dialog>
+        </div>
+        {/* new component ./ */}
       </div>
     )
   })
 }
 
-function EditableLinkInput({ text, url, position, setUpdateRequestStatus }) {
+// Network and State-Management functions /.
+async function onAddLinkClicked(
+  handle,
+  newLink,
+  setAddRequestStatus,
+  dispatch
+) {
+  try {
+    setAddRequestStatus("pending")
+
+    // createAsyncThunk only takes one argument
+    const addData = {
+      handle,
+      newLink,
+    }
+
+    dispatch(addNewLink(addData))
+  } catch (error) {
+    console.error("Failed to add link: ", error)
+  } finally {
+    setAddRequestStatus("idle")
+  }
+}
+
+async function onSaveUpdatedLinkClicked(
+  handle,
+  updatedLink,
+  setUpdateRequestStatus,
+  dispatch
+) {
+  console.log(
+    `%c onSaveUpdatedLinkClicked!!`,
+    "color: green; font-size: 1.5em;"
+  )
+
+  try {
+    setUpdateRequestStatus("pending")
+
+    // createAsyncThunk only takes one argument
+    const updateData = {
+      handle,
+      updatedLink,
+    }
+
+    dispatch(updateLink(updateData))
+  } catch (error) {
+    console.error("Failed to save link: ", error)
+  } finally {
+    setUpdateRequestStatus("idle")
+  }
+}
+// Network and State-Management functions ./
+
+// UI interactions /.
+function EditableLinkItem({
+  linkPosition,
+  linkUrl,
+  linkText,
+  setUpdateRequestStatus,
+  onSaveUpdatedLinkClicked,
+  setDeleteLinkRequestStatus,
+  frontendId,
+}) {
+  return (
+    <div
+      key={"pos-" + linkPosition + "-editable"}
+      className="group/edit flex my-4"
+    >
+      <div className="w-full bg-konkikyou-blue py-2 px-3 mx-2">
+        <LinkDisplay
+          linkPosition={linkPosition}
+          linkUrl={linkUrl}
+          linkText={linkText}
+        />
+      </div>
+      <Dialog>
+        <DialogTrigger asChild>
+          <div className="bg-konkikyou-blue pt-2 px-4">
+            <PenIconButton />
+          </div>
+        </DialogTrigger>
+        <EditLinkDialog
+          text={linkText}
+          url={linkUrl}
+          position={linkPosition}
+          setUpdateRequestStatus={setUpdateRequestStatus}
+          onSaveUpdatedLinkClicked={onSaveUpdatedLinkClicked}
+        />
+      </Dialog>
+      <Dialog>
+        <DialogTrigger asChild>
+          <div className="bg-konkikyou-blue mx-2 py-2 px-4">
+            <DeleteCrossIconButton />
+          </div>
+        </DialogTrigger>
+        <DeleteLinkDialog
+          frontendId={frontendId}
+          setDeleteLinkRequestStatus={setDeleteLinkRequestStatus}
+        />
+      </Dialog>
+    </div>
+  )
+}
+
+// Dialog for adding a link
+function CreateLinkDialog({
+  text,
+  url,
+  position,
+  setAddRequestStatus,
+  onAddLinkClicked,
+}) {
   // component-internal state
   const [linkText, setLinkText] = useState(text)
   const [linkUrl, setLinkUrl] = useState(url)
@@ -443,7 +535,108 @@ function EditableLinkInput({ text, url, position, setUpdateRequestStatus }) {
 
   // used for network and Redux state-management
   const dispatch = useDispatch()
-  // const [updateRequestStatus, setUpdateRequestStatus] = useState("idle")
+
+  // reading from context
+  const { handle } = useContext(ProfilePageContext)
+
+  // this won't work
+  // TODO: see if there GUI is refreshing after creating a link
+  // // update view independent of the backend
+  // useEffect(() => {
+  //   announce("value changed -> linkText", linkText)
+  //   let element = document.getElementById("linkText-" + linkPosition)
+  //   element.innerHTML = linkText
+  // }, [linkText])
+
+  return (
+    <DialogContent className="sm:max-w-[425px]">
+      <DialogHeader>
+        <DialogTitle>Add Link</DialogTitle>
+        <DialogDescription>
+          Define your link here. Click save when you're done.
+        </DialogDescription>
+      </DialogHeader>
+
+      <div className="grid gap-4 py-4">
+        <div className="grid grid-cols-4 items-center gap-4">
+          <Label htmlFor="linkText" className="text-right">
+            Text
+          </Label>
+          <Input
+            id={"linkTextInput-" + linkPosition}
+            type="text"
+            className="col-span-3"
+            value={linkText}
+            onChange={(e) => setLinkText(e.target.value)}
+          />
+        </div>
+        <div className="grid grid-cols-4 items-center gap-4">
+          <Label htmlFor="linkUrl" className="text-right">
+            Link
+          </Label>
+          <Input
+            id={"linkUrlInput-" + linkPosition}
+            type="text"
+            className="col-span-3"
+            value={linkUrl}
+            onChange={(e) => setLinkUrl(e.target.value)}
+          />
+        </div>
+      </div>
+      <DialogFooter>
+        <DialogClose>
+          <Button
+            type="submit"
+            onClick={() => {
+              onAddLinkClicked(
+                handle,
+                {
+                  url: linkUrl,
+                  text: linkText,
+                  position: linkPosition,
+                },
+                setAddRequestStatus,
+                dispatch
+              )
+            }}
+            // onClick={() =>
+            //   onSaveUpdatedLinkClicked(
+            //     handle,
+            //     {
+            //       url: linkUrl,
+            //       text: linkText,
+            //       position: linkPosition,
+            //     },
+            //     setUpdateRequestStatus,
+            //     dispatch
+            //   )
+            // }
+          >
+            Save changes
+          </Button>
+        </DialogClose>
+      </DialogFooter>
+    </DialogContent>
+  )
+}
+
+// Dialog to update a link
+function EditLinkDialog({
+  text,
+  url,
+  position,
+  setUpdateRequestStatus,
+  onSaveUpdatedLinkClicked,
+}) {
+  // component-internal state
+  const [linkText, setLinkText] = useState(text)
+  const [linkUrl, setLinkUrl] = useState(url)
+  const linkPosition = position
+
+  // used for network and Redux state-management
+  const dispatch = useDispatch()
+
+  // reading from context
   const { handle } = useContext(ProfilePageContext)
 
   // update view independent of the backend
@@ -472,14 +665,7 @@ function EditableLinkInput({ text, url, position, setUpdateRequestStatus }) {
             type="text"
             className="col-span-3"
             value={linkText}
-            // value={linkElementState[link.position].text}
-            // onChange={(e) => (linkText = e.target.value)}
             onChange={(e) => setLinkText(e.target.value)}
-            // onChange={(e) =>
-            //   setLinkElementState[link.position](
-            //     (linkElementState[link.position].text = e.target.value)
-            //   )
-            // }
           />
         </div>
         <div className="grid grid-cols-4 items-center gap-4">
@@ -491,16 +677,7 @@ function EditableLinkInput({ text, url, position, setUpdateRequestStatus }) {
             type="text"
             className="col-span-3"
             value={linkUrl}
-            // value={linkElementState[link.position].url}
             onChange={(e) => setLinkUrl(e.target.value)}
-            // onChange={(e) => (linkUrl = e.target.value)}
-            // onChange={(e) =>
-            //   setLinkElementState(() => {
-            //     let copyArray = linkCollection
-            //     copyArray.splice(link.position, 1, e.target.value)
-            //     return copyArray
-            //   })
-            // }
           />
         </div>
       </div>
@@ -508,7 +685,6 @@ function EditableLinkInput({ text, url, position, setUpdateRequestStatus }) {
         <DialogClose>
           <Button
             type="submit"
-            // onClick={() => sendLinkInputToUpdate(link.position)}
             onClick={() =>
               onSaveUpdatedLinkClicked(
                 handle,
@@ -530,42 +706,90 @@ function EditableLinkInput({ text, url, position, setUpdateRequestStatus }) {
   )
 }
 
-// Network and State-Management functions /.
-async function onSaveUpdatedLinkClicked(
+// Dialog to delete a link
+function DeleteLinkDialog({ frontendId, setDeleteLinkRequestStatus }) {
+  // Hooks can only be called inside of the body of a function component.
+  const { handle } = useContext(ProfilePageContext)
+
+  // used for network and Redux state-management
+  const dispatch = useDispatch()
+
+  // // TOOD: check if needed (or can be deleted)
+  // // to re-render
+  // const [deleteLinkRequestStatus, setDeleteLinkRequestStatus] = useState("idle")
+
+  return (
+    <DialogContent className="sm:max-w-[425px]">
+      <DialogHeader>
+        <DialogTitle>Delete Link</DialogTitle>
+        <DialogDescription>
+          Are you sure you want to delete this link?
+        </DialogDescription>
+      </DialogHeader>
+      <DialogFooter>
+        <DialogClose>
+          <Button
+            type="submit"
+            id="confirmLinkDeletion-Button"
+            onClick={() =>
+              onDeleteLinkClicked(
+                frontendId,
+                handle,
+                dispatch,
+                setDeleteLinkRequestStatus
+              )
+            }
+          >
+            YES
+          </Button>
+          <Button type="submit" id="cancelLinkDeletion-Button">
+            NO
+          </Button>
+        </DialogClose>
+      </DialogFooter>
+    </DialogContent>
+  )
+}
+
+function onDeleteLinkClicked(
+  frontendId,
   handle,
-  updatedLink,
-  setUpdateRequestStatus,
-  dispatch
+  dispatch,
+  setDeleteLinkRequestStatus
 ) {
   console.log(
-    `%c onSaveUpdatedLinkClicked!!`,
-    "color: green; font-size: 1.5em;"
+    `%c onDeleteLinkClicked for link at position '${linkPosition}', handle '${handle}'`,
+    "color:green;font-size:1.5em;"
   )
 
   try {
-    setUpdateRequestStatus("pending")
+    setDeleteLinkRequestStatus("pending")
 
     // createAsyncThunk only takes one argument
-    const updateData = {
+    const deletionData = {
       handle,
-      updatedLink,
+      frontendId,
     }
 
-    /*
-          {
-      url: updatedLink.url,
-      text: updatedLink.text,
-      position: updatedLink.position,
-    }
-    */
-
-    dispatch(updateLink(updateData))
-    // { myArrayOfObjects: [...myArrayOfObjects] }
-    // dispatch(updateLink({ updateData: [...updateData] }))
+    dispatch(deleteLink(deletionData))
   } catch (error) {
-    console.error("Failed to save link: ", error)
+    console.error("Failed to delete link: ", error)
   } finally {
-    setUpdateRequestStatus("idle")
+    setDeleteLinkRequestStatus("idle")
   }
 }
-// Network and State-Management functions ./
+
+function LinkDisplay({ linkPosition, linkUrl, linkText }) {
+  return (
+    <>
+      <a>
+        <IconMapper url={linkUrl} />
+        <span id={"linkText-" + linkPosition} className="mx-2">
+          {linkText.length > 0 ? linkText : linkUrl}
+        </span>
+      </a>
+    </>
+  )
+}
+
+// UI interactions ./

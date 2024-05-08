@@ -9,7 +9,8 @@ export async function linkCollectionClient(
   method = "GET",
   body = null,
   linkPosition = null,
-  contentBoxPosition = 0
+  contentBoxPosition = 0,
+  frontendId = null
 ) {
   // 'CRUD' style
   switch (contentType) {
@@ -27,7 +28,12 @@ export async function linkCollectionClient(
 
     case "link":
       if (method === "POST") {
-        return await addLinkToCollection(handle, method, body)
+        return await addLinkToCollection(
+          handle,
+          contentBoxPosition,
+          method,
+          body
+        )
       } else if (method === "GET") {
         throw new Error(
           "GET method is not supported for a single link. Ask for the whole link collection instead."
@@ -45,7 +51,7 @@ export async function linkCollectionClient(
         }
         return await deleteLinkWithinCollection(
           handle,
-          linkPosition,
+          frontendId,
           contentBoxPosition,
           method
         )
@@ -123,8 +129,8 @@ async function updateLinkCollection(handle, contentBoxPosition, body) {
 // client functions for LinkCollection /.
 
 // client functions for Link /.
-async function addLinkToCollection(handle, method, body) {
-  const endpoint = `${baseurl}/api/v1/linkCollection/link?handle=${handle}&position=${contentBoxPosition}`
+async function addLinkToCollection(handle, contentBoxPosition, method, body) {
+  const endpoint = `${baseURL}/api/v1/linkCollection/link?handle=${handle}&contentBoxPosition=${contentBoxPosition}`
 
   return await apiHandler(endpoint, method, body)
 }
@@ -142,12 +148,20 @@ async function updateLinkWithinCollection(
 
 async function deleteLinkWithinCollection(
   handle,
-  linkPosition,
+  frontendId,
   contentBoxPosition = 0,
   method
 ) {
+  announce("deleteLinkWithinCollection", {
+    handle,
+    frontendId,
+    contentBoxPosition,
+    method,
+  })
+
   // atm only contentBoxPosition of 0 is supported
-  let endpoint = `${baseurl}/api/v1/linkCollection/link?handle=${handle}&position=${linkPosition}`
+  // let endpoint = `${baseURL}/api/v1/linkCollection/link?handle=${handle}&position=${linkPosition}`
+  let endpoint = `${baseURL}/api/v1/linkCollection/link/delete?handle=${handle}&frontendId=${frontendId}`
 
   return await apiHandler(endpoint, method)
 }

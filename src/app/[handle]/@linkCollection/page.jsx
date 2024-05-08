@@ -17,6 +17,8 @@ export default function Page() {
   )
 }
 
+const sectionTitle = "Links"
+
 function LinkCollection() {
   const { handle } = useContext(ProfilePageContext)
   if (!handle) {
@@ -26,7 +28,11 @@ function LinkCollection() {
   // providing handle for Redux
   return (
     <>
-      <LinkCollectionEntries handle={handle} mode={"linked"} />
+      <LinkCollectionEntries
+        handle={handle}
+        mode={"linked"}
+        sectionTitle={sectionTitle}
+      />
     </>
   )
 }
