@@ -333,9 +333,7 @@ function DndFrame({ linkCollectionByPosition, setReorderedLinkCollection }) {
       setReorderedLinkCollection(linkNodes)
       setDragEventHandled(false)
     }
-  }, [dragEventHandled])
-
-  // used to be [linkNodes] but caused unnecessary circular reloads
+  }, [linkNodes])
 
   // this is the key to the 'position' issue ./
   // ******************************************************************** //
@@ -579,15 +577,6 @@ function CreateLinkDialog({
 
   // reading from context
   const { handle } = useContext(ProfilePageContext)
-
-  // this won't work
-  // TODO: see if there GUI is refreshing after creating a link
-  // // update view independent of the backend
-  // useEffect(() => {
-  //   announce("value changed -> linkText", linkText)
-  //   let element = document.getElementById("linkText-" + linkPosition)
-  //   element.innerHTML = linkText
-  // }, [linkText])
 
   return (
     <DialogContent className="sm:max-w-[425px]">
