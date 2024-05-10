@@ -20,7 +20,7 @@ import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 // imports for UI ./
 
-import React, { useEffect, useState, useId, useContext } from "react"
+import React, { useEffect, useState, useId, useContext, use } from "react"
 import { useDispatch } from "react-redux"
 import { nanoid } from "@reduxjs/toolkit"
 
@@ -115,7 +115,34 @@ export const LinkCollectionEntries = ({ handle, mode, sectionTitle }) => {
     if (linkCollectionStatus === "idle") {
       dispatch(fetchLinkCollection(handle))
     }
+
+    // to make sure links are always added at the end
+    if (linkCollectionByPosition.length > 0) {
+      setNextHighestPosition(
+        linkCollectionByPosition[linkCollectionByPosition.length - 1].position +
+          1
+      )
+    }
   }, [linkCollectionStatus, dispatch])
+
+  // to make sure links are always added at the end
+  const [nextHighestPosition, setNextHighestPosition] = useState(0)
+
+  // for debugging
+  useEffect(() => {
+    if (nextHighestPosition > 0) {
+      console.log(
+        `%c nextHighestPosition is set to: ${nextHighestPosition}`,
+        "color: cyan;"
+      )
+      console.log(
+        `%c position of last element is set to: ${
+          linkCollectionByPosition[linkCollectionByPosition.length - 1].position
+        }`,
+        "color: cyan;"
+      )
+    }
+  }, [nextHighestPosition])
 
   let contentOfLinkCollection = []
   if (linkCollectionStatus === "loading") {
@@ -167,7 +194,7 @@ export const LinkCollectionEntries = ({ handle, mode, sectionTitle }) => {
                 <CreateLinkDialog
                   text={editableLinkText}
                   url={editableLinkUrl}
-                  position={linkCollectionByPosition.length}
+                  position={nextHighestPosition}
                   frontendId={nanoid()}
                   setAddRequestStatus={setAddRequestStatus}
                   onAddLinkClicked={onAddLinkClicked}
@@ -417,9 +444,10 @@ function CollectionOfEditableLinks({ linkCollectionByPosition }) {
 
     announce("linkCollectionByPosition", linkCollectionByPosition) // this is the updated one
     // setAdaptableLinkCollection(linkCollectionByPosition)
+
+    // TODO: this overwrites the flow initially done via adaptableLinkCollection
     setLinkNodes(linkCollectionByPosition) // causes re-render after deletion
     // TODO: position needs to be re-assigned, too!
-    // TODO: check if 'update' still works
 
     announce("updateRequestStatus:", updateRequestStatus)
   }, [updateRequestStatus, deleteLinkRequestStatus, linkCollectionByPosition])
