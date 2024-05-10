@@ -95,21 +95,22 @@ export const LinkCollectionEntries = ({ handle, mode, sectionTitle }) => {
   //     return link
   //   }
   // )
-  announce("[xPOSITION I]: linkCollection", linkCollection)
-  announce(
-    "[xPOSITION II]: linkCollectionByPositionUnclean",
-    linkCollectionByPositionUnclean
-  )
-  announce(
-    "[xPOSITION III]: linkCollectionByPosition",
-    linkCollectionByPosition
-  )
+  // announce("[xPOSITION I]: linkCollection", linkCollection)
+  // announce(
+  //   "[xPOSITION II]: linkCollectionByPositionUnclean",
+  //   linkCollectionByPositionUnclean
+  // )
+  // announce(
+  //   "[xPOSITION III]: linkCollectionByPosition",
+  //   linkCollectionByPosition
+  // )
 
   announce("TOP LEVEL linkCollectionByPosition", linkCollectionByPosition)
 
   useEffect(() => {
     // only for debugging 'position' issue
     announce("linkCollectionStatus is :", linkCollectionStatus)
+    announce("linkCollection is :", linkCollection)
 
     if (linkCollectionStatus === "idle") {
       dispatch(fetchLinkCollection(handle))
@@ -133,7 +134,6 @@ export const LinkCollectionEntries = ({ handle, mode, sectionTitle }) => {
             />
           </>
         )
-
         break
 
       case "draggable":
@@ -210,7 +210,10 @@ function DraggableLinkCollection({ handle, linkCollectionByPosition }) {
   const [updateRequestStatus, setUpdateRequestStatus] = useState("idle")
   const dispatch = useDispatch()
 
-  announce("calibrating linkCollectionByPosition", linkCollectionByPosition)
+  announce(
+    "calibrating linkCollection for <DraggableLinkCollection/>",
+    linkCollectionByPosition
+  )
   const [reorderedLinkCollection, setReorderedLinkCollection] = useState([
     linkCollectionByPosition,
   ])
@@ -263,15 +266,21 @@ function DraggableLinkCollection({ handle, linkCollectionByPosition }) {
         "sending reorderedLinkCollection to backend (default positions):",
         reorderedLinkCollection
       )
+      const collectionWithRightPositions = reorderedLinkCollection.map(
+        (linkNode, index) => {
+          linkNode.position = index
+          return linkNode
+        }
+      )
       announce(
         "sending reorderedLinkCollection to backend (updated positions):",
-        reorderedLinkCollection
+        collectionWithRightPositions
       )
 
       // createAsyncThunk only takes one argument
       const updateData = {
         handle,
-        links: reorderedLinkCollection,
+        links: collectionWithRightPositions,
       }
       dispatch(updateLinkCollection(updateData))
     } catch (error) {
@@ -290,6 +299,9 @@ function DndFrame({ linkCollectionByPosition, setReorderedLinkCollection }) {
     })
   )
 
+  // to trigger updrill if needed
+  const [dragEventHandled, setDragEventHandled] = useState(null)
+
   // ******************************************************************** //
   // this is the key to the 'position' issue /.
 
@@ -300,7 +312,7 @@ function DndFrame({ linkCollectionByPosition, setReorderedLinkCollection }) {
         "assigning linkNode.id based on frontendId",
         linkNode.frontendId
       )
-      announce("linkCollection for linkNode", linkCollectionByPosition)
+      // announce("linkCollection for linkNode", linkCollectionByPosition)
       linkNode.id = linkNode.frontendId
       return linkNode
     })
@@ -308,10 +320,22 @@ function DndFrame({ linkCollectionByPosition, setReorderedLinkCollection }) {
 
   // used to up-drill every time reorder happens
   useEffect(() => {
-    setReorderedLinkCollection(linkNodes)
+    // don't updrill on mount
+    if (dragEventHandled) {
+      // for debugging /.
+      console.log(
+        `%c dragEventHandled was touched: type=${typeof dragEventHandled}, value=${dragEventHandled}`,
+        "color: cyan; font-weight: bold;"
+      )
+      announce("linkCollection within useEffect", linkCollectionByPosition)
+      // for debugging ./
 
-    announce("linkCollection within useEffect", linkCollectionByPosition)
-  }, [linkNodes])
+      setReorderedLinkCollection(linkNodes)
+      setDragEventHandled(false)
+    }
+  }, [dragEventHandled])
+
+  // used to be [linkNodes] but caused unnecessary circular reloads
 
   // this is the key to the 'position' issue ./
   // ******************************************************************** //
@@ -362,6 +386,8 @@ function DndFrame({ linkCollectionByPosition, setReorderedLinkCollection }) {
         newlySortedItems.forEach((linkNode, index) => {
           linkNode.position = index
         })
+        setDragEventHandled(true)
+
         return newlySortedItems
       })
     }
