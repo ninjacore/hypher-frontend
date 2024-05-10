@@ -20,7 +20,7 @@ import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 // imports for UI ./
 
-import React, { useEffect, useState, useId, useContext } from "react"
+import React, { useEffect, useState, useId, useContext, use } from "react"
 import { useDispatch } from "react-redux"
 import { nanoid } from "@reduxjs/toolkit"
 
@@ -95,26 +95,54 @@ export const LinkCollectionEntries = ({ handle, mode, sectionTitle }) => {
   //     return link
   //   }
   // )
-  announce("[xPOSITION I]: linkCollection", linkCollection)
-  announce(
-    "[xPOSITION II]: linkCollectionByPositionUnclean",
-    linkCollectionByPositionUnclean
-  )
-  announce(
-    "[xPOSITION III]: linkCollectionByPosition",
-    linkCollectionByPosition
-  )
+  // announce("[xPOSITION I]: linkCollection", linkCollection)
+  // announce(
+  //   "[xPOSITION II]: linkCollectionByPositionUnclean",
+  //   linkCollectionByPositionUnclean
+  // )
+  // announce(
+  //   "[xPOSITION III]: linkCollectionByPosition",
+  //   linkCollectionByPosition
+  // )
 
   announce("TOP LEVEL linkCollectionByPosition", linkCollectionByPosition)
 
   useEffect(() => {
     // only for debugging 'position' issue
     announce("linkCollectionStatus is :", linkCollectionStatus)
+    announce("linkCollection is :", linkCollection)
 
     if (linkCollectionStatus === "idle") {
       dispatch(fetchLinkCollection(handle))
     }
+
+    // to make sure links are always added at the end
+    if (linkCollectionByPosition.length > 0) {
+      setNextHighestPosition(
+        linkCollectionByPosition[linkCollectionByPosition.length - 1].position +
+          1
+      )
+    }
   }, [linkCollectionStatus, dispatch])
+
+  // to make sure links are always added at the end
+  const [nextHighestPosition, setNextHighestPosition] = useState(0)
+
+  // for debugging
+  useEffect(() => {
+    if (nextHighestPosition > 0) {
+      console.log(
+        `%c nextHighestPosition is set to: ${nextHighestPosition}`,
+        "color: cyan;"
+      )
+      console.log(
+        `%c position of last element is set to: ${
+          linkCollectionByPosition[linkCollectionByPosition.length - 1].position
+        }`,
+        "color: cyan;"
+      )
+    }
+  }, [nextHighestPosition])
 
   let contentOfLinkCollection = []
   if (linkCollectionStatus === "loading") {
@@ -133,7 +161,6 @@ export const LinkCollectionEntries = ({ handle, mode, sectionTitle }) => {
             />
           </>
         )
-
         break
 
       case "draggable":
@@ -167,7 +194,7 @@ export const LinkCollectionEntries = ({ handle, mode, sectionTitle }) => {
                 <CreateLinkDialog
                   text={editableLinkText}
                   url={editableLinkUrl}
-                  position={linkCollectionByPosition.length}
+                  position={nextHighestPosition}
                   frontendId={nanoid()}
                   setAddRequestStatus={setAddRequestStatus}
                   onAddLinkClicked={onAddLinkClicked}
@@ -210,7 +237,10 @@ function DraggableLinkCollection({ handle, linkCollectionByPosition }) {
   const [updateRequestStatus, setUpdateRequestStatus] = useState("idle")
   const dispatch = useDispatch()
 
-  announce("calibrating linkCollectionByPosition", linkCollectionByPosition)
+  announce(
+    "calibrating linkCollection for <DraggableLinkCollection/>",
+    linkCollectionByPosition
+  )
   const [reorderedLinkCollection, setReorderedLinkCollection] = useState([
     linkCollectionByPosition,
   ])
@@ -263,15 +293,21 @@ function DraggableLinkCollection({ handle, linkCollectionByPosition }) {
         "sending reorderedLinkCollection to backend (default positions):",
         reorderedLinkCollection
       )
+      const collectionWithRightPositions = reorderedLinkCollection.map(
+        (linkNode, index) => {
+          linkNode.position = index
+          return linkNode
+        }
+      )
       announce(
         "sending reorderedLinkCollection to backend (updated positions):",
-        reorderedLinkCollection
+        collectionWithRightPositions
       )
 
       // createAsyncThunk only takes one argument
       const updateData = {
         handle,
-        links: reorderedLinkCollection,
+        links: collectionWithRightPositions,
       }
       dispatch(updateLinkCollection(updateData))
     } catch (error) {
@@ -290,6 +326,9 @@ function DndFrame({ linkCollectionByPosition, setReorderedLinkCollection }) {
     })
   )
 
+  // to trigger updrill if needed
+  const [dragEventHandled, setDragEventHandled] = useState(null)
+
   // ******************************************************************** //
   // this is the key to the 'position' issue /.
 
@@ -300,7 +339,7 @@ function DndFrame({ linkCollectionByPosition, setReorderedLinkCollection }) {
         "assigning linkNode.id based on frontendId",
         linkNode.frontendId
       )
-      announce("linkCollection for linkNode", linkCollectionByPosition)
+      // announce("linkCollection for linkNode", linkCollectionByPosition)
       linkNode.id = linkNode.frontendId
       return linkNode
     })
@@ -308,9 +347,19 @@ function DndFrame({ linkCollectionByPosition, setReorderedLinkCollection }) {
 
   // used to up-drill every time reorder happens
   useEffect(() => {
-    setReorderedLinkCollection(linkNodes)
+    // don't updrill on mount
+    if (dragEventHandled) {
+      // for debugging /.
+      console.log(
+        `%c dragEventHandled was touched: type=${typeof dragEventHandled}, value=${dragEventHandled}`,
+        "color: cyan; font-weight: bold;"
+      )
+      announce("linkCollection within useEffect", linkCollectionByPosition)
+      // for debugging ./
 
-    announce("linkCollection within useEffect", linkCollectionByPosition)
+      setReorderedLinkCollection(linkNodes)
+      setDragEventHandled(false)
+    }
   }, [linkNodes])
 
   // this is the key to the 'position' issue ./
@@ -362,6 +411,8 @@ function DndFrame({ linkCollectionByPosition, setReorderedLinkCollection }) {
         newlySortedItems.forEach((linkNode, index) => {
           linkNode.position = index
         })
+        setDragEventHandled(true)
+
         return newlySortedItems
       })
     }
@@ -393,9 +444,10 @@ function CollectionOfEditableLinks({ linkCollectionByPosition }) {
 
     announce("linkCollectionByPosition", linkCollectionByPosition) // this is the updated one
     // setAdaptableLinkCollection(linkCollectionByPosition)
+
+    // TODO: this overwrites the flow initially done via adaptableLinkCollection
     setLinkNodes(linkCollectionByPosition) // causes re-render after deletion
     // TODO: position needs to be re-assigned, too!
-    // TODO: check if 'update' still works
 
     announce("updateRequestStatus:", updateRequestStatus)
   }, [updateRequestStatus, deleteLinkRequestStatus, linkCollectionByPosition])
@@ -553,15 +605,6 @@ function CreateLinkDialog({
 
   // reading from context
   const { handle } = useContext(ProfilePageContext)
-
-  // this won't work
-  // TODO: see if there GUI is refreshing after creating a link
-  // // update view independent of the backend
-  // useEffect(() => {
-  //   announce("value changed -> linkText", linkText)
-  //   let element = document.getElementById("linkText-" + linkPosition)
-  //   element.innerHTML = linkText
-  // }, [linkText])
 
   return (
     <DialogContent className="sm:max-w-[425px]">
