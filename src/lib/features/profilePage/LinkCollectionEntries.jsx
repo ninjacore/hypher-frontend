@@ -88,22 +88,21 @@ export const LinkCollectionEntries = ({ handle, mode, sectionTitle }) => {
   // )
   // TODO: check if skipping this solves the 'position' errors
   // to make sure the position always starts counting from 0
-  const linkCollectionByPosition = linkCollectionByPositionUnclean
-  // .map(
-  //   (link, index) => {
-  //     link.position = index
-  //     return link
-  //   }
-  // )
+  const linkCollectionByPosition = linkCollectionByPositionUnclean.map(
+    (link, index) => {
+      link.position = index
+      return link
+    }
+  )
   // announce("[xPOSITION I]: linkCollection", linkCollection)
   // announce(
   //   "[xPOSITION II]: linkCollectionByPositionUnclean",
   //   linkCollectionByPositionUnclean
   // )
-  // announce(
-  //   "[xPOSITION III]: linkCollectionByPosition",
-  //   linkCollectionByPosition
-  // )
+  announce(
+    "[xPOSITION III]: linkCollectionByPosition",
+    linkCollectionByPosition
+  )
 
   announce("TOP LEVEL linkCollectionByPosition", linkCollectionByPosition)
 
