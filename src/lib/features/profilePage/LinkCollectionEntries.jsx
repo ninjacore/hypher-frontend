@@ -82,28 +82,34 @@ export const LinkCollectionEntries = ({ handle, mode, sectionTitle }) => {
   // to be used for all 3 modes
   const linkCollection = JSON.parse(JSON.stringify(links))
   // data gets sorted but position number can be anything
+
+  announce("[xPOSITION I]: linkCollection", linkCollection)
+  let lastInitialPosition = null
+  if (linkCollection.length > 0) {
+    lastInitialPosition = linkCollection[linkCollection.length - 1].position
+  }
+
+  // TODO: delete this step
   const linkCollectionByPositionUnclean = linkCollection
   // .toSorted(
   //   (a, b) => a.position - b.position
   // )
   // TODO: check if skipping this solves the 'position' errors
   // to make sure the position always starts counting from 0
-  const linkCollectionByPosition = linkCollectionByPositionUnclean
-  // .map(
-  //   (link, index) => {
-  //     link.position = index
-  //     return link
-  //   }
-  // )
-  // announce("[xPOSITION I]: linkCollection", linkCollection)
+  const linkCollectionByPosition = linkCollectionByPositionUnclean.map(
+    (link, index) => {
+      link.position = index
+      return link
+    }
+  )
   // announce(
   //   "[xPOSITION II]: linkCollectionByPositionUnclean",
   //   linkCollectionByPositionUnclean
   // )
-  // announce(
-  //   "[xPOSITION III]: linkCollectionByPosition",
-  //   linkCollectionByPosition
-  // )
+  announce(
+    "[xPOSITION III]: linkCollectionByPosition",
+    linkCollectionByPosition
+  )
 
   announce("TOP LEVEL linkCollectionByPosition", linkCollectionByPosition)
 
@@ -118,10 +124,8 @@ export const LinkCollectionEntries = ({ handle, mode, sectionTitle }) => {
 
     // to make sure links are always added at the end
     if (linkCollectionByPosition.length > 0) {
-      setNextHighestPosition(
-        linkCollectionByPosition[linkCollectionByPosition.length - 1].position +
-          1
-      )
+      // needs to reflect positions as they were initially given by the backend
+      setNextHighestPosition(lastInitialPosition + 1)
     }
   }, [linkCollectionStatus, dispatch])
 
