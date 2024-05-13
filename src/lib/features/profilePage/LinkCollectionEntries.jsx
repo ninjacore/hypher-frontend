@@ -160,7 +160,7 @@ export const LinkCollectionEntries = ({ handle, mode, sectionTitle }) => {
           <>
             <h2 className="section-title">{sectionTitle}</h2>
 
-            <ClickableLInkCollection
+            <ClickableLinkCollection
               linkCollectionByPosition={linkCollectionByPosition}
             />
           </>
@@ -218,7 +218,7 @@ export const LinkCollectionEntries = ({ handle, mode, sectionTitle }) => {
   return <>{contentOfLinkCollection}</>
 }
 
-function ClickableLInkCollection({ linkCollectionByPosition }) {
+function ClickableLinkCollection({ linkCollectionByPosition }) {
   return linkCollectionByPosition.map((link) => {
     return (
       <a
@@ -246,7 +246,7 @@ function DraggableLinkCollection({ handle, linkCollectionByPosition }) {
     linkCollectionByPosition
   )
   const [reorderedLinkCollection, setReorderedLinkCollection] = useState([
-    linkCollectionByPosition,
+    ...linkCollectionByPosition,
   ])
 
   // to cancel the update
@@ -430,9 +430,9 @@ function CollectionOfEditableLinks({ linkCollectionByPosition }) {
   // TODO: this doesn't trigger... why?
 
   // served by parent component
-  const [adaptableLinkCollection, setAdaptableLinkCollection] = useState(
-    linkCollectionByPosition
-  )
+  const [adaptableLinkCollection, setAdaptableLinkCollection] = useState([
+    ...linkCollectionByPosition,
+  ])
 
   // 'shadow copy' for updrill
   const [linkNodes, setLinkNodes] = useState(
@@ -440,6 +440,7 @@ function CollectionOfEditableLinks({ linkCollectionByPosition }) {
       return linkNode
     })
   )
+  // TODO: does this updrill upon 'updateLink' ?
   // used to up-drill every time reorder happens
   useEffect(() => {
     // setAdaptableLinkCollection(linkNodes) // TODO: check if this causes overwrite of positions
@@ -455,6 +456,7 @@ function CollectionOfEditableLinks({ linkCollectionByPosition }) {
 
     announce("updateRequestStatus:", updateRequestStatus)
   }, [updateRequestStatus, deleteLinkRequestStatus, linkCollectionByPosition])
+  // TODO: check these dependencies for their validity
 
   return linkNodes.map((link) => {
     announce("link", link)
