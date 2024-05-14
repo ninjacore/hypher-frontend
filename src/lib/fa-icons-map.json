@@ -41,11 +41,19 @@
     },
 
     {
-      "shortName": "Discord",
+      "shortName": "Discord Invite",
       "iconPrefix": "fab",
       "iconName": "discord",
       "description": "Default Discord icon",
-      "regexToMatch": "https://discord.gg/"
+      "regexToMatch": "discord.gg"
+    },
+
+    {
+      "shortName": "Discord Server",
+      "iconPrefix": "fab",
+      "iconName": "discord",
+      "description": "Default Discord icon",
+      "regexToMatch": "discord.com"
     },
 
     {
