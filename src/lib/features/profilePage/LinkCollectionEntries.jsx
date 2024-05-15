@@ -78,15 +78,17 @@ export const LinkCollectionEntries = ({ handle, mode, sectionTitle }) => {
   // backend always sends the links in order
   const linkCollectionByPosition = JSON.parse(JSON.stringify(links))
 
+  // to make sure links are always added at the end
   let lastInitialPosition = null
+  let initialAmountOfLinks = 0
   if (linkCollectionByPosition.length > 0) {
     lastInitialPosition =
       linkCollectionByPosition[linkCollectionByPosition.length - 1].position
+    initialAmountOfLinks = linkCollectionByPosition.length
   }
 
   announce("TOP LEVEL linkCollectionByPosition", linkCollectionByPosition)
 
-  // TODO: update nextHighestPosition when a link is deleted
   useEffect(() => {
     // only for debugging 'position' issue
     announce("linkCollectionStatus is :", linkCollectionStatus)
@@ -100,8 +102,29 @@ export const LinkCollectionEntries = ({ handle, mode, sectionTitle }) => {
     if (linkCollectionByPosition.length > 0) {
       // needs to reflect positions as they were initially given by the backend
       setNextHighestPosition(lastInitialPosition + 1)
+
+      // if a link was added we need to update the nextHighestPosition
+      if (
+        linkCollectionByPosition.length > initialAmountOfLinks ||
+        linkCollectionByPosition[linkCollectionByPosition.length - 1]
+          .position !== lastInitialPosition
+      ) {
+        console.log("link was added to linkCollection")
+
+        // consistently add up while links are added
+        setNextHighestPosition(
+          linkCollectionByPosition[linkCollectionByPosition.length - 1]
+            .position + 1
+        )
+        console.log("incremented nextHighestPosition:", nextHighestPosition)
+      } else if (linkCollectionByPosition.length > initialAmountOfLinks) {
+        console.log("link was added, but other condition was not met.")
+        console.log("initialAmountOfLinks:", initialAmountOfLinks)
+        console.log("amount of links now:", linkCollectionByPosition.length)
+      }
     }
-  }, [linkCollectionStatus, dispatch])
+  }, [linkCollectionStatus, dispatch, linkCollectionByPosition])
+  // TODO: dependency linkCollectionStatus not changing upon adding a link, it seems
 
   // to make sure links are always added at the end
   const [nextHighestPosition, setNextHighestPosition] = useState(0)
@@ -397,6 +420,7 @@ function CollectionOfEditableLinks({ linkCollectionByPosition }) {
       return linkNode
     })
   )
+  // TODO: only re-assign upon true action (not on mount)
   // used to up-drill every time reorder happens
   useEffect(() => {
     announce("linkCollectionByPosition", linkCollectionByPosition) // this is the updated one
@@ -776,7 +800,7 @@ function onDeleteLinkClicked(
 }
 
 function LinkDisplay({ linkPosition, linkUrl, linkText, frontendId }) {
-  announce("LinkDisplay", { linkPosition, linkUrl, linkText })
+  // announce("LinkDisplay", { linkPosition, linkUrl, linkText })
   return (
     <>
       <a>
