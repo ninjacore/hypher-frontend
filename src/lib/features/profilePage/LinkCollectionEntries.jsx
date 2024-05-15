@@ -79,44 +79,41 @@ export const LinkCollectionEntries = ({ handle, mode, sectionTitle }) => {
     (state) => state.linkCollection.status
   )
 
-  // to be used for all 3 modes
-  const linkCollection = JSON.parse(JSON.stringify(links))
+  // backend always sends the links in order
+  const linkCollectionByPosition = JSON.parse(JSON.stringify(links))
   // data gets sorted but position number can be anything
 
-  announce("[xPOSITION I]: linkCollection", linkCollection)
+  announce("[xPOSITION I]: linkCollection", linkCollectionByPosition)
   let lastInitialPosition = null
-  if (linkCollection.length > 0) {
-    lastInitialPosition = linkCollection[linkCollection.length - 1].position
+  if (linkCollectionByPosition.length > 0) {
+    lastInitialPosition =
+      linkCollectionByPosition[linkCollectionByPosition.length - 1].position
   }
 
   // TODO: delete this step
-  const linkCollectionByPositionUnclean = linkCollection
+  // const linkCollectionByPositionUnclean = linkCollection
   // .toSorted(
   //   (a, b) => a.position - b.position
   // )
   // TODO: check if skipping this solves the 'position' errors
   // to make sure the position always starts counting from 0
-  const linkCollectionByPosition = linkCollectionByPositionUnclean.map(
-    (link, index) => {
-      link.position = index
-      return link
-    }
-  )
+  // const linkCollectionByPosition = linkCollectionByPositionUnclean.map(
+  //   (link, index) => {
+  //     link.position = index
+  //     return link
+  //   }
+  // )
   // announce(
   //   "[xPOSITION II]: linkCollectionByPositionUnclean",
   //   linkCollectionByPositionUnclean
   // )
-  announce(
-    "[xPOSITION III]: linkCollectionByPosition",
-    linkCollectionByPosition
-  )
 
   announce("TOP LEVEL linkCollectionByPosition", linkCollectionByPosition)
 
   useEffect(() => {
     // only for debugging 'position' issue
     announce("linkCollectionStatus is :", linkCollectionStatus)
-    announce("linkCollection is :", linkCollection)
+    announce("linkCollection is :", linkCollectionByPosition)
 
     if (linkCollectionStatus === "idle") {
       dispatch(fetchLinkCollection(handle))
@@ -245,6 +242,8 @@ function DraggableLinkCollection({ handle, linkCollectionByPosition }) {
     "calibrating linkCollection for <DraggableLinkCollection/>",
     linkCollectionByPosition
   )
+
+  // 'shawod copy' for dispatch on save
   const [reorderedLinkCollection, setReorderedLinkCollection] = useState([
     ...linkCollectionByPosition,
   ])
@@ -333,9 +332,6 @@ function DndFrame({ linkCollectionByPosition, setReorderedLinkCollection }) {
   // to trigger updrill if needed
   const [dragEventHandled, setDragEventHandled] = useState(null)
 
-  // ******************************************************************** //
-  // this is the key to the 'position' issue /.
-
   // used for drag-and-drop (reorder and transition animation)
   const [linkNodes, setLinkNodes] = useState(
     linkCollectionByPosition.map((linkNode) => {
@@ -365,9 +361,6 @@ function DndFrame({ linkCollectionByPosition, setReorderedLinkCollection }) {
       setDragEventHandled(false)
     }
   }, [linkNodes])
-
-  // this is the key to the 'position' issue ./
-  // ******************************************************************** //
 
   // for debugging
   let counter = 0
@@ -429,14 +422,9 @@ function CollectionOfEditableLinks({ linkCollectionByPosition }) {
   const [deleteLinkRequestStatus, setDeleteLinkRequestStatus] = useState("idle")
   // TODO: this doesn't trigger... why?
 
-  // served by parent component
-  const [adaptableLinkCollection, setAdaptableLinkCollection] = useState([
-    ...linkCollectionByPosition,
-  ])
-
-  // 'shadow copy' for updrill
+  // 'shadow copy' for dispatch
   const [linkNodes, setLinkNodes] = useState(
-    adaptableLinkCollection.map((linkNode) => {
+    linkCollectionByPosition.map((linkNode) => {
       return linkNode
     })
   )
@@ -445,7 +433,7 @@ function CollectionOfEditableLinks({ linkCollectionByPosition }) {
   useEffect(() => {
     // setAdaptableLinkCollection(linkNodes) // TODO: check if this causes overwrite of positions
 
-    announce("adaptableLinkCollection", adaptableLinkCollection)
+    // announce("adaptableLinkCollection", adaptableLinkCollection)
 
     announce("linkCollectionByPosition", linkCollectionByPosition) // this is the updated one
     // setAdaptableLinkCollection(linkCollectionByPosition)
@@ -460,10 +448,10 @@ function CollectionOfEditableLinks({ linkCollectionByPosition }) {
 
   return linkNodes.map((link) => {
     announce("link", link)
-    announce(
-      `linkElementState at this position (${link.position})`,
-      adaptableLinkCollection[link.position]
-    )
+    // announce(
+    //   `linkElementState at this position (${link.position})`,
+    //   adaptableLinkCollection[link.position]
+    // )
 
     return (
       <div key={"linkItem-" + link.position}>
