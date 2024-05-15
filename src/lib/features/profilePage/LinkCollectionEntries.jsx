@@ -2,7 +2,6 @@
 
 // imports for UI /.
 import { IconMapper } from "@/components/iconMapper"
-import { EditButton } from "@/components/ui/editButtonPen"
 import { PenIconButton } from "@/components/ui/penIconButton"
 import { DeleteCrossIconButton } from "@/components/ui/DeleteCrossIconButton"
 import {
@@ -40,11 +39,8 @@ import {
 } from "@/lib/features/profilePage/linkCollectionSlice"
 import { unwrapResult } from "@reduxjs/toolkit"
 
-// specificly for drag-and-drop functionality
-// import { useSortable } from "@dnd-kit/sortable"
-import { SortableLinkNode } from "@/lib/utils/SortableLinkNode/SortableLinkNode"
-
 // imports for sorting functionality /.
+import { SortableLinkNode } from "@/lib/utils/SortableLinkNode/SortableLinkNode"
 import {
   DndContext,
   closestCenter,
@@ -79,44 +75,22 @@ export const LinkCollectionEntries = ({ handle, mode, sectionTitle }) => {
     (state) => state.linkCollection.status
   )
 
-  // to be used for all 3 modes
-  const linkCollection = JSON.parse(JSON.stringify(links))
-  // data gets sorted but position number can be anything
+  // backend always sends the links in order
+  const linkCollectionByPosition = JSON.parse(JSON.stringify(links))
 
-  announce("[xPOSITION I]: linkCollection", linkCollection)
   let lastInitialPosition = null
-  if (linkCollection.length > 0) {
-    lastInitialPosition = linkCollection[linkCollection.length - 1].position
+  if (linkCollectionByPosition.length > 0) {
+    lastInitialPosition =
+      linkCollectionByPosition[linkCollectionByPosition.length - 1].position
   }
-
-  // TODO: delete this step
-  const linkCollectionByPositionUnclean = linkCollection
-  // .toSorted(
-  //   (a, b) => a.position - b.position
-  // )
-  // TODO: check if skipping this solves the 'position' errors
-  // to make sure the position always starts counting from 0
-  const linkCollectionByPosition = linkCollectionByPositionUnclean.map(
-    (link, index) => {
-      link.position = index
-      return link
-    }
-  )
-  // announce(
-  //   "[xPOSITION II]: linkCollectionByPositionUnclean",
-  //   linkCollectionByPositionUnclean
-  // )
-  announce(
-    "[xPOSITION III]: linkCollectionByPosition",
-    linkCollectionByPosition
-  )
 
   announce("TOP LEVEL linkCollectionByPosition", linkCollectionByPosition)
 
+  // TODO: update nextHighestPosition when a link is deleted
   useEffect(() => {
     // only for debugging 'position' issue
     announce("linkCollectionStatus is :", linkCollectionStatus)
-    announce("linkCollection is :", linkCollection)
+    announce("linkCollection is :", linkCollectionByPosition)
 
     if (linkCollectionStatus === "idle") {
       dispatch(fetchLinkCollection(handle))
@@ -187,11 +161,7 @@ export const LinkCollectionEntries = ({ handle, mode, sectionTitle }) => {
 
               <Dialog>
                 <DialogTrigger asChild>
-                  <Button
-                    variant="outline"
-                    className="bg-white text-black"
-                    // onClick={() => setEditMode(true)}
-                  >
+                  <Button variant="outline" className="bg-white text-black">
                     {"ADD"}
                   </Button>
                 </DialogTrigger>
@@ -245,6 +215,8 @@ function DraggableLinkCollection({ handle, linkCollectionByPosition }) {
     "calibrating linkCollection for <DraggableLinkCollection/>",
     linkCollectionByPosition
   )
+
+  // 'shawod copy' for dispatch on save
   const [reorderedLinkCollection, setReorderedLinkCollection] = useState([
     ...linkCollectionByPosition,
   ])
@@ -256,7 +228,6 @@ function DraggableLinkCollection({ handle, linkCollectionByPosition }) {
     <>
       <p>Pick up a link to change its position in the collection.</p>
       <DndFrame
-        // linkCollection={linkCollection}
         linkCollectionByPosition={linkCollectionByPosition}
         setReorderedLinkCollection={setReorderedLinkCollection}
       />
@@ -333,9 +304,6 @@ function DndFrame({ linkCollectionByPosition, setReorderedLinkCollection }) {
   // to trigger updrill if needed
   const [dragEventHandled, setDragEventHandled] = useState(null)
 
-  // ******************************************************************** //
-  // this is the key to the 'position' issue /.
-
   // used for drag-and-drop (reorder and transition animation)
   const [linkNodes, setLinkNodes] = useState(
     linkCollectionByPosition.map((linkNode) => {
@@ -343,7 +311,6 @@ function DndFrame({ linkCollectionByPosition, setReorderedLinkCollection }) {
         "assigning linkNode.id based on frontendId",
         linkNode.frontendId
       )
-      // announce("linkCollection for linkNode", linkCollectionByPosition)
       linkNode.id = linkNode.frontendId
       return linkNode
     })
@@ -366,9 +333,6 @@ function DndFrame({ linkCollectionByPosition, setReorderedLinkCollection }) {
     }
   }, [linkNodes])
 
-  // this is the key to the 'position' issue ./
-  // ******************************************************************** //
-
   // for debugging
   let counter = 0
 
@@ -380,7 +344,6 @@ function DndFrame({ linkCollectionByPosition, setReorderedLinkCollection }) {
       id={useId()}
     >
       <SortableContext items={linkNodes} strategy={verticalListSortingStrategy}>
-        {/* <DraggableLinkElements links={links} /> */}
         {linkNodes.map((linkNode) => {
           console.log("round #" + counter + " id is: " + linkNode.id)
           counter++
@@ -427,47 +390,25 @@ function CollectionOfEditableLinks({ linkCollectionByPosition }) {
   // to trigger re-render in effect
   const [updateRequestStatus, setUpdateRequestStatus] = useState("idle")
   const [deleteLinkRequestStatus, setDeleteLinkRequestStatus] = useState("idle")
-  // TODO: this doesn't trigger... why?
 
-  // served by parent component
-  const [adaptableLinkCollection, setAdaptableLinkCollection] = useState([
-    ...linkCollectionByPosition,
-  ])
-
-  // 'shadow copy' for updrill
+  // 'shadow copy' for dispatch
   const [linkNodes, setLinkNodes] = useState(
-    adaptableLinkCollection.map((linkNode) => {
+    linkCollectionByPosition.map((linkNode) => {
       return linkNode
     })
   )
-  // TODO: does this updrill upon 'updateLink' ?
   // used to up-drill every time reorder happens
   useEffect(() => {
-    // setAdaptableLinkCollection(linkNodes) // TODO: check if this causes overwrite of positions
-
-    announce("adaptableLinkCollection", adaptableLinkCollection)
-
     announce("linkCollectionByPosition", linkCollectionByPosition) // this is the updated one
-    // setAdaptableLinkCollection(linkCollectionByPosition)
-
-    // TODO: this overwrites the flow initially done via adaptableLinkCollection
     setLinkNodes(linkCollectionByPosition) // causes re-render after deletion
-    // TODO: position needs to be re-assigned, too!
-
     announce("updateRequestStatus:", updateRequestStatus)
   }, [updateRequestStatus, deleteLinkRequestStatus, linkCollectionByPosition])
-  // TODO: check these dependencies for their validity
 
   return linkNodes.map((link) => {
     announce("link", link)
-    announce(
-      `linkElementState at this position (${link.position})`,
-      adaptableLinkCollection[link.position]
-    )
 
     return (
       <div key={"linkItem-" + link.position}>
-        {/* new component /. */}
         <div className="">
           <EditableLinkItem
             linkPosition={link.position}
@@ -479,7 +420,6 @@ function CollectionOfEditableLinks({ linkCollectionByPosition }) {
             frontendId={link.frontendId}
           />
         </div>
-        {/* new component ./ */}
       </div>
     )
   })
@@ -666,18 +606,6 @@ function CreateLinkDialog({
               setLinkText("")
               setLinkUrl("")
             }}
-            // onClick={() =>
-            //   onSaveUpdatedLinkClicked(
-            //     handle,
-            //     {
-            //       url: linkUrl,
-            //       text: linkText,
-            //       position: linkPosition,
-            //     },
-            //     setUpdateRequestStatus,
-            //     dispatch
-            //   )
-            // }
           >
             Save changes
           </Button>
@@ -785,10 +713,6 @@ function DeleteLinkDialog({ frontendId, setDeleteLinkRequestStatus }) {
 
   // used for network and Redux state-management
   const dispatch = useDispatch()
-
-  // // TOOD: check if needed (or can be deleted)
-  // // to re-render
-  // const [deleteLinkRequestStatus, setDeleteLinkRequestStatus] = useState("idle")
 
   return (
     <DialogContent className="sm:max-w-[425px]">

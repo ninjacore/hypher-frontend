@@ -63,7 +63,6 @@ export async function linkCollectionClient(
   }
 }
 
-// TODO: everything other than 'endpoint' should be moved to one generic client function
 async function apiHandler(endpoint, method, body = null) {
   const config = {
     method: method,
@@ -160,7 +159,6 @@ async function deleteLinkWithinCollection(
   })
 
   // atm only contentBoxPosition of 0 is supported
-  // let endpoint = `${baseURL}/api/v1/linkCollection/link?handle=${handle}&position=${linkPosition}`
   let endpoint = `${baseURL}/api/v1/linkCollection/link/delete?handle=${handle}&frontendId=${frontendId}`
 
   return await apiHandler(endpoint, method)
