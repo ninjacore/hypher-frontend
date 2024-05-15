@@ -129,7 +129,6 @@ const linkCollectionSlice = createSlice({
       .addCase(addNewLink.fulfilled, (state, action) => {
         state.status = "succeeded"
         let newLink = action.payload
-        // newLink.frontendId = nanoid() // already done in AddDialog
         state.links = state.links.concat(newLink)
       })
       .addCase(updateLink.fulfilled, (state, action) => {
