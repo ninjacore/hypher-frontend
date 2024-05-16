@@ -842,7 +842,7 @@ function LinkCollectionProgressBar({ linkCollection }) {
   return (
     <>
       <span>
-        You are listing {linkCollection.length} links of 12 possible links
+        You are listing {linkCollection.length} out of 12 possible links
       </span>
       <Progress
         id="linkCollectionProgressBar"
