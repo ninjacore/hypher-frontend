@@ -124,6 +124,25 @@ export const LinkCollectionEntries = ({ handle, mode, sectionTitle }) => {
         console.log("amount of links now:", linkCollectionByPosition.length)
       }
     }
+
+    // TODO: move one level up or change whole setup
+    // de-activate 'change order' button if there are no links
+    if (linkCollectionByPosition.length < 2) {
+      let changeOrderButton = document.getElementById(
+        "activateReorderLinkCollectionButton"
+      )
+      if (changeOrderButton) {
+        changeOrderButton.setAttribute("disabled", "disabled")
+      }
+    } else {
+      // reset to default
+      let changeOrderButton = document.getElementById(
+        "activateReorderLinkCollectionButton"
+      )
+      if (changeOrderButton) {
+        changeOrderButton.removeAttribute("disabled")
+      }
+    }
   }, [linkCollectionStatus, dispatch, linkCollectionByPosition])
   // TODO: dependency linkCollectionStatus not changing upon adding a link, it seems
 
