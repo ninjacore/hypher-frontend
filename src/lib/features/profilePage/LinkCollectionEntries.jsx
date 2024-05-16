@@ -17,6 +17,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
+import { Progress } from "@/components/ui/progress"
 // imports for UI ./
 
 import React, { useEffect, useState, useId, useContext, use } from "react"
@@ -156,7 +157,6 @@ export const LinkCollectionEntries = ({ handle, mode, sectionTitle }) => {
         contentOfLinkCollection = (
           <>
             <h2 className="section-title">{sectionTitle}</h2>
-
             <ClickableLinkCollection
               linkCollectionByPosition={linkCollectionByPosition}
             />
@@ -181,7 +181,6 @@ export const LinkCollectionEntries = ({ handle, mode, sectionTitle }) => {
           <>
             <div className="flex justify-between">
               <h2 className="section-title">{sectionTitle}</h2>
-
               <Dialog>
                 <DialogTrigger asChild>
                   <Button variant="outline" className="bg-white text-black">
@@ -198,6 +197,10 @@ export const LinkCollectionEntries = ({ handle, mode, sectionTitle }) => {
                 />
               </Dialog>
             </div>
+
+            <LinkCollectionProgressBar
+              linkCollection={linkCollectionByPosition}
+            />
 
             <CollectionOfEditableLinks
               linkCollectionByPosition={linkCollectionByPosition}
@@ -814,3 +817,22 @@ function LinkDisplay({ linkPosition, linkUrl, linkText, frontendId }) {
 }
 
 // UI interactions ./
+
+// UI information /.
+function LinkCollectionProgressBar({ linkCollection }) {
+  let progress = (linkCollection.length / 12) * 100
+
+  return (
+    <>
+      <span>
+        You are listing {linkCollection.length} links of 12 possible links
+      </span>
+      <Progress
+        id="linkCollectionProgressBar"
+        value={progress}
+        className="w-[60%] my-4"
+      />
+    </>
+  )
+}
+// UI information ./
