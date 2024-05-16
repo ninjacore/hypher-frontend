@@ -17,6 +17,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
+import { Progress } from "@/components/ui/progress"
 // imports for UI ./
 
 import React, { useEffect, useState, useId, useContext, use } from "react"
@@ -123,6 +124,25 @@ export const LinkCollectionEntries = ({ handle, mode, sectionTitle }) => {
         console.log("amount of links now:", linkCollectionByPosition.length)
       }
     }
+
+    // TODO: move one level up or change whole setup
+    // de-activate 'change order' button if there are no links
+    if (linkCollectionByPosition.length < 2) {
+      let changeOrderButton = document.getElementById(
+        "activateReorderLinkCollectionButton"
+      )
+      if (changeOrderButton) {
+        changeOrderButton.setAttribute("disabled", "disabled")
+      }
+    } else {
+      // reset to default
+      let changeOrderButton = document.getElementById(
+        "activateReorderLinkCollectionButton"
+      )
+      if (changeOrderButton) {
+        changeOrderButton.removeAttribute("disabled")
+      }
+    }
   }, [linkCollectionStatus, dispatch, linkCollectionByPosition])
   // TODO: dependency linkCollectionStatus not changing upon adding a link, it seems
 
@@ -153,15 +173,19 @@ export const LinkCollectionEntries = ({ handle, mode, sectionTitle }) => {
   } else if (linkCollectionStatus === "succeeded") {
     switch (mode) {
       case "linked":
-        contentOfLinkCollection = (
-          <>
-            <h2 className="section-title">{sectionTitle}</h2>
-
-            <ClickableLinkCollection
-              linkCollectionByPosition={linkCollectionByPosition}
-            />
-          </>
-        )
+        // if there are no links, don't display anything
+        if (linkCollectionByPosition.length === 0) {
+          contentOfLinkCollection = <></>
+        } else {
+          contentOfLinkCollection = (
+            <>
+              <h2 className="section-title">{sectionTitle}</h2>
+              <ClickableLinkCollection
+                linkCollectionByPosition={linkCollectionByPosition}
+              />
+            </>
+          )
+        }
         break
 
       case "draggable":
@@ -181,13 +205,11 @@ export const LinkCollectionEntries = ({ handle, mode, sectionTitle }) => {
           <>
             <div className="flex justify-between">
               <h2 className="section-title">{sectionTitle}</h2>
-
               <Dialog>
-                <DialogTrigger asChild>
-                  <Button variant="outline" className="bg-white text-black">
-                    {"ADD"}
-                  </Button>
-                </DialogTrigger>
+                <AddLinkButtion
+                  amountOfLinks={linkCollectionByPosition.length}
+                  maxAmountOfLinks={12}
+                />
                 <CreateLinkDialog
                   text={editableLinkText}
                   url={editableLinkUrl}
@@ -198,7 +220,9 @@ export const LinkCollectionEntries = ({ handle, mode, sectionTitle }) => {
                 />
               </Dialog>
             </div>
-
+            <LinkCollectionProgressBar
+              linkCollection={linkCollectionByPosition}
+            />
             <CollectionOfEditableLinks
               linkCollectionByPosition={linkCollectionByPosition}
             />
@@ -504,6 +528,26 @@ async function onSaveUpdatedLinkClicked(
 // Network and State-Management functions ./
 
 // UI interactions /.
+function AddLinkButtion({ amountOfLinks, maxAmountOfLinks }) {
+  if (amountOfLinks >= maxAmountOfLinks) {
+    // inactive mode
+    return (
+      <Button variant="outline" className="bg-white text-black" disabled>
+        {"ADD"}
+      </Button>
+    )
+  }
+
+  // active mode
+  return (
+    <DialogTrigger asChild>
+      <Button variant="outline" className="bg-white text-black">
+        {"ADD"}
+      </Button>
+    </DialogTrigger>
+  )
+}
+
 function EditableLinkItem({
   linkPosition,
   linkUrl,
@@ -814,3 +858,22 @@ function LinkDisplay({ linkPosition, linkUrl, linkText, frontendId }) {
 }
 
 // UI interactions ./
+
+// UI information /.
+function LinkCollectionProgressBar({ linkCollection }) {
+  let progress = (linkCollection.length / 12) * 100
+
+  return (
+    <>
+      <span>
+        You are listing {linkCollection.length} out of 12 possible links
+      </span>
+      <Progress
+        id="linkCollectionProgressBar"
+        value={progress}
+        className="w-[60%] my-4"
+      />
+    </>
+  )
+}
+// UI information ./
