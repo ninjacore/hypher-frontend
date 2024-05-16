@@ -105,19 +105,19 @@ async function apiHandler(endpoint, method, body = null) {
 
 // client functions for LinkCollection /.
 async function createLinkCollection(handle, method, body) {
-  const endpoint = `${baseURL}/api/v1/linkCollection?handle=${handle}&contentBoxPosition=${contentBoxPosition}`
+  const endpoint = `${baseURL}/api/v2/linkCollection?handle=${handle}&contentBoxPosition=${contentBoxPosition}`
 
   return await apiHandler(endpoint, method, body)
 }
 
 async function getLinkCollection(handle, contentBoxPosition, method) {
-  const endpoint = `${baseURL}/api/v1/linkCollection?handle=${handle}&contentBoxPosition=${contentBoxPosition}`
+  const endpoint = `${baseURL}/api/v2/linkCollection?handle=${handle}&contentBoxPosition=${contentBoxPosition}`
 
   return await apiHandler(endpoint, method)
 }
 
 async function updateLinkCollection(handle, contentBoxPosition, body) {
-  const endpoint = `${baseURL}/api/v1/linkCollection/update?handle=${handle}&contentBoxPosition=${contentBoxPosition}`
+  const endpoint = `${baseURL}/api/v2/linkCollection/update?handle=${handle}&contentBoxPosition=${contentBoxPosition}`
   if (!body) {
     throw new Error("Body is required for update.")
   } else {
@@ -129,7 +129,7 @@ async function updateLinkCollection(handle, contentBoxPosition, body) {
 
 // client functions for Link /.
 async function addLinkToCollection(handle, contentBoxPosition, method, body) {
-  const endpoint = `${baseURL}/api/v1/linkCollection/link?handle=${handle}&contentBoxPosition=${contentBoxPosition}`
+  const endpoint = `${baseURL}/api/v2/linkCollection/link?handle=${handle}&contentBoxPosition=${contentBoxPosition}`
 
   return await apiHandler(endpoint, method, body)
 }
@@ -140,7 +140,7 @@ async function updateLinkWithinCollection(
   method,
   body
 ) {
-  const endpoint = `${baseURL}/api/v1/linkCollection/link/update?handle=${handle}&contentBoxPosition=${contentBoxPosition}`
+  const endpoint = `${baseURL}/api/v2/linkCollection/link/update?handle=${handle}&contentBoxPosition=${contentBoxPosition}`
 
   return await apiHandler(endpoint, method, body)
 }
@@ -159,7 +159,7 @@ async function deleteLinkWithinCollection(
   })
 
   // atm only contentBoxPosition of 0 is supported
-  let endpoint = `${baseURL}/api/v1/linkCollection/link/delete?handle=${handle}&frontendId=${frontendId}`
+  let endpoint = `${baseURL}/api/v2/linkCollection/link/delete?handle=${handle}&frontendId=${frontendId}`
 
   return await apiHandler(endpoint, method)
 }
