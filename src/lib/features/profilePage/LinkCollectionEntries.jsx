@@ -173,14 +173,19 @@ export const LinkCollectionEntries = ({ handle, mode, sectionTitle }) => {
   } else if (linkCollectionStatus === "succeeded") {
     switch (mode) {
       case "linked":
-        contentOfLinkCollection = (
-          <>
-            <h2 className="section-title">{sectionTitle}</h2>
-            <ClickableLinkCollection
-              linkCollectionByPosition={linkCollectionByPosition}
-            />
-          </>
-        )
+        // if there are no links, don't display anything
+        if (linkCollectionByPosition.length === 0) {
+          contentOfLinkCollection = <></>
+        } else {
+          contentOfLinkCollection = (
+            <>
+              <h2 className="section-title">{sectionTitle}</h2>
+              <ClickableLinkCollection
+                linkCollectionByPosition={linkCollectionByPosition}
+              />
+            </>
+          )
+        }
         break
 
       case "draggable":
