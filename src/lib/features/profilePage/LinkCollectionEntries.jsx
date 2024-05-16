@@ -182,11 +182,10 @@ export const LinkCollectionEntries = ({ handle, mode, sectionTitle }) => {
             <div className="flex justify-between">
               <h2 className="section-title">{sectionTitle}</h2>
               <Dialog>
-                <DialogTrigger asChild>
-                  <Button variant="outline" className="bg-white text-black">
-                    {"ADD"}
-                  </Button>
-                </DialogTrigger>
+                <AddLinkButtion
+                  amountOfLinks={linkCollectionByPosition.length}
+                  maxAmountOfLinks={12}
+                />
                 <CreateLinkDialog
                   text={editableLinkText}
                   url={editableLinkUrl}
@@ -197,11 +196,9 @@ export const LinkCollectionEntries = ({ handle, mode, sectionTitle }) => {
                 />
               </Dialog>
             </div>
-
             <LinkCollectionProgressBar
               linkCollection={linkCollectionByPosition}
             />
-
             <CollectionOfEditableLinks
               linkCollectionByPosition={linkCollectionByPosition}
             />
@@ -507,6 +504,26 @@ async function onSaveUpdatedLinkClicked(
 // Network and State-Management functions ./
 
 // UI interactions /.
+function AddLinkButtion({ amountOfLinks, maxAmountOfLinks }) {
+  if (amountOfLinks >= maxAmountOfLinks) {
+    // inactive mode
+    return (
+      <Button variant="outline" className="bg-white text-black" disabled>
+        {"ADD"}
+      </Button>
+    )
+  }
+
+  // active mode
+  return (
+    <DialogTrigger asChild>
+      <Button variant="outline" className="bg-white text-black">
+        {"ADD"}
+      </Button>
+    </DialogTrigger>
+  )
+}
+
 function EditableLinkItem({
   linkPosition,
   linkUrl,
