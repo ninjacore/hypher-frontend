@@ -2,7 +2,6 @@ import { createSlice } from "@reduxjs/toolkit"
 
 // for data fetch
 import { nanoid, createAsyncThunk } from "@reduxjs/toolkit"
-import { profileDataClient } from "@/lib/utils/profileDataClients/profileDataClient"
 import { linkCollectionClient } from "@/lib/utils/profileDataClients/linkCollectionClient"
 import { announce } from "@/lib/utils/debugTools/announce"
 
@@ -139,8 +138,12 @@ const linkCollectionSlice = createSlice({
           action.payload
         )
 
-        // save updated links
-        state.links = action.payload
+        let updatedLink = action.payload
+
+        // find the link that was updated and replace it
+        state.links = state.links.map((link) =>
+          link.frontendId === updatedLink.frontendId ? updatedLink : link
+        )
       })
       .addCase(deleteLink.rejected, (state, action) => {
         state.status = "failed"
