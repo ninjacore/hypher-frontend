@@ -191,7 +191,7 @@ export const LinkCollectionEntries = ({ handle, mode, sectionTitle }) => {
       case "draggable":
         contentOfLinkCollection = (
           <>
-            <h2 className="section-title">{sectionTitle}</h2>
+            <h2 className="section-title">{"Reorder " + sectionTitle}</h2>
             <DraggableLinkCollection
               handle={handle}
               linkCollectionByPosition={linkCollectionByPosition}
@@ -204,7 +204,7 @@ export const LinkCollectionEntries = ({ handle, mode, sectionTitle }) => {
         contentOfLinkCollection = (
           <>
             <div className="flex justify-between">
-              <h2 className="section-title">{sectionTitle}</h2>
+              <h2 className="section-title">{"Manage " + sectionTitle}</h2>
               <Dialog>
                 <AddLinkButtion
                   amountOfLinks={linkCollectionByPosition.length}
