@@ -533,7 +533,7 @@ function AddLinkButtion({ amountOfLinks, maxAmountOfLinks }) {
     // inactive mode
     return (
       <Button variant="outline" className="bg-white text-black" disabled>
-        {"ADD"}
+        add
       </Button>
     )
   }
@@ -542,7 +542,7 @@ function AddLinkButtion({ amountOfLinks, maxAmountOfLinks }) {
   return (
     <DialogTrigger asChild>
       <Button variant="outline" className="bg-white text-black">
-        {"ADD"}
+        add
       </Button>
     </DialogTrigger>
   )
@@ -657,26 +657,41 @@ function CreateLinkDialog({
       </div>
       <DialogFooter>
         <DialogClose>
-          <Button
-            type="submit"
-            onClick={() => {
-              onAddLinkClicked(
-                handle,
-                {
-                  frontendId: frontendId,
-                  url: linkUrl,
-                  text: linkText,
-                  position: linkPosition,
-                },
-                setAddRequestStatus,
-                dispatch
-              )
-              setLinkText("")
-              setLinkUrl("")
-            }}
-          >
-            Save changes
-          </Button>
+          <div className="flex justify-end gap-5">
+            <Button
+              className="bg-white text-black"
+              variant="outline"
+              type="reset"
+              onClick={() => {
+                setLinkText("")
+                setLinkUrl("")
+              }}
+            >
+              cancel
+            </Button>
+            <Button
+              className="bg-white text-black"
+              variant="outline"
+              type="submit"
+              onClick={() => {
+                onAddLinkClicked(
+                  handle,
+                  {
+                    frontendId: frontendId,
+                    url: linkUrl,
+                    text: linkText,
+                    position: linkPosition,
+                  },
+                  setAddRequestStatus,
+                  dispatch
+                )
+                setLinkText("")
+                setLinkUrl("")
+              }}
+            >
+              save
+            </Button>
+          </div>
         </DialogClose>
       </DialogFooter>
     </DialogContent>
@@ -750,24 +765,40 @@ function EditLinkDialog({
       </div>
       <DialogFooter>
         <DialogClose>
-          <Button
-            type="submit"
-            onClick={() =>
-              onSaveUpdatedLinkClicked(
-                handle,
-                {
-                  frontendId: frontendId,
-                  url: linkUrl,
-                  text: linkText,
-                  position: linkPosition,
-                },
-                setUpdateRequestStatus,
-                dispatch
-              )
-            }
-          >
-            Save changes
-          </Button>
+          <div className="flex justify-end gap-5">
+            <Button
+              className="bg-white text-black"
+              variant="outline"
+              type="reset"
+              onClick={() => {
+                setLinkText(text)
+                setLinkUrl(url)
+              }}
+            >
+              cancel
+            </Button>
+
+            <Button
+              className="bg-white text-black"
+              variant="outline"
+              type="submit"
+              onClick={() =>
+                onSaveUpdatedLinkClicked(
+                  handle,
+                  {
+                    frontendId: frontendId,
+                    url: linkUrl,
+                    text: linkText,
+                    position: linkPosition,
+                  },
+                  setUpdateRequestStatus,
+                  dispatch
+                )
+              }
+            >
+              save
+            </Button>
+          </div>
         </DialogClose>
       </DialogFooter>
     </DialogContent>
@@ -792,23 +823,32 @@ function DeleteLinkDialog({ frontendId, setDeleteLinkRequestStatus }) {
       </DialogHeader>
       <DialogFooter>
         <DialogClose>
-          <Button
-            type="submit"
-            id="confirmLinkDeletion-Button"
-            onClick={() =>
-              onDeleteLinkClicked(
-                frontendId,
-                handle,
-                dispatch,
-                setDeleteLinkRequestStatus
-              )
-            }
-          >
-            YES
-          </Button>
-          <Button type="submit" id="cancelLinkDeletion-Button">
-            NO
-          </Button>
+          <div className="flex justify-end gap-2">
+            <Button
+              className="bg-white text-black"
+              variant="outline"
+              type="submit"
+              id="confirmLinkDeletion-Button"
+              onClick={() =>
+                onDeleteLinkClicked(
+                  frontendId,
+                  handle,
+                  dispatch,
+                  setDeleteLinkRequestStatus
+                )
+              }
+            >
+              yes
+            </Button>
+            <Button
+              className="bg-white text-black"
+              variant="outline"
+              type="reset"
+              id="cancelLinkDeletion-Button"
+            >
+              no
+            </Button>
+          </div>
         </DialogClose>
       </DialogFooter>
     </DialogContent>
