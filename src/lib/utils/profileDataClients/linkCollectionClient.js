@@ -65,19 +65,19 @@ export async function linkCollectionClient(
 
 // client functions for LinkCollection /.
 async function createLinkCollection(handle, method, body) {
-  const endpoint = `${baseURL}/api/v2/linkCollection?handle=${handle}&contentBoxPosition=${contentBoxPosition}`
+  const endpoint = `${baseURL}/api/v2/linkCollection?handle=${handle}`
 
   return await apiHandler(endpoint, method, body)
 }
 
 async function getLinkCollection(handle, contentBoxPosition, method) {
-  const endpoint = `${baseURL}/api/v2/linkCollection?handle=${handle}&contentBoxPosition=${contentBoxPosition}`
+  const endpoint = `${baseURL}/api/v2/linkCollection?handle=${handle}`
 
   return await apiHandler(endpoint, method)
 }
 
 async function updateLinkCollection(handle, contentBoxPosition, body) {
-  const endpoint = `${baseURL}/api/v2/linkCollection/update?handle=${handle}&contentBoxPosition=${contentBoxPosition}`
+  const endpoint = `${baseURL}/api/v2/linkCollection/update?handle=${handle}`
   if (!body) {
     throw new Error("Body is required for update.")
   } else {
@@ -89,7 +89,7 @@ async function updateLinkCollection(handle, contentBoxPosition, body) {
 
 // client functions for Link /.
 async function addLinkToCollection(handle, contentBoxPosition, method, body) {
-  const endpoint = `${baseURL}/api/v2/linkCollection/link?handle=${handle}&contentBoxPosition=${contentBoxPosition}`
+  const endpoint = `${baseURL}/api/v2/linkCollection/link?handle=${handle}`
 
   return await apiHandler(endpoint, method, body)
 }
@@ -100,7 +100,7 @@ async function updateLinkWithinCollection(
   method,
   body
 ) {
-  const endpoint = `${baseURL}/api/v2/linkCollection/link/update?handle=${handle}&contentBoxPosition=${contentBoxPosition}`
+  const endpoint = `${baseURL}/api/v2/linkCollection/link/update?handle=${handle}`
 
   return await apiHandler(endpoint, method, body)
 }
