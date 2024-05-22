@@ -2,6 +2,7 @@
 
 // imports for UI /.
 import { IconMapper } from "@/components/iconMapper"
+import { Card } from "@/components/ui/card"
 import { PenIconButton } from "@/components/ui/penIconButton"
 import { DeleteCrossIconButton } from "@/components/ui/DeleteCrossIconButton"
 import {
@@ -55,6 +56,10 @@ import {
 import { announce } from "@/lib/utils/debugTools/announce"
 
 export const FeaturedContentEntries = ({ handle, mode, sectionTitle }) => {
+  // for changing editable modes
+  const [featuredContentIsSortable, setFeaturedContentIsSortable] =
+    useState(false)
+
   // for adding featured content
   const [addRequestStatus, setAddRequestStatus] = useState("idle")
   let editableContentTitle = ""
@@ -78,21 +83,20 @@ export const FeaturedContentEntries = ({ handle, mode, sectionTitle }) => {
   // backend always sends content in order
   const featuredContentByPosition = JSON.parse(JSON.stringify(featuredContent))
 
-  // ["one", "two", "three"] //
-
-  // if (featuredContent) {
-  //   let data = JSON.parse(JSON.stringify(featuredContent))
-  //   announce("TOP LEVEL data (featuredContent)", data)
-  // }
-
+  // TODO: find the obsolete part
+  // "there's something wrong, I can feel it" /.
   // to make sure content is always added at the end
-  let lastInitialPosition = null
+  let initialLastPosition = null
   let initialAmountOfFeaturedContent = 0
   if (featuredContentByPosition.length > 0) {
-    lastInitialPosition =
+    initialLastPosition =
       featuredContentByPosition[featuredContentByPosition.length - 1].position
     initialAmountOfFeaturedContent = featuredContentByPosition.length
   }
+
+  // to make sure links are always added at the end
+  const [nextHighestPosition, setNextHighestPosition] = useState(0)
+  // "there's something wrong, I can feel it" ./
 
   announce("TOP LEVEL featuredContentByPosition", featuredContentByPosition)
 
@@ -100,28 +104,183 @@ export const FeaturedContentEntries = ({ handle, mode, sectionTitle }) => {
     if (featuredContentStatus === "idle") {
       dispatch(fetchFeaturedContent(handle))
     }
+
+    // if content was added we need to update the nextHighestPosition
+    checkNextHighestPosition(
+      initialAmountOfFeaturedContent,
+      initialLastPosition,
+      featuredContentByPosition,
+      setNextHighestPosition
+    )
+
+    // de-activate 'change order' button if there's not more than 1 featured content
+    checkChangeOrderButton(featuredContentByPosition)
   }, [featuredContentStatus, dispatch, featuredContentByPosition])
 
-  // TODO: default
-  return (
-    <div>
-      <h2 className="section-title">{sectionTitle}</h2>
-      <ClickableFeaturedContent
-        featuredContentByPosition={featuredContentByPosition}
-      />
-    </div>
-  )
+  // switches for content rendering /.
+  if (featuredContentStatus === "loading") {
+    return <div>Loading... {sectionTitle}</div>
+  }
+
+  if (featuredContentStatus === "failed") {
+    return <div>Failed to load {sectionTitle}</div>
+  }
+
+  if (featuredContentStatus === "succeeded" && mode === "linked") {
+    return (
+      <div>
+        <h2 className="section-title">{sectionTitle}</h2>
+        <ClickableFeaturedContent
+          featuredContentByPosition={featuredContentByPosition}
+        />
+      </div>
+    )
+  }
+
+  if (featuredContentStatus === "succeeded" && mode === "editable") {
+    if (featuredContentIsSortable) {
+      return (
+        <>
+          <h2 className="section-title">{sectionTitle}</h2>
+          <DraggableFeaturedContent
+            setFeaturedContentIsSortable={setFeaturedContentIsSortable}
+          />
+        </>
+      )
+    }
+
+    return (
+      <>
+        <h2 className="section-title">{sectionTitle}</h2>
+        <EditableFeaturedContent />
+        <div className="flex justify-end">
+          <Button
+            id="activateReorderLinkCollectionButton"
+            variant="outline"
+            className="bg-white text-black"
+            onClick={() => setFeaturedContentIsSortable(true)}
+          >
+            change order
+          </Button>
+        </div>
+      </>
+    )
+  }
+  // switches for content rendering ./
 }
 
 function ClickableFeaturedContent({ featuredContentByPosition }) {
   return featuredContentByPosition.map((content) => {
     return (
-      <a href={content.url} target="_blank" key={content.frontendId}>
-        <div className="my-4 mx-2 py-2 px-3 bg-green-300">
-          <h3>{content.title}</h3>
-          <p>{content.description}</p>
-        </div>
-      </a>
+      <Card key={content.category + content.position} className="my-4">
+        <a href={content.url} target="_blank">
+          <div className="flex">
+            <div className="text-5xl py-4 px-2">
+              <IconMapper url={content.category + ":"} />
+            </div>
+            <div className="grow p-2">
+              <span>{content.title.length > 0 ? content.title : ""}</span>
+              <br />
+              <span>
+                {content.description.length > 0
+                  ? content.description
+                  : content.url}
+              </span>
+            </div>
+          </div>
+        </a>
+      </Card>
     )
   })
 }
+
+function EditableFeaturedContent() {
+  return <p>editable tbd</p>
+}
+
+function DraggableFeaturedContent({ setFeaturedContentIsSortable }) {
+  return (
+    <>
+      <p>Pick up a link to change its position in the collection.</p>
+      <p>
+        <b>draggable tbd</b>
+      </p>
+      <div className="flex justify-end gap-5">
+        <div>
+          <Button
+            id="cancelReorderedLinkCollectionButton"
+            variant="outline"
+            className="bg-white text-black"
+            onClick={() => {
+              setFeaturedContentIsSortable(false) // exit dnd-mode
+            }}
+          >
+            cancel
+          </Button>
+        </div>
+        <div>
+          <Button
+            id="saveReorderedLinkCollectionButton"
+            variant="outline"
+            className="bg-white text-black"
+            onClick={() => {
+              // TODO: onSaveUpdateClicked()
+              setFeaturedContentIsSortable(false) // exit dnd-mode
+            }}
+          >
+            save
+          </Button>
+        </div>
+      </div>
+    </>
+  )
+}
+
+// support functions /.
+function checkNextHighestPosition(
+  initialAmountOfFeaturedContent,
+  initialLastPosition,
+  featuredContentByPosition,
+  setNextHighestPosition
+) {
+  // cover the case when there's no content
+  if (!featuredContentByPosition.length > 0) {
+    setNextHighestPosition(0)
+  }
+
+  try {
+    if (
+      featuredContentByPosition.length > initialAmountOfFeaturedContent ||
+      featuredContentByPosition[featuredContentByPosition.length - 1]
+        .position !== initialLastPosition
+    ) {
+      setNextHighestPosition(
+        featuredContentByPosition[featuredContentByPosition.length - 1]
+          .position + 1
+      )
+    }
+  } catch (error) {
+    console.error("checkNextHighestPosition error:", error)
+  }
+}
+
+function checkChangeOrderButton(featuredContentByPosition) {
+  if (featuredContentByPosition.length < 2) {
+    let changeOrderButton = document.getElementById(
+      "activateReorderFeaturedContentButton"
+    )
+    if (changeOrderButton) {
+      changeOrderButton.setAttribute("disabled", "disabled")
+    }
+  } else {
+    // reset to default
+    let changeOrderButton = document.getElementById(
+      "activateReorderFeaturedContentButton"
+    )
+    if (changeOrderButton) {
+      changeOrderButton.removeAttribute("disabled")
+    }
+  }
+}
+
+// support functions ./
