@@ -2,6 +2,7 @@
 
 // imports for UI /.
 import { IconMapper } from "@/components/iconMapper"
+import { Card } from "@/components/ui/card"
 import { PenIconButton } from "@/components/ui/penIconButton"
 import { DeleteCrossIconButton } from "@/components/ui/DeleteCrossIconButton"
 import {
@@ -116,12 +117,24 @@ export const FeaturedContentEntries = ({ handle, mode, sectionTitle }) => {
 function ClickableFeaturedContent({ featuredContentByPosition }) {
   return featuredContentByPosition.map((content) => {
     return (
-      <a href={content.url} target="_blank" key={content.frontendId}>
-        <div className="my-4 mx-2 py-2 px-3 bg-green-300">
-          <h3>{content.title}</h3>
-          <p>{content.description}</p>
-        </div>
-      </a>
+      <Card key={content.category + content.position} className="my-4">
+        <a href={content.url} target="_blank">
+          <div className="flex">
+            <div className="text-5xl py-4 px-2">
+              <IconMapper url={content.category + ":"} />
+            </div>
+            <div className="grow p-2">
+              <span>{content.title.length > 0 ? content.title : ""}</span>
+              <br />
+              <span>
+                {content.description.length > 0
+                  ? content.description
+                  : content.url}
+              </span>
+            </div>
+          </div>
+        </a>
+      </Card>
     )
   })
 }
