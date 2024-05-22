@@ -14,6 +14,7 @@ export default function Layout({
   linkCollection,
   editableLinkCollection,
   featured,
+  editableFeatured,
 }) {
   const [editMode, setEditMode] = useState(false)
   const { handle } = useContext(ProfilePageContext)
@@ -64,10 +65,7 @@ export default function Layout({
           </CardContent>
         </Card>
         <Card className="mb-6">
-          <CardContent>
-            {/* {editableFeatured} */}
-            Setting up editableFeatured...
-          </CardContent>
+          <CardContent>{editableFeatured}</CardContent>
         </Card>
         <hr />
         <div id="mobileMessageOutput"></div>
