@@ -142,7 +142,9 @@ export const FeaturedContentEntries = ({ handle, mode, sectionTitle }) => {
       return (
         <>
           <h2 className="section-title">{sectionTitle}</h2>
-          <DraggableFeaturedContent />
+          <DraggableFeaturedContent
+            setFeaturedContentIsSortable={setFeaturedContentIsSortable}
+          />
         </>
       )
     }
@@ -196,8 +198,42 @@ function EditableFeaturedContent() {
   return <p>editable tbd</p>
 }
 
-function DraggableFeaturedContent() {
-  return <p>draggable tbd</p>
+function DraggableFeaturedContent({ setFeaturedContentIsSortable }) {
+  return (
+    <>
+      <p>Pick up a link to change its position in the collection.</p>
+      <p>
+        <b>draggable tbd</b>
+      </p>
+      <div className="flex justify-end gap-5">
+        <div>
+          <Button
+            id="cancelReorderedLinkCollectionButton"
+            variant="outline"
+            className="bg-white text-black"
+            onClick={() => {
+              setFeaturedContentIsSortable(false) // exit dnd-mode
+            }}
+          >
+            cancel
+          </Button>
+        </div>
+        <div>
+          <Button
+            id="saveReorderedLinkCollectionButton"
+            variant="outline"
+            className="bg-white text-black"
+            onClick={() => {
+              // TODO: onSaveUpdateClicked()
+              setFeaturedContentIsSortable(false) // exit dnd-mode
+            }}
+          >
+            save
+          </Button>
+        </div>
+      </div>
+    </>
+  )
 }
 
 // support functions /.
