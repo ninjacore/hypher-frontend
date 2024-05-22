@@ -10,7 +10,11 @@ import { Card, CardContent, CardSingleLineHeader } from "@/components/ui/card"
 // to be handled by token
 const pageOwner = true
 
-export default function Layout({ linkCollection, editableLinkCollection }) {
+export default function Layout({
+  linkCollection,
+  editableLinkCollection,
+  featured,
+}) {
   const [editMode, setEditMode] = useState(false)
   const { handle } = useContext(ProfilePageContext)
 
@@ -104,10 +108,7 @@ export default function Layout({ linkCollection, editableLinkCollection }) {
         <CardContent>{linkCollection}</CardContent>
       </Card>
       <Card className="mb-6">
-        <CardContent>
-          {/* {featured} */}
-          Setting up featured...
-        </CardContent>
+        <CardContent>{featured}</CardContent>
       </Card>
       <hr />
       <div id="mobileMessageOutput"></div>
