@@ -77,57 +77,56 @@ export const LinkCollectionEntries = ({ handle, mode, sectionTitle }) => {
   )
 
   // backend always sends the links in order
-  const linkCollectionByPosition = JSON.parse(JSON.stringify(links))
+  const mutableLinkCollection = JSON.parse(JSON.stringify(links))
 
   // to make sure links are always added at the end
   let lastInitialPosition = null
   let initialAmountOfLinks = 0
-  if (linkCollectionByPosition.length > 0) {
+  if (mutableLinkCollection.length > 0) {
     lastInitialPosition =
-      linkCollectionByPosition[linkCollectionByPosition.length - 1].position
-    initialAmountOfLinks = linkCollectionByPosition.length
+      mutableLinkCollection[mutableLinkCollection.length - 1].position
+    initialAmountOfLinks = mutableLinkCollection.length
   }
 
-  announce("TOP LEVEL linkCollectionByPosition", linkCollectionByPosition)
+  announce("TOP LEVEL mutableLinkCollection", mutableLinkCollection)
 
   useEffect(() => {
     // only for debugging 'position' issue
     announce("linkCollectionStatus is :", linkCollectionStatus)
-    announce("linkCollection is :", linkCollectionByPosition)
+    announce("linkCollection is :", mutableLinkCollection)
 
     if (linkCollectionStatus === "idle") {
       dispatch(fetchLinkCollection(handle))
     }
 
     // to make sure links are always added at the end
-    if (linkCollectionByPosition.length > 0) {
+    if (mutableLinkCollection.length > 0) {
       // needs to reflect positions as they were initially given by the backend
       setNextHighestPosition(lastInitialPosition + 1)
 
       // if a link was added we need to update the nextHighestPosition
       if (
-        linkCollectionByPosition.length > initialAmountOfLinks ||
-        linkCollectionByPosition[linkCollectionByPosition.length - 1]
-          .position !== lastInitialPosition
+        mutableLinkCollection.length > initialAmountOfLinks ||
+        mutableLinkCollection[mutableLinkCollection.length - 1].position !==
+          lastInitialPosition
       ) {
         console.log("link was added to linkCollection")
 
         // consistently add up while links are added
         setNextHighestPosition(
-          linkCollectionByPosition[linkCollectionByPosition.length - 1]
-            .position + 1
+          mutableLinkCollection[mutableLinkCollection.length - 1].position + 1
         )
         console.log("incremented nextHighestPosition:", nextHighestPosition)
-      } else if (linkCollectionByPosition.length > initialAmountOfLinks) {
+      } else if (mutableLinkCollection.length > initialAmountOfLinks) {
         console.log("link was added, but other condition was not met.")
         console.log("initialAmountOfLinks:", initialAmountOfLinks)
-        console.log("amount of links now:", linkCollectionByPosition.length)
+        console.log("amount of links now:", mutableLinkCollection.length)
       }
     }
 
     // TODO: move one level up or change whole setup
     // de-activate 'change order' button if there are no links
-    if (linkCollectionByPosition.length < 2) {
+    if (mutableLinkCollection.length < 2) {
       let changeOrderButton = document.getElementById(
         "activateReorderLinkCollectionButton"
       )
@@ -143,7 +142,7 @@ export const LinkCollectionEntries = ({ handle, mode, sectionTitle }) => {
         changeOrderButton.removeAttribute("disabled")
       }
     }
-  }, [linkCollectionStatus, dispatch, linkCollectionByPosition])
+  }, [linkCollectionStatus, dispatch, mutableLinkCollection])
   // TODO: dependency linkCollectionStatus not changing upon adding a link, it seems
 
   // to make sure links are always added at the end
@@ -158,7 +157,7 @@ export const LinkCollectionEntries = ({ handle, mode, sectionTitle }) => {
       )
       console.log(
         `%c position of last element is set to: ${
-          linkCollectionByPosition[linkCollectionByPosition.length - 1].position
+          mutableLinkCollection[mutableLinkCollection.length - 1].position
         }`,
         "color: cyan;"
       )
@@ -174,14 +173,14 @@ export const LinkCollectionEntries = ({ handle, mode, sectionTitle }) => {
     switch (mode) {
       case "linked":
         // if there are no links, don't display anything
-        if (linkCollectionByPosition.length === 0) {
+        if (mutableLinkCollection.length === 0) {
           contentOfLinkCollection = <></>
         } else {
           contentOfLinkCollection = (
             <>
               <h2 className="section-title">{sectionTitle}</h2>
               <ClickableLinkCollection
-                linkCollectionByPosition={linkCollectionByPosition}
+                mutableLinkCollection={mutableLinkCollection}
               />
             </>
           )
@@ -194,7 +193,7 @@ export const LinkCollectionEntries = ({ handle, mode, sectionTitle }) => {
             <h2 className="section-title">{"Reorder " + sectionTitle}</h2>
             <DraggableLinkCollection
               handle={handle}
-              linkCollectionByPosition={linkCollectionByPosition}
+              mutableLinkCollection={mutableLinkCollection}
             />
           </>
         )
@@ -207,7 +206,7 @@ export const LinkCollectionEntries = ({ handle, mode, sectionTitle }) => {
               <h2 className="section-title">{"Manage " + sectionTitle}</h2>
               <Dialog>
                 <AddLinkButtion
-                  amountOfLinks={linkCollectionByPosition.length}
+                  amountOfLinks={mutableLinkCollection.length}
                   maxAmountOfLinks={12}
                 />
                 <CreateLinkDialog
@@ -220,11 +219,9 @@ export const LinkCollectionEntries = ({ handle, mode, sectionTitle }) => {
                 />
               </Dialog>
             </div>
-            <LinkCollectionProgressBar
-              linkCollection={linkCollectionByPosition}
-            />
+            <LinkCollectionProgressBar linkCollection={mutableLinkCollection} />
             <CollectionOfEditableLinks
-              linkCollectionByPosition={linkCollectionByPosition}
+              mutableLinkCollection={mutableLinkCollection}
             />
           </>
         )
@@ -235,8 +232,8 @@ export const LinkCollectionEntries = ({ handle, mode, sectionTitle }) => {
   return <>{contentOfLinkCollection}</>
 }
 
-function ClickableLinkCollection({ linkCollectionByPosition }) {
-  return linkCollectionByPosition.map((link) => {
+function ClickableLinkCollection({ mutableLinkCollection }) {
+  return mutableLinkCollection.map((link) => {
     return (
       <a
         href={link.url}
@@ -254,18 +251,18 @@ function ClickableLinkCollection({ linkCollectionByPosition }) {
   })
 }
 
-function DraggableLinkCollection({ handle, linkCollectionByPosition }) {
+function DraggableLinkCollection({ handle, mutableLinkCollection }) {
   const [updateRequestStatus, setUpdateRequestStatus] = useState("idle")
   const dispatch = useDispatch()
 
   announce(
     "calibrating linkCollection for <DraggableLinkCollection/>",
-    linkCollectionByPosition
+    mutableLinkCollection
   )
 
   // 'shadow copy' for dispatch on save
   const [reorderedLinkCollection, setReorderedLinkCollection] = useState([
-    ...linkCollectionByPosition,
+    ...mutableLinkCollection,
   ])
 
   // to cancel the update
@@ -275,7 +272,7 @@ function DraggableLinkCollection({ handle, linkCollectionByPosition }) {
     <>
       <p>Pick up a link to change its position in the collection.</p>
       <DndFrame
-        linkCollectionByPosition={linkCollectionByPosition}
+        mutableLinkCollection={mutableLinkCollection}
         setReorderedLinkCollection={setReorderedLinkCollection}
       />
       <div className="flex justify-end gap-5">
@@ -340,7 +337,7 @@ function DraggableLinkCollection({ handle, linkCollectionByPosition }) {
   }
 }
 
-function DndFrame({ linkCollectionByPosition, setReorderedLinkCollection }) {
+function DndFrame({ mutableLinkCollection, setReorderedLinkCollection }) {
   const sensors = useSensors(
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
@@ -353,7 +350,7 @@ function DndFrame({ linkCollectionByPosition, setReorderedLinkCollection }) {
 
   // used for drag-and-drop (reorder and transition animation)
   const [linkNodes, setLinkNodes] = useState(
-    linkCollectionByPosition.map((linkNode) => {
+    mutableLinkCollection.map((linkNode) => {
       console.log(
         "assigning linkNode.id based on frontendId",
         linkNode.frontendId
@@ -372,7 +369,7 @@ function DndFrame({ linkCollectionByPosition, setReorderedLinkCollection }) {
         `%c dragEventHandled was touched: type=${typeof dragEventHandled}, value=${dragEventHandled}`,
         "color: cyan; font-weight: bold;"
       )
-      announce("linkCollection within useEffect", linkCollectionByPosition)
+      announce("linkCollection within useEffect", mutableLinkCollection)
       // for debugging ./
 
       setReorderedLinkCollection(linkNodes)
@@ -433,24 +430,24 @@ function DndFrame({ linkCollectionByPosition, setReorderedLinkCollection }) {
   }
 }
 
-function CollectionOfEditableLinks({ linkCollectionByPosition }) {
+function CollectionOfEditableLinks({ mutableLinkCollection }) {
   // to trigger re-render in effect
   const [updateRequestStatus, setUpdateRequestStatus] = useState("idle")
   const [deleteLinkRequestStatus, setDeleteLinkRequestStatus] = useState("idle")
 
   // 'shadow copy' for dispatch
   const [linkNodes, setLinkNodes] = useState(
-    linkCollectionByPosition.map((linkNode) => {
+    mutableLinkCollection.map((linkNode) => {
       return linkNode
     })
   )
   // TODO: only re-assign upon true action (not on mount)
   // used to up-drill every time reorder happens
   useEffect(() => {
-    announce("linkCollectionByPosition", linkCollectionByPosition) // this is the updated one
-    setLinkNodes(linkCollectionByPosition) // causes re-render after deletion
+    announce("mutableLinkCollection", mutableLinkCollection) // this is the updated one
+    setLinkNodes(mutableLinkCollection) // causes re-render after deletion
     announce("updateRequestStatus:", updateRequestStatus)
-  }, [updateRequestStatus, deleteLinkRequestStatus, linkCollectionByPosition])
+  }, [updateRequestStatus, deleteLinkRequestStatus, mutableLinkCollection])
 
   return linkNodes.map((link) => {
     announce("link", link)
