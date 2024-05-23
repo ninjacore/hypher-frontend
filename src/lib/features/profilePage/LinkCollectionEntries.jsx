@@ -41,7 +41,7 @@ import {
 import { unwrapResult } from "@reduxjs/toolkit"
 
 // imports for sorting functionality /.
-import { SortableLinkNode } from "@/lib/utils/SortableLinkNode/SortableLinkNode"
+import { SortableLinkNode } from "@/lib/utils/dragAndDropNodes/SortableLinkNode"
 import {
   DndContext,
   closestCenter,
