@@ -23,7 +23,8 @@ body {
 }
 
 /* background color for focus (e.g., drag-and-drop) */
-.bg-dark-midnight-blue {
+.bg-konkikyou-blue:hover,
+.bg-konkikyou-blue:active {
   background-color: #003366;
 }
 
