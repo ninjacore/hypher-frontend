@@ -263,7 +263,7 @@ function DraggableLinkCollection({ handle, linkCollectionByPosition }) {
     linkCollectionByPosition
   )
 
-  // 'shawod copy' for dispatch on save
+  // 'shadow copy' for dispatch on save
   const [reorderedLinkCollection, setReorderedLinkCollection] = useState([
     ...linkCollectionByPosition,
   ])
