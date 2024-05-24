@@ -190,7 +190,7 @@ function ClickableFeaturedContent({ mutableLinkCollection }) {
               <span>
                 {content.description.length > 0
                   ? content.description
-                  : content.url}
+                  : content.url.substring(0, 26) + "..."}
               </span>
             </div>
           </div>

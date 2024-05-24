@@ -39,7 +39,9 @@ function SortableFeaturedContentNode(props) {
             <span>{props.title.length > 0 ? props.title : ""}</span>
             <br />
             <span>
-              {props.description.length > 0 ? props.description : props.url}
+              {props.description.length > 0
+                ? props.description
+                : props.url.substring(0, 26) + "..."}
             </span>
           </div>
         </div>
