@@ -32,7 +32,11 @@ import { ProfilePageContext } from "@/app/[handle]/utils/ProfilePageContext"
 import { useSelector } from "react-redux"
 
 // specific CRUD actions for this feature
-import { fetchFeaturedContent } from "@/lib/features/profilePage/featuredContentSlice"
+import {
+  fetchFeaturedContent,
+  updateFeaturedContentEntries,
+  updateSingleContentEntry,
+} from "@/lib/features/profilePage/featuredContentSlice"
 
 // imports for sorting functionality /.
 import { SortableFeaturedContentNode } from "@/lib/utils/dragAndDropNodes/SortableFeaturedContentNode"
@@ -143,6 +147,7 @@ export const FeaturedContentEntries = ({ handle, mode, sectionTitle }) => {
         <>
           <h2 className="section-title">{sectionTitle}</h2>
           <DraggableFeaturedContent
+            handle={handle}
             mutableFeaturedContent={mutableFeaturedContent}
             setFeaturedContentIsSortable={setFeaturedContentIsSortable}
           />
@@ -200,6 +205,7 @@ function EditableFeaturedContent() {
 }
 
 function DraggableFeaturedContent({
+  handle,
   mutableFeaturedContent,
   setFeaturedContentIsSortable,
 }) {
@@ -237,7 +243,7 @@ function DraggableFeaturedContent({
             variant="outline"
             className="bg-white text-black"
             onClick={() => {
-              // TODO: onSaveUpdateClicked()
+              onSaveUpdateClicked(handle, reorderedFeaturedContent)
               setFeaturedContentIsSortable(false) // exit dnd-mode
             }}
           >
@@ -247,6 +253,42 @@ function DraggableFeaturedContent({
       </div>
     </>
   )
+
+  async function onSaveUpdateClicked(
+    handle,
+    bufferedFeaturedContentCollection
+  ) {
+    try {
+      setUpdateRequestStatus("pending")
+      announce(
+        "sending reorderedFeaturedContent to backend (default positions):",
+        bufferedFeaturedContentCollection
+      )
+      const collectionWithRightPositions =
+        bufferedFeaturedContentCollection.map((featuredNode, index) => {
+          featuredNode.position = index
+          return featuredNode
+        })
+      announce(
+        "sending reorderedFeaturedContent to backend (updated positions):",
+        collectionWithRightPositions
+      )
+
+      // createAsyncThunk only takes one argument
+      const updateData = {
+        handle,
+        content: collectionWithRightPositions,
+      }
+      dispatch(updateFeaturedContentEntries(updateData))
+    } catch (error) {
+      console.error(
+        "[onSaveUpdateClicked] Failed to save the featured content to the collection:",
+        error
+      )
+    } finally {
+      setUpdateRequestStatus("idle")
+    }
+  }
 }
 
 // status support functions /.

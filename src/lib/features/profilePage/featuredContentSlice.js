@@ -2,7 +2,12 @@ import { createSlice } from "@reduxjs/toolkit"
 
 // for data fetch
 import { nanoid, createAsyncThunk } from "@reduxjs/toolkit"
-import { getFeaturedContent } from "@/lib/utils/profileDataClients/featuredContentClient"
+import {
+  getFeaturedContent,
+  updateFeaturedContent,
+  updateFeaturedContentEntry,
+} from "@/lib/utils/profileDataClients/featuredContentClient"
+import { announce } from "@/lib/utils/debugTools/announce"
 
 const initialState = {
   contentList: [],
@@ -28,6 +33,39 @@ const featuredContentSlice = createSlice({
         state.status = "failed"
         state.error = action.error.message
       })
+      .addCase(updateFeaturedContentEntries.pending, (state) => {
+        state.status = "loading"
+      })
+      .addCase(updateFeaturedContentEntries.fulfilled, (state, action) => {
+        state.status = "succeeded"
+
+        // replace state.contentList with the updated content
+        state.contentList = state.contentList = action.payload
+      })
+
+      .addCase(updateSingleContentEntry.pending, (state) => {
+        state.status = "loading"
+      })
+
+      .addCase(updateSingleContentEntry.fulfilled, (state, action) => {
+        state.status = "succeeded"
+
+        announce(
+          "action.payload witihin updateSingleContentEntry case (slice) ",
+          action.payload
+        )
+
+        // update the contentList with the updated content
+        let updatedContent = action.payload
+        const existingContentIndex = state.contentList.findIndex(
+          (content) => content.frontendId === updatedContent.frontendId
+        )
+        state.contentList[existingContentIndex] = updatedContent
+      })
+      .addCase(updateSingleContentEntry.rejected, (state, action) => {
+        state.status = "failed"
+        state.error = action.error.message
+      })
   },
 })
 
@@ -39,6 +77,36 @@ export const fetchFeaturedContent = createAsyncThunk(
     const response = await getFeaturedContent(handle)
     console.log("got something for featuredContent!! --> ", response.data)
 
+    return response.data
+  }
+)
+
+export const updateFeaturedContentEntries = createAsyncThunk(
+  "featuredContent/updateFeaturedContentEntries",
+  async (contentUpdateData) => {
+    const response = await updateFeaturedContent(
+      contentUpdateData.handle,
+      contentUpdateData.content
+    )
+    return response.data
+  }
+)
+
+// TODO: check if right data-tree
+export const updateSingleContentEntry = createAsyncThunk(
+  "featuredContent/updateSingleContentEntry",
+  async (contentUpdateData) => {
+    const response = await updateFeaturedContentEntry(
+      contentUpdateData.handle,
+      {
+        title: contentUpdateData.content.title,
+        description: contentUpdateData.content.description,
+        url: contentUpdateData.content.url,
+        position: contentUpdateData.content.position,
+        category: contentUpdateData.content.category,
+        frontendId: contentUpdateData.content.frontendId,
+      }
+    )
     return response.data
   }
 )
