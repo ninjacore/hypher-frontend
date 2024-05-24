@@ -330,7 +330,10 @@ function DraggableLinkCollection({ handle, mutableLinkCollection }) {
       }
       dispatch(updateLinkCollection(updateData))
     } catch (error) {
-      console.error("Failed to save the link collection: ", error)
+      console.error(
+        "[onSaveUpdateClicked] Failed to save the link collection: ",
+        error
+      )
     } finally {
       setUpdateRequestStatus("idle")
     }
