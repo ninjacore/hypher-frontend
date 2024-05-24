@@ -11,4 +11,15 @@ export async function getFeaturedContent(handle) {
   return await apiHandler(endpoint, "GET")
 }
 
+export async function updateFeaturedContent(handle, dataUpdates) {
+  const endpoint = `${baseURL}/api/v2/featuredContent/update?handle=${handle}`
+
+  return await apiHandler(endpoint, "PUT", dataUpdates)
+}
+
+export async function updateFeaturedContentEntry(handle, updatedData) {
+  const endpoint = `${baseURL}/api/v2/featuredContent/content/update?handle=${handle}`
+
+  return await apiHandler(endpoint, "PUT", updatedData)
+}
 // client functions for FeaturedContent ./

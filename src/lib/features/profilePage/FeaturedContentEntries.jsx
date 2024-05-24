@@ -32,10 +32,14 @@ import { ProfilePageContext } from "@/app/[handle]/utils/ProfilePageContext"
 import { useSelector } from "react-redux"
 
 // specific CRUD actions for this feature
-import { fetchFeaturedContent } from "@/lib/features/profilePage/featuredContentSlice"
+import {
+  fetchFeaturedContent,
+  updateFeaturedContentEntries,
+  updateSingleContentEntry,
+} from "@/lib/features/profilePage/featuredContentSlice"
 
 // imports for sorting functionality /.
-// import { SortableLinkNode } from "@/lib/utils/SortableLinkNode/SortableLinkNode"
+import { SortableFeaturedContentNode } from "@/lib/utils/dragAndDropNodes/SortableFeaturedContentNode"
 import {
   DndContext,
   closestCenter,
@@ -81,24 +85,24 @@ export const FeaturedContentEntries = ({ handle, mode, sectionTitle }) => {
   )
 
   // backend always sends content in order
-  const featuredContentByPosition = JSON.parse(JSON.stringify(featuredContent))
+  const mutableFeaturedContent = JSON.parse(JSON.stringify(featuredContent))
 
   // TODO: find the obsolete part
   // "there's something wrong, I can feel it" /.
   // to make sure content is always added at the end
   let initialLastPosition = null
   let initialAmountOfFeaturedContent = 0
-  if (featuredContentByPosition.length > 0) {
+  if (mutableFeaturedContent.length > 0) {
     initialLastPosition =
-      featuredContentByPosition[featuredContentByPosition.length - 1].position
-    initialAmountOfFeaturedContent = featuredContentByPosition.length
+      mutableFeaturedContent[mutableFeaturedContent.length - 1].position
+    initialAmountOfFeaturedContent = mutableFeaturedContent.length
   }
 
   // to make sure links are always added at the end
   const [nextHighestPosition, setNextHighestPosition] = useState(0)
   // "there's something wrong, I can feel it" ./
 
-  announce("TOP LEVEL featuredContentByPosition", featuredContentByPosition)
+  announce("TOP LEVEL mutableLinkCollection", mutableFeaturedContent)
 
   useEffect(() => {
     if (featuredContentStatus === "idle") {
@@ -109,13 +113,13 @@ export const FeaturedContentEntries = ({ handle, mode, sectionTitle }) => {
     checkNextHighestPosition(
       initialAmountOfFeaturedContent,
       initialLastPosition,
-      featuredContentByPosition,
+      mutableFeaturedContent,
       setNextHighestPosition
     )
 
     // de-activate 'change order' button if there's not more than 1 featured content
-    checkChangeOrderButton(featuredContentByPosition)
-  }, [featuredContentStatus, dispatch, featuredContentByPosition])
+    checkChangeOrderButton(mutableFeaturedContent)
+  }, [featuredContentStatus, dispatch, mutableFeaturedContent])
 
   // switches for content rendering /.
   if (featuredContentStatus === "loading") {
@@ -131,7 +135,7 @@ export const FeaturedContentEntries = ({ handle, mode, sectionTitle }) => {
       <div>
         <h2 className="section-title">{sectionTitle}</h2>
         <ClickableFeaturedContent
-          featuredContentByPosition={featuredContentByPosition}
+          mutableLinkCollection={mutableFeaturedContent}
         />
       </div>
     )
@@ -143,6 +147,8 @@ export const FeaturedContentEntries = ({ handle, mode, sectionTitle }) => {
         <>
           <h2 className="section-title">{sectionTitle}</h2>
           <DraggableFeaturedContent
+            handle={handle}
+            mutableFeaturedContent={mutableFeaturedContent}
             setFeaturedContentIsSortable={setFeaturedContentIsSortable}
           />
         </>
@@ -169,8 +175,8 @@ export const FeaturedContentEntries = ({ handle, mode, sectionTitle }) => {
   // switches for content rendering ./
 }
 
-function ClickableFeaturedContent({ featuredContentByPosition }) {
-  return featuredContentByPosition.map((content) => {
+function ClickableFeaturedContent({ mutableLinkCollection }) {
+  return mutableLinkCollection.map((content) => {
     return (
       <Card key={content.category + content.position} className="my-4">
         <a href={content.url} target="_blank">
@@ -184,7 +190,7 @@ function ClickableFeaturedContent({ featuredContentByPosition }) {
               <span>
                 {content.description.length > 0
                   ? content.description
-                  : content.url}
+                  : content.url.substring(0, 26) + "..."}
               </span>
             </div>
           </div>
@@ -198,13 +204,26 @@ function EditableFeaturedContent() {
   return <p>editable tbd</p>
 }
 
-function DraggableFeaturedContent({ setFeaturedContentIsSortable }) {
+function DraggableFeaturedContent({
+  handle,
+  mutableFeaturedContent,
+  setFeaturedContentIsSortable,
+}) {
+  const [updateRequestStatus, setUpdateRequestStatus] = useState("idle")
+  const dispatch = useDispatch()
+
+  // 'shadow copy' for dispatch on save
+  const [reorderedFeaturedContent, setReorderedFeaturedContent] = useState([
+    ...mutableFeaturedContent,
+  ])
+
   return (
     <>
       <p>Pick up a link to change its position in the collection.</p>
-      <p>
-        <b>draggable tbd</b>
-      </p>
+      <DndFrame
+        mutableFeaturedContent={mutableFeaturedContent}
+        setReorderedFeaturedContent={setReorderedFeaturedContent}
+      />
       <div className="flex justify-end gap-5">
         <div>
           <Button
@@ -224,7 +243,7 @@ function DraggableFeaturedContent({ setFeaturedContentIsSortable }) {
             variant="outline"
             className="bg-white text-black"
             onClick={() => {
-              // TODO: onSaveUpdateClicked()
+              onSaveUpdateClicked(handle, reorderedFeaturedContent)
               setFeaturedContentIsSortable(false) // exit dnd-mode
             }}
           >
@@ -234,29 +253,64 @@ function DraggableFeaturedContent({ setFeaturedContentIsSortable }) {
       </div>
     </>
   )
+
+  async function onSaveUpdateClicked(
+    handle,
+    bufferedFeaturedContentCollection
+  ) {
+    try {
+      setUpdateRequestStatus("pending")
+      announce(
+        "sending reorderedFeaturedContent to backend (default positions):",
+        bufferedFeaturedContentCollection
+      )
+      const collectionWithRightPositions =
+        bufferedFeaturedContentCollection.map((featuredNode, index) => {
+          featuredNode.position = index
+          return featuredNode
+        })
+      announce(
+        "sending reorderedFeaturedContent to backend (updated positions):",
+        collectionWithRightPositions
+      )
+
+      // createAsyncThunk only takes one argument
+      const updateData = {
+        handle,
+        content: collectionWithRightPositions,
+      }
+      dispatch(updateFeaturedContentEntries(updateData))
+    } catch (error) {
+      console.error(
+        "[onSaveUpdateClicked] Failed to save the featured content to the collection:",
+        error
+      )
+    } finally {
+      setUpdateRequestStatus("idle")
+    }
+  }
 }
 
-// support functions /.
+// status support functions /.
 function checkNextHighestPosition(
   initialAmountOfFeaturedContent,
   initialLastPosition,
-  featuredContentByPosition,
+  mutableLinkCollection,
   setNextHighestPosition
 ) {
   // cover the case when there's no content
-  if (!featuredContentByPosition.length > 0) {
+  if (!mutableLinkCollection.length > 0) {
     setNextHighestPosition(0)
   }
 
   try {
     if (
-      featuredContentByPosition.length > initialAmountOfFeaturedContent ||
-      featuredContentByPosition[featuredContentByPosition.length - 1]
-        .position !== initialLastPosition
+      mutableLinkCollection.length > initialAmountOfFeaturedContent ||
+      mutableLinkCollection[mutableLinkCollection.length - 1].position !==
+        initialLastPosition
     ) {
       setNextHighestPosition(
-        featuredContentByPosition[featuredContentByPosition.length - 1]
-          .position + 1
+        mutableLinkCollection[mutableLinkCollection.length - 1].position + 1
       )
     }
   } catch (error) {
@@ -264,8 +318,8 @@ function checkNextHighestPosition(
   }
 }
 
-function checkChangeOrderButton(featuredContentByPosition) {
-  if (featuredContentByPosition.length < 2) {
+function checkChangeOrderButton(mutableLinkCollection) {
+  if (mutableLinkCollection.length < 2) {
     let changeOrderButton = document.getElementById(
       "activateReorderFeaturedContentButton"
     )
@@ -282,5 +336,110 @@ function checkChangeOrderButton(featuredContentByPosition) {
     }
   }
 }
+// status support functions ./
 
-// support functions ./
+// drag-and-drop support functions /.
+function DndFrame({ mutableFeaturedContent, setReorderedFeaturedContent }) {
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  )
+
+  // to trigger updrill if needed
+  const [dragEventHandled, setDragEventHandled] = useState(null)
+
+  // used for drag-and-drop (reorder and transition animation)
+  const [featuredContentNodes, setFeaturedContentNodes] = useState(
+    mutableFeaturedContent.map((featuredNode) => {
+      console.log(
+        "assigning featuredNode.id based on frontendId",
+        featuredNode.frontendId
+      )
+      announce("featuredNode", featuredNode)
+
+      featuredNode.id = featuredNode.frontendId
+      return featuredNode
+    })
+  )
+
+  // used to up-drill every time reorder happens
+  useEffect(() => {
+    // don't updrill on mount
+    if (dragEventHandled) {
+      // for debugging /.
+      console.log(
+        `%c dragEventHandled was touched: type=${typeof dragEventHandled}, value=${dragEventHandled}`,
+        "color: cyan; font-weight: bold;"
+      )
+      announce("featuredContent within useEffect", mutableFeaturedContent)
+      // for debugging ./
+
+      setReorderedFeaturedContent(featuredContentNodes)
+      setDragEventHandled(false)
+    }
+  }, [featuredContentNodes])
+
+  // for debugging
+  let counter = 0
+
+  return (
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCenter}
+      onDragEnd={handleDragEnd}
+      id={useId()}
+    >
+      <SortableContext
+        items={featuredContentNodes}
+        strategy={verticalListSortingStrategy}
+      >
+        {featuredContentNodes.map((contentNode) => {
+          console.log("round #" + counter + " id is: " + contentNode.id)
+          counter++
+
+          return (
+            <SortableFeaturedContentNode
+              key={contentNode.position}
+              id={contentNode.id}
+              title={contentNode.title}
+              description={contentNode.description}
+              url={contentNode.url}
+              category={contentNode.category}
+            />
+          )
+        })}
+      </SortableContext>
+    </DndContext>
+  )
+
+  function handleDragEnd(event) {
+    const { active, over } = event
+
+    console.log(`%c active.id => ${active.id}`, `color: green;`)
+    console.log(`%c over.id => ${over.id}`, `color: green;`)
+
+    if (active.id !== over.id) {
+      setFeaturedContentNodes((items) => {
+        const oldIndex = items
+          .map((featuredNode) => featuredNode.id)
+          .indexOf(active.id)
+
+        const newIndex = items
+          .map((featuredNode) => featuredNode.id)
+          .indexOf(over.id)
+
+        // swap positions (including the 'position' attribute)
+        const newlySortedItems = arrayMove(items, oldIndex, newIndex)
+        newlySortedItems.forEach((featuredNode, index) => {
+          featuredNode.position = index
+        })
+        setDragEventHandled(true)
+
+        return newlySortedItems
+      })
+    }
+  }
+}
+// drag-and-drop support functions ./
