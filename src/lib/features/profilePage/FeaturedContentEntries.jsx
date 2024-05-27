@@ -158,7 +158,10 @@ export const FeaturedContentEntries = ({ handle, mode, sectionTitle }) => {
     return (
       <>
         <h2 className="section-title">{sectionTitle}</h2>
-        <EditableFeaturedContent />
+        <EditableFeaturedContent
+          handle={handle}
+          mutableFeaturedContent={mutableFeaturedContent}
+        />
         <div className="flex justify-end">
           <Button
             id="activateReorderLinkCollectionButton"
@@ -200,8 +203,13 @@ function ClickableFeaturedContent({ mutableLinkCollection }) {
   })
 }
 
-function EditableFeaturedContent() {
-  return <p>editable tbd</p>
+function EditableFeaturedContent({ handle, mutableFeaturedContent }) {
+  return (
+    <>
+      <FeaturedContentProgressBar featuredContent={mutableFeaturedContent} />
+      <p>editable tbd</p>
+    </>
+  )
 }
 
 function DraggableFeaturedContent({
@@ -337,6 +345,32 @@ function checkChangeOrderButton(mutableLinkCollection) {
   }
 }
 // status support functions ./
+
+// manage content support functions /.
+function FeaturedContentDisplay() {}
+
+function FeaturedContentProgressBar({ featuredContent }) {
+  let progress = (featuredContent.length / 6) * 100
+
+  return (
+    <>
+      <span>
+        You are listing {featuredContent.length} of 6 possible content items.
+      </span>
+      <Progress
+        id="featuredContentProgressBar"
+        value={progress}
+        className="w-[60%] my-4"
+      />
+    </>
+  )
+}
+
+function CreateContentDialog() {}
+
+function DeleteContentDialog() {}
+
+// manage content support functions ./
 
 // drag-and-drop support functions /.
 function DndFrame({ mutableFeaturedContent, setReorderedFeaturedContent }) {
