@@ -6,6 +6,9 @@ import { useSortable } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
 import { IconMapper } from "@/components/iconMapper"
 
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import { faGripLines } from "@fortawesome/free-solid-svg-icons"
+
 import { Card } from "@/components/ui/card"
 
 function SortableFeaturedContentNode(props) {
@@ -43,6 +46,12 @@ function SortableFeaturedContentNode(props) {
                 ? props.description
                 : props.url.substring(0, 26) + "..."}
             </span>
+          </div>
+          <div className="py-6 px-8">
+            <FontAwesomeIcon
+              icon={faGripLines}
+              className="fas fa-grip-lines text-base"
+            ></FontAwesomeIcon>
           </div>
         </div>
       </Card>
