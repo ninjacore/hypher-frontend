@@ -162,6 +162,8 @@ export const FeaturedContentEntries = ({ handle, mode, sectionTitle }) => {
           handle={handle}
           mutableFeaturedContent={mutableFeaturedContent}
           sectionTitle={sectionTitle}
+          nextHighestPosition={nextHighestPosition}
+          setAddRequestStatus={setAddRequestStatus}
         />
         <div className="flex justify-end">
           <Button
@@ -208,7 +210,14 @@ function EditableFeaturedContent({
   handle,
   mutableFeaturedContent,
   sectionTitle,
+  nextHighestPosition,
+  setAddRequestStatus,
 }) {
+  let editableTitle = ""
+  let editableDescription = ""
+  let editableUrl = ""
+  let editableCategory = ""
+
   return (
     <>
       <div className="flex justify-between">
@@ -219,7 +228,16 @@ function EditableFeaturedContent({
             amountOfContent={mutableFeaturedContent.length}
             maxAmountOfContent={6}
           />
-          <CreateContentDialog />
+          <CreateContentDialog
+            title={editableTitle}
+            description={editableDescription}
+            url={editableUrl}
+            category={editableCategory}
+            position={nextHighestPosition}
+            frontendId={nanoid()}
+            setAddRequestStatus={setAddRequestStatus}
+            onAddContentClicked={onAddContentClicked}
+          />
         </Dialog>
       </div>
 
@@ -271,7 +289,12 @@ function DraggableFeaturedContent({
             variant="outline"
             className="bg-white text-black"
             onClick={() => {
-              onSaveUpdateClicked(handle, reorderedFeaturedContent)
+              onSaveUpdateClicked(
+                handle,
+                reorderedFeaturedContent,
+                setUpdateRequestStatus,
+                dispatch
+              )
               setFeaturedContentIsSortable(false) // exit dnd-mode
             }}
           >
@@ -281,42 +304,6 @@ function DraggableFeaturedContent({
       </div>
     </>
   )
-
-  async function onSaveUpdateClicked(
-    handle,
-    bufferedFeaturedContentCollection
-  ) {
-    try {
-      setUpdateRequestStatus("pending")
-      announce(
-        "sending reorderedFeaturedContent to backend (default positions):",
-        bufferedFeaturedContentCollection
-      )
-      const collectionWithRightPositions =
-        bufferedFeaturedContentCollection.map((featuredNode, index) => {
-          featuredNode.position = index
-          return featuredNode
-        })
-      announce(
-        "sending reorderedFeaturedContent to backend (updated positions):",
-        collectionWithRightPositions
-      )
-
-      // createAsyncThunk only takes one argument
-      const updateData = {
-        handle,
-        content: collectionWithRightPositions,
-      }
-      dispatch(updateFeaturedContentEntries(updateData))
-    } catch (error) {
-      console.error(
-        "[onSaveUpdateClicked] Failed to save the featured content to the collection:",
-        error
-      )
-    } finally {
-      setUpdateRequestStatus("idle")
-    }
-  }
 }
 
 // status support functions /.
@@ -519,12 +506,134 @@ function FeaturedContentProgressBar({ featuredContent }) {
   )
 }
 
-function CreateContentDialog() {}
+function CreateContentDialog({
+  title,
+  description,
+  url,
+  category,
+  position,
+  frontendId,
+  setAddRequestStatus,
+  onAddContentClicked,
+}) {
+  // component-internal state
+  const [contentTitle, setContentTitle] = useState(title)
+  const [contentDescription, setContentDescription] = useState(description)
+  const [contentUrl, setContentUrl] = useState(url)
+  const [contentCategory, setContentCategory] = useState(category)
+  const contentPosition = position
+
+  // used for network and Redux state-management
+  const dispatch = useDispatch()
+
+  // TODO: check if this costs performance
+  // reading from context
+  const { handle } = useContext(ProfilePageContext)
+
+  return (
+    <DialogContent className="sm:max-w-[425px]">
+      <DialogHeader>
+        <DialogTitle>Add Link</DialogTitle>
+        <DialogDescription>
+          Define your link here. Click save when you're done.
+        </DialogDescription>
+      </DialogHeader>
+
+      <div className="grid gap-4 py-4">
+        <div className="grid grid-cols-4 items-center gap-4">
+          <Label htmlFor="contentTitle" className="text-right">
+            Title
+          </Label>
+          <Input
+            id={"contentTitleInput-" + contentPosition}
+            type="text"
+            className="col-span-3"
+            value={contentTitle}
+            onChange={(e) => setContentTitle(e.target.value)}
+          />
+
+          <Label htmlFor="contentDescription" className="text-right">
+            Description
+          </Label>
+          <Input
+            id={"contentDescriptionInput-" + contentPosition}
+            type="text"
+            className="col-span-3"
+            value={contentDescription}
+            onChange={(e) => setContentDescription(e.target.value)}
+          />
+          <Label htmlFor="contentUrl" className="text-right">
+            Url
+          </Label>
+          <Input
+            id={"contentUrlInput-" + contentPosition}
+            type="text"
+            className="col-span-3"
+            value={contentUrl}
+            onChange={(e) => setContentUrl(e.target.value)}
+          />
+          <Label htmlFor="contentCategory" className="text-right">
+            Category
+          </Label>
+          <Input
+            id={"contentCategoryInput-" + contentPosition}
+            type="text"
+            className="col-span-3"
+            value={contentCategory}
+            onChange={(e) => setContentCategory(e.target.value)}
+          />
+        </div>
+      </div>
+      <DialogFooter>
+        <DialogClose>
+          <div className="flex justify-end gap-5">
+            <Button
+              className="bg-white text-black"
+              variant="outline"
+              type="reset"
+              onClick={() => {
+                setContentTitle("")
+                setContentDescription("")
+                setContentUrl("")
+                setContentCategory("")
+              }}
+            >
+              cancel
+            </Button>
+            <Button
+              className="bg-white text-black"
+              variant="outline"
+              type="submit"
+              onClick={() => {
+                // onAddLinkClicked(
+                //   handle,
+                //   {
+                //     frontendId: frontendId,
+                //     url: linkUrl,
+                //     text: linkText,
+                //     position: linkPosition,
+                //   },
+                //   setAddRequestStatus,
+                //   dispatch
+                // )
+                setContentTitle("")
+                setContentDescription("")
+                setContentUrl("")
+                setContentCategory("")
+              }}
+            >
+              save
+            </Button>
+          </div>
+        </DialogClose>
+      </DialogFooter>
+    </DialogContent>
+  )
+}
 
 function EditContentDialog() {}
 
 function DeleteContentDialog() {}
-
 // manage content support functions ./
 
 // drag-and-drop support functions /.
@@ -632,3 +741,48 @@ function DndFrame({ mutableFeaturedContent, setReorderedFeaturedContent }) {
   }
 }
 // drag-and-drop support functions ./
+
+// Network and State-Management functions /.
+async function onAddContentClicked() {
+  console.log("onAddContentClicked")
+}
+
+async function onSaveUpdateClicked(
+  handle,
+  bufferedFeaturedContentCollection,
+  setUpdateRequestStatus,
+  dispatch
+) {
+  try {
+    setUpdateRequestStatus("pending")
+    announce(
+      "sending reorderedFeaturedContent to backend (default positions):",
+      bufferedFeaturedContentCollection
+    )
+    const collectionWithRightPositions = bufferedFeaturedContentCollection.map(
+      (featuredNode, index) => {
+        featuredNode.position = index
+        return featuredNode
+      }
+    )
+    announce(
+      "sending reorderedFeaturedContent to backend (updated positions):",
+      collectionWithRightPositions
+    )
+
+    // createAsyncThunk only takes one argument
+    const updateData = {
+      handle,
+      content: collectionWithRightPositions,
+    }
+    dispatch(updateFeaturedContentEntries(updateData))
+  } catch (error) {
+    console.error(
+      "[onSaveUpdateClicked] Failed to save the featured content to the collection:",
+      error
+    )
+  } finally {
+    setUpdateRequestStatus("idle")
+  }
+}
+// Network and State-Management functions ./
