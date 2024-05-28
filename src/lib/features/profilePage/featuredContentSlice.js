@@ -5,6 +5,7 @@ import { nanoid, createAsyncThunk } from "@reduxjs/toolkit"
 import {
   getFeaturedContent,
   updateFeaturedContent,
+  addNewFeaturedContentEntry,
   updateFeaturedContentEntry,
 } from "@/lib/utils/profileDataClients/featuredContentClient"
 import { announce } from "@/lib/utils/debugTools/announce"
@@ -21,6 +22,7 @@ const featuredContentSlice = createSlice({
   reducers: {},
   extraReducers(builder) {
     builder
+      // Fetch
       .addCase(fetchFeaturedContent.pending, (state) => {
         state.status = "loading"
       })
@@ -33,6 +35,7 @@ const featuredContentSlice = createSlice({
         state.status = "failed"
         state.error = action.error.message
       })
+      // Update
       .addCase(updateFeaturedContentEntries.pending, (state) => {
         state.status = "loading"
       })
@@ -43,10 +46,19 @@ const featuredContentSlice = createSlice({
         state.contentList = state.contentList = action.payload
       })
 
+      // Add
+      .addCase(addNewFeaturedContent.pending, (state) => {
+        state.status = "loading"
+      })
+      .addCase(addNewFeaturedContent.fulfilled, (state, action) => {
+        state.status = "succeeded"
+        let newContent = action.payload
+        state.contentList = state.contentList.concat(newContent)
+      })
+      // Update
       .addCase(updateSingleContentEntry.pending, (state) => {
         state.status = "loading"
       })
-
       .addCase(updateSingleContentEntry.fulfilled, (state, action) => {
         state.status = "succeeded"
 
@@ -88,6 +100,15 @@ export const updateFeaturedContentEntries = createAsyncThunk(
       contentUpdateData.handle,
       contentUpdateData.content
     )
+    return response.data
+  }
+)
+
+export const addNewFeaturedContent = createAsyncThunk(
+  "featuredContent/addNewFeaturedContent",
+  async (contentUpdateData) => {
+    const { handle, content } = contentUpdateData
+    const response = await addNewFeaturedContentEntry(handle, content)
     return response.data
   }
 )

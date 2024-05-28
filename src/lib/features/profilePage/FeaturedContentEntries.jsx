@@ -35,6 +35,7 @@ import { useSelector } from "react-redux"
 import {
   fetchFeaturedContent,
   updateFeaturedContentEntries,
+  addNewFeaturedContent,
   updateSingleContentEntry,
 } from "@/lib/features/profilePage/featuredContentSlice"
 
@@ -605,17 +606,19 @@ function CreateContentDialog({
               variant="outline"
               type="submit"
               onClick={() => {
-                // onAddLinkClicked(
-                //   handle,
-                //   {
-                //     frontendId: frontendId,
-                //     url: linkUrl,
-                //     text: linkText,
-                //     position: linkPosition,
-                //   },
-                //   setAddRequestStatus,
-                //   dispatch
-                // )
+                onAddContentClicked(
+                  handle,
+                  {
+                    frontendId: frontendId,
+                    title: contentTitle,
+                    description: contentDescription,
+                    url: contentUrl,
+                    category: contentCategory,
+                    position: contentPosition,
+                  },
+                  setAddRequestStatus,
+                  dispatch
+                )
                 setContentTitle("")
                 setContentDescription("")
                 setContentUrl("")
@@ -743,8 +746,27 @@ function DndFrame({ mutableFeaturedContent, setReorderedFeaturedContent }) {
 // drag-and-drop support functions ./
 
 // Network and State-Management functions /.
-async function onAddContentClicked() {
-  console.log("onAddContentClicked")
+async function onAddContentClicked(
+  handle,
+  newContent,
+  setAddRequestStatus,
+  dispatch
+) {
+  try {
+    setAddRequestStatus("pending")
+
+    // createAsayncThunk only takes one argument
+    const addData = {
+      handle,
+      content: newContent,
+    }
+
+    dispatch(addNewFeaturedContent(addData))
+  } catch (error) {
+    console.error("Failed to add content: ", error)
+  } finally {
+    setAddRequestStatus("idle")
+  }
 }
 
 async function onSaveUpdateClicked(
