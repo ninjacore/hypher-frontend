@@ -157,10 +157,11 @@ export const FeaturedContentEntries = ({ handle, mode, sectionTitle }) => {
 
     return (
       <>
-        <h2 className="section-title">{sectionTitle}</h2>
+        {/* <h2 className="section-title">{sectionTitle}</h2> */}
         <EditableFeaturedContent
           handle={handle}
           mutableFeaturedContent={mutableFeaturedContent}
+          sectionTitle={sectionTitle}
         />
         <div className="flex justify-end">
           <Button
@@ -203,9 +204,32 @@ function ClickableFeaturedContent({ mutableLinkCollection }) {
   })
 }
 
-function EditableFeaturedContent({ handle, mutableFeaturedContent }) {
+function EditableFeaturedContent({
+  handle,
+  mutableFeaturedContent,
+  sectionTitle,
+}) {
   return (
     <>
+      <div className="flex justify-between">
+        <h2 className="section-title">{"Manage " + sectionTitle}</h2>
+
+        <Dialog>
+          <AddContentButton
+            amountOfContent={mutableFeaturedContent.length}
+            maxAmountOfContent={6}
+          />
+          {/* <CreateLinkDialog
+            text={editableLinkText}
+            url={editableLinkUrl}
+            position={nextHighestPosition}
+            frontendId={nanoid()}
+            setAddRequestStatus={setAddRequestStatus}
+            onAddLinkClicked={onAddLinkClicked}
+          /> */}
+        </Dialog>
+      </div>
+
       <FeaturedContentProgressBar featuredContent={mutableFeaturedContent} />
       <CollectionOfFeaturedContent
         mutableFeaturedContent={mutableFeaturedContent}
@@ -445,6 +469,26 @@ function FeaturedContentDisplay({
         </div>
       </div>
     </Card>
+  )
+}
+
+function AddContentButton({ amountOfContent, maxAmountOfContent }) {
+  if (amountOfContent >= maxAmountOfContent) {
+    // inactive mode
+    return (
+      <Button variant="outline" className="bg-white text-black" disabled>
+        add
+      </Button>
+    )
+  }
+
+  // active mode
+  return (
+    <DialogTrigger asChild>
+      <Button variant="outline" className="bg-white text-black">
+        add
+      </Button>
+    </DialogTrigger>
   )
 }
 
