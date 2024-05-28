@@ -445,7 +445,7 @@ function CollectionOfEditableLinks({ mutableLinkCollection }) {
     })
   )
   // TODO: only re-assign upon true action (not on mount)
-  // used to up-drill every time reorder happens
+  // used to up-drill every time change happens
   useEffect(() => {
     announce("mutableLinkCollection", mutableLinkCollection) // this is the updated one
     setLinkNodes(mutableLinkCollection) // causes re-render after deletion
@@ -887,12 +887,10 @@ function LinkDisplay({ linkPosition, linkUrl, linkText, frontendId }) {
   // announce("LinkDisplay", { linkPosition, linkUrl, linkText })
   return (
     <>
-      <a>
-        <IconMapper url={linkUrl} />
-        <span id={"linkText-" + linkPosition + frontendId} className="mx-2">
-          {linkText.length > 0 ? linkText : linkUrl}
-        </span>
-      </a>
+      <IconMapper url={linkUrl} />
+      <span id={"linkText-" + linkPosition + frontendId} className="mx-2">
+        {linkText.length > 0 ? linkText : linkUrl}
+      </span>
     </>
   )
 }
