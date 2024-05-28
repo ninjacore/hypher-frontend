@@ -207,7 +207,9 @@ function EditableFeaturedContent({ handle, mutableFeaturedContent }) {
   return (
     <>
       <FeaturedContentProgressBar featuredContent={mutableFeaturedContent} />
-      <p>editable tbd</p>
+      <CollectionOfFeaturedContent
+        mutableFeaturedContent={mutableFeaturedContent}
+      />
     </>
   )
 }
@@ -303,22 +305,22 @@ function DraggableFeaturedContent({
 function checkNextHighestPosition(
   initialAmountOfFeaturedContent,
   initialLastPosition,
-  mutableLinkCollection,
+  mutableFeaturedContent,
   setNextHighestPosition
 ) {
   // cover the case when there's no content
-  if (!mutableLinkCollection.length > 0) {
+  if (!mutableFeaturedContent.length > 0) {
     setNextHighestPosition(0)
   }
 
   try {
     if (
-      mutableLinkCollection.length > initialAmountOfFeaturedContent ||
-      mutableLinkCollection[mutableLinkCollection.length - 1].position !==
+      mutableFeaturedContent.length > initialAmountOfFeaturedContent ||
+      mutableFeaturedContent[mutableFeaturedContent.length - 1].position !==
         initialLastPosition
     ) {
       setNextHighestPosition(
-        mutableLinkCollection[mutableLinkCollection.length - 1].position + 1
+        mutableFeaturedContent[mutableFeaturedContent.length - 1].position + 1
       )
     }
   } catch (error) {
@@ -347,7 +349,104 @@ function checkChangeOrderButton(mutableLinkCollection) {
 // status support functions ./
 
 // manage content support functions /.
-function FeaturedContentDisplay() {}
+function CollectionOfFeaturedContent({ mutableFeaturedContent }) {
+  // to trigger re-render in effect
+  const [updateRequestStatus, setUpdateRequestStatus] = useState("idle")
+  const [deleteRequestStatus, setDeleteRequestStatus] = useState("idle")
+
+  // 'shadow copy' for dispatch
+  const [contentNodes, setContentNodes] = useState(
+    mutableFeaturedContent.map((featuredNode) => {
+      featuredNode.id = featuredNode.frontendId
+      return featuredNode
+    })
+  )
+
+  // up-drill every time change happens
+  useEffect(() => {
+    announce("mutableFeaturedContent", mutableFeaturedContent)
+    setContentNodes(mutableFeaturedContent) // causes re-render after deletion
+    announce("updateRequestStatus", updateRequestStatus)
+  }, [updateRequestStatus, deleteRequestStatus, mutableFeaturedContent])
+
+  return contentNodes.map((contentNode) => {
+    announce("featuredContent:", contentNode)
+
+    return (
+      <EditableFeaturedContentItem
+        key={contentNode.frontendId}
+        contentPosition={contentNode.position}
+        contentTitle={contentNode.title}
+        contentDescription={contentNode.description}
+        contentUrl={contentNode.url}
+        contentCategory={contentNode.category}
+      />
+    )
+  })
+}
+
+function EditableFeaturedContentItem({
+  contentPosition,
+  contentTitle,
+  contentDescription,
+  contentUrl,
+  contentCategory,
+}) {
+  return (
+    <>
+      <FeaturedContentDisplay
+        contentPosition={contentPosition}
+        contentTitle={contentTitle}
+        contentDescription={contentDescription}
+        contentUrl={contentUrl}
+        contentCategory={contentCategory}
+      />
+    </>
+  )
+}
+
+function FeaturedContentDisplay({
+  contentPosition,
+  contentTitle,
+  contentDescription,
+  contentUrl,
+  contentCategory,
+}) {
+  return (
+    <Card
+      key={contentCategory + contentPosition + "non-linked"}
+      className="bg-midnight-blue"
+    >
+      <div className="flex my-4 pl-2.5 text-white bg-konkikyou-blue rounded-none">
+        <div className="text-5xl py-4 px-2">
+          <IconMapper url={contentCategory + ":"} />
+        </div>
+        <div className="grow p-2">
+          <span>{contentTitle.length > 0 ? contentTitle : ""}</span>
+          <br />
+          <span>
+            {contentDescription.length > 0
+              ? contentDescription
+              : contentUrl.substring(0, 26) + "..."}
+          </span>
+        </div>
+
+        <div className="flex-col bg-midnight-blue pl-2">
+          <div className="flex">
+            <div className="bg-konkikyou-blue pt-2 px-4">
+              <PenIconButton />
+            </div>
+
+            <div className="bg-konkikyou-blue mx-2 py-2 px-4">
+              <DeleteCrossIconButton />
+            </div>
+          </div>
+          <div></div>
+        </div>
+      </div>
+    </Card>
+  )
+}
 
 function FeaturedContentProgressBar({ featuredContent }) {
   let progress = (featuredContent.length / 6) * 100
