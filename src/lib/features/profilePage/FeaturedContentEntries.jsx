@@ -219,14 +219,7 @@ function EditableFeaturedContent({
             amountOfContent={mutableFeaturedContent.length}
             maxAmountOfContent={6}
           />
-          {/* <CreateContentDialog
-            text={editableLinkText}
-            url={editableLinkUrl}
-            position={nextHighestPosition}
-            frontendId={nanoid()}
-            setAddRequestStatus={setAddRequestStatus}
-            onAddLinkClicked={onAddLinkClicked}
-          /> */}
+          <CreateContentDialog />
         </Dialog>
       </div>
 
@@ -433,15 +426,31 @@ function EditableFeaturedContentItem({
 
         <div className="flex-col bg-midnight-blue pl-2">
           <div className="flex">
-            <div className="bg-konkikyou-blue pt-2 px-4">
-              <PenIconButton />
-            </div>
+            <Dialog>
+              <DialogTrigger asChild>
+                <div className="bg-konkikyou-blue pt-2 px-4">
+                  <PenIconButton />
+                </div>
+              </DialogTrigger>
+              <EditContentDialog
+              // frontendId={frontendId}
+              // setDeleteLinkRequestStatus={setDeleteLinkRequestStatus}
+              />
+            </Dialog>
 
-            <div className="bg-konkikyou-blue mx-2 py-2 px-4">
-              <DeleteCrossIconButton />
-            </div>
+            <Dialog>
+              <DialogTrigger asChild>
+                <div className="bg-konkikyou-blue mx-2 py-2 px-4">
+                  <DeleteCrossIconButton />
+                </div>
+              </DialogTrigger>
+              <DeleteContentDialog
+              // frontendId={frontendId}
+              // setDeleteLinkRequestStatus={setDeleteLinkRequestStatus}
+              />
+            </Dialog>
           </div>
-          <div></div>
+          <div>{/* just here for formatting */}</div>
         </div>
       </div>
     </Card>
@@ -511,6 +520,8 @@ function FeaturedContentProgressBar({ featuredContent }) {
 }
 
 function CreateContentDialog() {}
+
+function EditContentDialog() {}
 
 function DeleteContentDialog() {}
 
