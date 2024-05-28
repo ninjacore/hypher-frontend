@@ -219,7 +219,7 @@ function EditableFeaturedContent({
             amountOfContent={mutableFeaturedContent.length}
             maxAmountOfContent={6}
           />
-          {/* <CreateLinkDialog
+          {/* <CreateContentDialog
             text={editableLinkText}
             url={editableLinkUrl}
             position={nextHighestPosition}
@@ -231,6 +231,7 @@ function EditableFeaturedContent({
       </div>
 
       <FeaturedContentProgressBar featuredContent={mutableFeaturedContent} />
+
       <CollectionOfFeaturedContent
         mutableFeaturedContent={mutableFeaturedContent}
       />
@@ -417,43 +418,18 @@ function EditableFeaturedContentItem({
   contentCategory,
 }) {
   return (
-    <>
-      <FeaturedContentDisplay
-        contentPosition={contentPosition}
-        contentTitle={contentTitle}
-        contentDescription={contentDescription}
-        contentUrl={contentUrl}
-        contentCategory={contentCategory}
-      />
-    </>
-  )
-}
-
-function FeaturedContentDisplay({
-  contentPosition,
-  contentTitle,
-  contentDescription,
-  contentUrl,
-  contentCategory,
-}) {
-  return (
     <Card
       key={contentCategory + contentPosition + "non-linked"}
       className="bg-midnight-blue"
     >
       <div className="flex my-4 pl-2.5 text-white bg-konkikyou-blue rounded-none">
-        <div className="text-5xl py-4 px-2">
-          <IconMapper url={contentCategory + ":"} />
-        </div>
-        <div className="grow p-2">
-          <span>{contentTitle.length > 0 ? contentTitle : ""}</span>
-          <br />
-          <span>
-            {contentDescription.length > 0
-              ? contentDescription
-              : contentUrl.substring(0, 26) + "..."}
-          </span>
-        </div>
+        <FeaturedContentDisplay
+          contentPosition={contentPosition}
+          contentTitle={contentTitle}
+          contentDescription={contentDescription}
+          contentUrl={contentUrl}
+          contentCategory={contentCategory}
+        />
 
         <div className="flex-col bg-midnight-blue pl-2">
           <div className="flex">
@@ -469,6 +445,31 @@ function FeaturedContentDisplay({
         </div>
       </div>
     </Card>
+  )
+}
+
+function FeaturedContentDisplay({
+  contentPosition,
+  contentTitle,
+  contentDescription,
+  contentUrl,
+  contentCategory,
+}) {
+  return (
+    <>
+      <div className="text-5xl py-4 px-2">
+        <IconMapper url={contentCategory + ":"} />
+      </div>
+      <div className="grow p-2">
+        <span>{contentTitle.length > 0 ? contentTitle : ""}</span>
+        <br />
+        <span>
+          {contentDescription.length > 0
+            ? contentDescription
+            : contentUrl.substring(0, 26) + "..."}
+        </span>
+      </div>
+    </>
   )
 }
 
@@ -498,7 +499,7 @@ function FeaturedContentProgressBar({ featuredContent }) {
   return (
     <>
       <span>
-        You are listing {featuredContent.length} of 6 possible content items.
+        You are listing {featuredContent.length} out of 6 possible content items
       </span>
       <Progress
         id="featuredContentProgressBar"
