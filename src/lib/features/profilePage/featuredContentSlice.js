@@ -7,6 +7,7 @@ import {
   updateFeaturedContent,
   addNewFeaturedContentEntry,
   updateFeaturedContentEntry,
+  deleteFeaturedContentEntry,
 } from "@/lib/utils/profileDataClients/featuredContentClient"
 import { announce } from "@/lib/utils/debugTools/announce"
 
@@ -78,6 +79,22 @@ const featuredContentSlice = createSlice({
         state.status = "failed"
         state.error = action.error.message
       })
+
+      // Delete
+      .addCase(deleteSingleContentEntry.pending, (state) => {
+        state.status = "loading"
+      })
+      .addCase(deleteSingleContentEntry.fulfilled, (state, action) => {
+        state.status = "succeeded"
+
+        state.contentList = state.contentList.filter(
+          (content) => content.frontendId !== action.payload.frontendId
+        )
+      })
+      .addCase(deleteSingleContentEntry.rejected, (state, action) => {
+        state.status = "failed"
+        state.error = action.error.message
+      })
   },
 })
 
@@ -131,6 +148,16 @@ export const updateSingleContentEntry = createAsyncThunk(
     return response.data
   }
 )
+
+export const deleteSingleContentEntry = createAsyncThunk(
+  "featuredContent/deleteSingleContentEntry",
+  async (deletionData) => {
+    const { handle, frontendId } = deletionData
+    const response = await deleteFeaturedContentEntry(handle, frontendId)
+    return response.data
+  }
+)
+
 // client interactions ./
 
 export default featuredContentSlice.reducer

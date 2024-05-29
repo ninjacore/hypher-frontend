@@ -30,4 +30,10 @@ export async function updateFeaturedContentEntry(handle, updatedData) {
 
   return await apiHandler(endpoint, "PUT", updatedData)
 }
+
+export async function deleteFeaturedContentEntry(handle, frontendId) {
+  const endpoint = `${baseURL}/api/v2/featuredContent/content/delete?handle=${handle}&frontendId=${frontendId}`
+
+  return await apiHandler(endpoint, "DELETE")
+}
 // client functions for single entry of FeaturedContent ./

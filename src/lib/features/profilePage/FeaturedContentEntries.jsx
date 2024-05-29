@@ -37,6 +37,7 @@ import {
   updateFeaturedContentEntries,
   addNewFeaturedContent,
   updateSingleContentEntry,
+  deleteSingleContentEntry,
 } from "@/lib/features/profilePage/featuredContentSlice"
 
 // imports for sorting functionality /.
@@ -386,6 +387,9 @@ function CollectionOfFeaturedContent({ mutableFeaturedContent }) {
         contentDescription={contentNode.description}
         contentUrl={contentNode.url}
         contentCategory={contentNode.category}
+        frontendId={contentNode.frontendId}
+        setUpdateRequestStatus={setUpdateRequestStatus}
+        setDeleteRequestStatus={setDeleteRequestStatus}
       />
     )
   })
@@ -397,6 +401,9 @@ function EditableFeaturedContentItem({
   contentDescription,
   contentUrl,
   contentCategory,
+  frontendId,
+  setUpdateRequestStatus,
+  setDeleteRequestStatus,
 }) {
   return (
     <Card
@@ -422,7 +429,7 @@ function EditableFeaturedContentItem({
               </DialogTrigger>
               <EditContentDialog
               // frontendId={frontendId}
-              // setDeleteLinkRequestStatus={setDeleteLinkRequestStatus}
+              // setUpdateRequestStatus={setUpdateRequestStatus}
               />
             </Dialog>
 
@@ -433,8 +440,8 @@ function EditableFeaturedContentItem({
                 </div>
               </DialogTrigger>
               <DeleteContentDialog
-              // frontendId={frontendId}
-              // setDeleteLinkRequestStatus={setDeleteLinkRequestStatus}
+                frontendId={frontendId}
+                setDeleteRequestStatus={setDeleteRequestStatus}
               />
             </Dialog>
           </div>
@@ -636,7 +643,54 @@ function CreateContentDialog({
 
 function EditContentDialog() {}
 
-function DeleteContentDialog() {}
+function DeleteContentDialog({ frontendId, setDeleteRequestStatus }) {
+  // Hooks can only be called inside of the body of a function component.
+  const { handle } = useContext(ProfilePageContext)
+
+  // used for network and Redux state-management
+  const dispatch = useDispatch()
+
+  return (
+    <DialogContent className="sm:max-w-[425px]">
+      <DialogHeader>
+        <DialogTitle>Delete Content</DialogTitle>
+        <DialogDescription>
+          Are you sure you want to stop featuring this content?
+        </DialogDescription>
+      </DialogHeader>
+      <DialogFooter>
+        <DialogClose>
+          <div className="flex justify-end gap-2">
+            <Button
+              className="bg-white text-black"
+              variant="outline"
+              type="submit"
+              id="confirmContentDeletion-Button"
+              onClick={() =>
+                onDeleteContentClicked(
+                  frontendId,
+                  handle,
+                  dispatch,
+                  setDeleteRequestStatus
+                )
+              }
+            >
+              yes
+            </Button>
+            <Button
+              className="bg-white text-black"
+              variant="outline"
+              type="reset"
+              id="cancelContentDeletion-Button"
+            >
+              no
+            </Button>
+          </div>
+        </DialogClose>
+      </DialogFooter>
+    </DialogContent>
+  )
+}
 // manage content support functions ./
 
 // drag-and-drop support functions /.
@@ -807,4 +861,27 @@ async function onSaveUpdateClicked(
     setUpdateRequestStatus("idle")
   }
 }
+
+async function onDeleteContentClicked(
+  frontendId,
+  handle,
+  dispatch,
+  setDeleteRequestStatus
+) {
+  try {
+    setDeleteRequestStatus("pending")
+
+    // createAsyncThunk only takes one argument
+    const deleteData = {
+      handle,
+      frontendId,
+    }
+    dispatch(deleteSingleContentEntry(deleteData))
+  } catch (error) {
+    console.error("Failed to delete content: ", error)
+  } finally {
+    setDeleteRequestStatus("idle")
+  }
+}
+
 // Network and State-Management functions ./
