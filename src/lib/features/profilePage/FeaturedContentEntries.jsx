@@ -35,7 +35,9 @@ import { useSelector } from "react-redux"
 import {
   fetchFeaturedContent,
   updateFeaturedContentEntries,
+  addNewFeaturedContent,
   updateSingleContentEntry,
+  deleteSingleContentEntry,
 } from "@/lib/features/profilePage/featuredContentSlice"
 
 // imports for sorting functionality /.
@@ -58,6 +60,7 @@ import {
 
 // debug support function
 import { announce } from "@/lib/utils/debugTools/announce"
+import { title } from "process"
 
 export const FeaturedContentEntries = ({ handle, mode, sectionTitle }) => {
   // for changing editable modes
@@ -157,10 +160,13 @@ export const FeaturedContentEntries = ({ handle, mode, sectionTitle }) => {
 
     return (
       <>
-        <h2 className="section-title">{sectionTitle}</h2>
+        {/* <h2 className="section-title">{sectionTitle}</h2> */}
         <EditableFeaturedContent
           handle={handle}
           mutableFeaturedContent={mutableFeaturedContent}
+          sectionTitle={sectionTitle}
+          nextHighestPosition={nextHighestPosition}
+          setAddRequestStatus={setAddRequestStatus}
         />
         <div className="flex justify-end">
           <Button
@@ -203,10 +209,43 @@ function ClickableFeaturedContent({ mutableLinkCollection }) {
   })
 }
 
-function EditableFeaturedContent({ handle, mutableFeaturedContent }) {
+function EditableFeaturedContent({
+  handle,
+  mutableFeaturedContent,
+  sectionTitle,
+  nextHighestPosition,
+  setAddRequestStatus,
+}) {
+  let editableTitle = ""
+  let editableDescription = ""
+  let editableUrl = ""
+  let editableCategory = ""
+
   return (
     <>
+      <div className="flex justify-between">
+        <h2 className="section-title">{"Manage " + sectionTitle}</h2>
+
+        <Dialog>
+          <AddContentButton
+            amountOfContent={mutableFeaturedContent.length}
+            maxAmountOfContent={6}
+          />
+          <CreateContentDialog
+            title={editableTitle}
+            description={editableDescription}
+            url={editableUrl}
+            category={editableCategory}
+            position={nextHighestPosition}
+            frontendId={nanoid()}
+            setAddRequestStatus={setAddRequestStatus}
+            onAddContentClicked={onAddContentClicked}
+          />
+        </Dialog>
+      </div>
+
       <FeaturedContentProgressBar featuredContent={mutableFeaturedContent} />
+
       <CollectionOfFeaturedContent
         mutableFeaturedContent={mutableFeaturedContent}
       />
@@ -253,7 +292,12 @@ function DraggableFeaturedContent({
             variant="outline"
             className="bg-white text-black"
             onClick={() => {
-              onSaveUpdateClicked(handle, reorderedFeaturedContent)
+              onSaveUpdateClicked(
+                handle,
+                reorderedFeaturedContent,
+                setUpdateRequestStatus,
+                dispatch
+              )
               setFeaturedContentIsSortable(false) // exit dnd-mode
             }}
           >
@@ -263,42 +307,6 @@ function DraggableFeaturedContent({
       </div>
     </>
   )
-
-  async function onSaveUpdateClicked(
-    handle,
-    bufferedFeaturedContentCollection
-  ) {
-    try {
-      setUpdateRequestStatus("pending")
-      announce(
-        "sending reorderedFeaturedContent to backend (default positions):",
-        bufferedFeaturedContentCollection
-      )
-      const collectionWithRightPositions =
-        bufferedFeaturedContentCollection.map((featuredNode, index) => {
-          featuredNode.position = index
-          return featuredNode
-        })
-      announce(
-        "sending reorderedFeaturedContent to backend (updated positions):",
-        collectionWithRightPositions
-      )
-
-      // createAsyncThunk only takes one argument
-      const updateData = {
-        handle,
-        content: collectionWithRightPositions,
-      }
-      dispatch(updateFeaturedContentEntries(updateData))
-    } catch (error) {
-      console.error(
-        "[onSaveUpdateClicked] Failed to save the featured content to the collection:",
-        error
-      )
-    } finally {
-      setUpdateRequestStatus("idle")
-    }
-  }
 }
 
 // status support functions /.
@@ -380,6 +388,9 @@ function CollectionOfFeaturedContent({ mutableFeaturedContent }) {
         contentDescription={contentNode.description}
         contentUrl={contentNode.url}
         contentCategory={contentNode.category}
+        frontendId={contentNode.frontendId}
+        setUpdateRequestStatus={setUpdateRequestStatus}
+        setDeleteRequestStatus={setDeleteRequestStatus}
       />
     )
   })
@@ -391,17 +402,60 @@ function EditableFeaturedContentItem({
   contentDescription,
   contentUrl,
   contentCategory,
+  frontendId,
+  setUpdateRequestStatus,
+  setDeleteRequestStatus,
 }) {
   return (
-    <>
-      <FeaturedContentDisplay
-        contentPosition={contentPosition}
-        contentTitle={contentTitle}
-        contentDescription={contentDescription}
-        contentUrl={contentUrl}
-        contentCategory={contentCategory}
-      />
-    </>
+    <Card
+      key={contentCategory + contentPosition + "non-linked"}
+      className="bg-midnight-blue"
+    >
+      <div className="flex my-4 pl-2.5 text-white bg-konkikyou-blue rounded-none">
+        <FeaturedContentDisplay
+          contentPosition={contentPosition}
+          contentTitle={contentTitle}
+          contentDescription={contentDescription}
+          contentUrl={contentUrl}
+          contentCategory={contentCategory}
+        />
+
+        <div className="flex-col bg-midnight-blue pl-2">
+          <div className="flex">
+            <Dialog>
+              <DialogTrigger asChild>
+                <div className="bg-konkikyou-blue pt-2 px-4">
+                  <PenIconButton />
+                </div>
+              </DialogTrigger>
+              <EditContentDialog
+                title={contentTitle}
+                description={contentDescription}
+                url={contentUrl}
+                category={contentCategory}
+                position={contentPosition}
+                frontendId={frontendId}
+                setUpdateRequestStatus={setUpdateRequestStatus}
+                onSaveUpdatedContentClicked={onSaveUpdatedContentClicked}
+              />
+            </Dialog>
+
+            <Dialog>
+              <DialogTrigger asChild>
+                <div className="bg-konkikyou-blue mx-2 py-2 px-4">
+                  <DeleteCrossIconButton />
+                </div>
+              </DialogTrigger>
+              <DeleteContentDialog
+                frontendId={frontendId}
+                setDeleteRequestStatus={setDeleteRequestStatus}
+              />
+            </Dialog>
+          </div>
+          <div>{/* just here for formatting */}</div>
+        </div>
+      </div>
+    </Card>
   )
 }
 
@@ -413,38 +467,40 @@ function FeaturedContentDisplay({
   contentCategory,
 }) {
   return (
-    <Card
-      key={contentCategory + contentPosition + "non-linked"}
-      className="bg-midnight-blue"
-    >
-      <div className="flex my-4 pl-2.5 text-white bg-konkikyou-blue rounded-none">
-        <div className="text-5xl py-4 px-2">
-          <IconMapper url={contentCategory + ":"} />
-        </div>
-        <div className="grow p-2">
-          <span>{contentTitle.length > 0 ? contentTitle : ""}</span>
-          <br />
-          <span>
-            {contentDescription.length > 0
-              ? contentDescription
-              : contentUrl.substring(0, 26) + "..."}
-          </span>
-        </div>
-
-        <div className="flex-col bg-midnight-blue pl-2">
-          <div className="flex">
-            <div className="bg-konkikyou-blue pt-2 px-4">
-              <PenIconButton />
-            </div>
-
-            <div className="bg-konkikyou-blue mx-2 py-2 px-4">
-              <DeleteCrossIconButton />
-            </div>
-          </div>
-          <div></div>
-        </div>
+    <>
+      <div className="text-5xl py-4 px-2">
+        <IconMapper url={contentCategory + ":"} />
       </div>
-    </Card>
+      <div className="grow p-2">
+        <span>{contentTitle.length > 0 ? contentTitle : ""}</span>
+        <br />
+        <span>
+          {contentDescription.length > 0
+            ? contentDescription
+            : contentUrl.substring(0, 26) + "..."}
+        </span>
+      </div>
+    </>
+  )
+}
+
+function AddContentButton({ amountOfContent, maxAmountOfContent }) {
+  if (amountOfContent >= maxAmountOfContent) {
+    // inactive mode
+    return (
+      <Button variant="outline" className="bg-white text-black" disabled>
+        add
+      </Button>
+    )
+  }
+
+  // active mode
+  return (
+    <DialogTrigger asChild>
+      <Button variant="outline" className="bg-white text-black">
+        add
+      </Button>
+    </DialogTrigger>
   )
 }
 
@@ -454,7 +510,7 @@ function FeaturedContentProgressBar({ featuredContent }) {
   return (
     <>
       <span>
-        You are listing {featuredContent.length} of 6 possible content items.
+        You are listing {featuredContent.length} out of 6 possible content items
       </span>
       <Progress
         id="featuredContentProgressBar"
@@ -465,10 +521,306 @@ function FeaturedContentProgressBar({ featuredContent }) {
   )
 }
 
-function CreateContentDialog() {}
+function CreateContentDialog({
+  title,
+  description,
+  url,
+  category,
+  position,
+  frontendId,
+  setAddRequestStatus,
+  onAddContentClicked,
+}) {
+  // component-internal state
+  const [contentTitle, setContentTitle] = useState(title)
+  const [contentDescription, setContentDescription] = useState(description)
+  const [contentUrl, setContentUrl] = useState(url)
+  const [contentCategory, setContentCategory] = useState(category)
+  const contentPosition = position
 
-function DeleteContentDialog() {}
+  // used for network and Redux state-management
+  const dispatch = useDispatch()
 
+  // TODO: check if this costs performance
+  // reading from context
+  const { handle } = useContext(ProfilePageContext)
+
+  return (
+    <DialogContent className="sm:max-w-[425px]">
+      <DialogHeader>
+        <DialogTitle>Add Link</DialogTitle>
+        <DialogDescription>
+          Define your link here. Click save when you're done.
+        </DialogDescription>
+      </DialogHeader>
+
+      <div className="grid gap-4 py-4">
+        <div className="grid grid-cols-4 items-center gap-4">
+          <Label htmlFor="contentTitle" className="text-right">
+            Title
+          </Label>
+          <Input
+            id={"contentTitleInput-" + contentPosition}
+            type="text"
+            className="col-span-3"
+            value={contentTitle}
+            onChange={(e) => setContentTitle(e.target.value)}
+          />
+          <Label htmlFor="contentDescription" className="text-right">
+            Description
+          </Label>
+          <Input
+            id={"contentDescriptionInput-" + contentPosition}
+            type="text"
+            className="col-span-3"
+            value={contentDescription}
+            onChange={(e) => setContentDescription(e.target.value)}
+          />
+          <Label htmlFor="contentUrl" className="text-right">
+            Url
+          </Label>
+          <Input
+            id={"contentUrlInput-" + contentPosition}
+            type="text"
+            className="col-span-3"
+            value={contentUrl}
+            onChange={(e) => setContentUrl(e.target.value)}
+          />
+          <Label htmlFor="contentCategory" className="text-right">
+            Category
+          </Label>
+          <Input
+            id={"contentCategoryInput-" + contentPosition}
+            type="text"
+            className="col-span-3"
+            value={contentCategory}
+            onChange={(e) => setContentCategory(e.target.value)}
+          />
+        </div>
+      </div>
+      <DialogFooter>
+        <DialogClose>
+          <div className="flex justify-end gap-5">
+            <Button
+              className="bg-white text-black"
+              variant="outline"
+              type="reset"
+              onClick={() => {
+                setContentTitle("")
+                setContentDescription("")
+                setContentUrl("")
+                setContentCategory("")
+              }}
+            >
+              cancel
+            </Button>
+            <Button
+              className="bg-white text-black"
+              variant="outline"
+              type="submit"
+              onClick={() => {
+                onAddContentClicked(
+                  handle,
+                  {
+                    frontendId: frontendId,
+                    title: contentTitle,
+                    description: contentDescription,
+                    url: contentUrl,
+                    category: contentCategory,
+                    position: contentPosition,
+                  },
+                  setAddRequestStatus,
+                  dispatch
+                )
+                setContentTitle("")
+                setContentDescription("")
+                setContentUrl("")
+                setContentCategory("")
+              }}
+            >
+              save
+            </Button>
+          </div>
+        </DialogClose>
+      </DialogFooter>
+    </DialogContent>
+  )
+}
+
+function EditContentDialog({
+  title,
+  description,
+  url,
+  category,
+  position,
+  frontendId,
+  setUpdateRequestStatus,
+  onSaveUpdatedContentClicked,
+}) {
+  // component-internal state
+  const [contentTitle, setContentTitle] = useState(title)
+  const [contentDescription, setContentDescription] = useState(description)
+  const [contentUrl, setContentUrl] = useState(url)
+  const [contentCategory, setContentCategory] = useState(category)
+  const contentPosition = position
+
+  // used for network and Redux state-management
+  const dispatch = useDispatch()
+
+  // reading from context
+  const { handle } = useContext(ProfilePageContext)
+
+  // this is why it can display the wrong text if mixed up position values
+  // TODO: update view independent of the backend
+  // useEffect(() => {}
+
+  return (
+    <DialogContent className="sm:max-w-[425px]">
+      <DialogHeader>
+        <DialogTitle>Edit Content</DialogTitle>
+        <DialogDescription>
+          Change your content here. Click save when you're done.
+        </DialogDescription>
+      </DialogHeader>
+
+      <div className="grid gap-4 py-4">
+        <div className="grid grid-cols-4 items-center gap-4">
+          <Label htmlFor="contentTitle" className="text-right">
+            Title
+          </Label>
+          <Input
+            id={"contentTitleInput-" + contentPosition}
+            type="text"
+            className="col-span-3"
+            value={contentTitle}
+            onChange={(e) => setContentTitle(e.target.value)}
+          />
+          <Label htmlFor="contentDescription" className="text-right">
+            Description
+          </Label>
+          <Input
+            id={"contentDescriptionInput-" + contentPosition}
+            type="text"
+            className="col-span-3"
+            value={contentDescription}
+            onChange={(e) => setContentDescription(e.target.value)}
+          />
+          <Label htmlFor="contentUrl" className="text-right">
+            Url
+          </Label>
+          <Input
+            id={"contentUrlInput-" + contentPosition}
+            type="text"
+            className="col-span-3"
+            value={contentUrl}
+            onChange={(e) => setContentUrl(e.target.value)}
+          />
+          <Label htmlFor="contentCategory" className="text-right">
+            Category
+          </Label>
+          <Input
+            id={"contentCategoryInput-" + contentPosition}
+            type="text"
+            className="col-span-3"
+            value={contentCategory}
+            onChange={(e) => setContentCategory(e.target.value)}
+          />
+        </div>
+      </div>
+      <DialogFooter>
+        <DialogClose>
+          <div className="flex justify-end gap-5">
+            <Button
+              className="bg-white text-black"
+              variant="outline"
+              type="reset"
+              onClick={() => {
+                setContentTitle(title)
+                setContentDescription(description)
+                setContentUrl(url)
+                setContentCategory(category)
+              }}
+            >
+              cancel
+            </Button>
+
+            <Button
+              className="bg-white text-black"
+              variant="outline"
+              type="submit"
+              onClick={() =>
+                onSaveUpdatedContentClicked(
+                  handle,
+                  {
+                    frontendId: frontendId,
+                    title: contentTitle,
+                    description: contentDescription,
+                    url: contentUrl,
+                    category: contentCategory,
+                    position: contentPosition,
+                  },
+                  setUpdateRequestStatus,
+                  dispatch
+                )
+              }
+            >
+              save
+            </Button>
+          </div>
+        </DialogClose>
+      </DialogFooter>
+    </DialogContent>
+  )
+}
+
+function DeleteContentDialog({ frontendId, setDeleteRequestStatus }) {
+  // Hooks can only be called inside of the body of a function component.
+  const { handle } = useContext(ProfilePageContext)
+
+  // used for network and Redux state-management
+  const dispatch = useDispatch()
+
+  return (
+    <DialogContent className="sm:max-w-[425px]">
+      <DialogHeader>
+        <DialogTitle>Delete Content</DialogTitle>
+        <DialogDescription>
+          Are you sure you want to stop featuring this content?
+        </DialogDescription>
+      </DialogHeader>
+      <DialogFooter>
+        <DialogClose>
+          <div className="flex justify-end gap-2">
+            <Button
+              className="bg-white text-black"
+              variant="outline"
+              type="submit"
+              id="confirmContentDeletion-Button"
+              onClick={() =>
+                onDeleteContentClicked(
+                  frontendId,
+                  handle,
+                  dispatch,
+                  setDeleteRequestStatus
+                )
+              }
+            >
+              yes
+            </Button>
+            <Button
+              className="bg-white text-black"
+              variant="outline"
+              type="reset"
+              id="cancelContentDeletion-Button"
+            >
+              no
+            </Button>
+          </div>
+        </DialogClose>
+      </DialogFooter>
+    </DialogContent>
+  )
+}
 // manage content support functions ./
 
 // drag-and-drop support functions /.
@@ -576,3 +928,114 @@ function DndFrame({ mutableFeaturedContent, setReorderedFeaturedContent }) {
   }
 }
 // drag-and-drop support functions ./
+
+// Network and State-Management functions /.
+async function onAddContentClicked(
+  handle,
+  newContent,
+  setAddRequestStatus,
+  dispatch
+) {
+  try {
+    setAddRequestStatus("pending")
+
+    // createAsayncThunk only takes one argument
+    const addData = {
+      handle,
+      content: newContent,
+    }
+
+    dispatch(addNewFeaturedContent(addData))
+  } catch (error) {
+    console.error("Failed to add content: ", error)
+  } finally {
+    setAddRequestStatus("idle")
+  }
+}
+
+async function onSaveUpdateClicked(
+  handle,
+  bufferedFeaturedContentCollection,
+  setUpdateRequestStatus,
+  dispatch
+) {
+  try {
+    setUpdateRequestStatus("pending")
+    announce(
+      "sending reorderedFeaturedContent to backend (default positions):",
+      bufferedFeaturedContentCollection
+    )
+    const collectionWithRightPositions = bufferedFeaturedContentCollection.map(
+      (featuredNode, index) => {
+        featuredNode.position = index
+        return featuredNode
+      }
+    )
+    announce(
+      "sending reorderedFeaturedContent to backend (updated positions):",
+      collectionWithRightPositions
+    )
+
+    // createAsyncThunk only takes one argument
+    const updateData = {
+      handle,
+      content: collectionWithRightPositions,
+    }
+    dispatch(updateFeaturedContentEntries(updateData))
+  } catch (error) {
+    console.error(
+      "[onSaveUpdateClicked] Failed to save the featured content to the collection:",
+      error
+    )
+  } finally {
+    setUpdateRequestStatus("idle")
+  }
+}
+
+async function onSaveUpdatedContentClicked(
+  handle,
+  updatedContent,
+  setUpdateRequestStatus,
+  dispatch
+) {
+  try {
+    setUpdateRequestStatus("pending")
+
+    // createAsyncThunk only takes one argument
+    const updateData = {
+      handle,
+      content: updatedContent,
+    }
+    announce("[featuredContent] updateData to dispatch", updateData)
+
+    dispatch(updateSingleContentEntry(updateData))
+  } catch (error) {
+    console.error("Failed to update content: ", error)
+  } finally {
+    setUpdateRequestStatus("idle")
+  }
+}
+
+async function onDeleteContentClicked(
+  frontendId,
+  handle,
+  dispatch,
+  setDeleteRequestStatus
+) {
+  try {
+    setDeleteRequestStatus("pending")
+
+    // createAsyncThunk only takes one argument
+    const deleteData = {
+      handle,
+      frontendId,
+    }
+    dispatch(deleteSingleContentEntry(deleteData))
+  } catch (error) {
+    console.error("Failed to delete content: ", error)
+  } finally {
+    setDeleteRequestStatus("idle")
+  }
+}
+
+// Network and State-Management functions ./
