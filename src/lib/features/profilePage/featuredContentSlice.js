@@ -134,17 +134,8 @@ export const addNewFeaturedContent = createAsyncThunk(
 export const updateSingleContentEntry = createAsyncThunk(
   "featuredContent/updateSingleContentEntry",
   async (contentUpdateData) => {
-    const response = await updateFeaturedContentEntry(
-      contentUpdateData.handle,
-      {
-        title: contentUpdateData.content.title,
-        description: contentUpdateData.content.description,
-        url: contentUpdateData.content.url,
-        position: contentUpdateData.content.position,
-        category: contentUpdateData.content.category,
-        frontendId: contentUpdateData.content.frontendId,
-      }
-    )
+    const { handle, content } = contentUpdateData
+    const response = await updateFeaturedContentEntry(handle, content)
     return response.data
   }
 )

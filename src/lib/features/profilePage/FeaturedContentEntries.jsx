@@ -60,6 +60,7 @@ import {
 
 // debug support function
 import { announce } from "@/lib/utils/debugTools/announce"
+import { title } from "process"
 
 export const FeaturedContentEntries = ({ handle, mode, sectionTitle }) => {
   // for changing editable modes
@@ -428,8 +429,14 @@ function EditableFeaturedContentItem({
                 </div>
               </DialogTrigger>
               <EditContentDialog
-              // frontendId={frontendId}
-              // setUpdateRequestStatus={setUpdateRequestStatus}
+                title={contentTitle}
+                description={contentDescription}
+                url={contentUrl}
+                category={contentCategory}
+                position={contentPosition}
+                frontendId={frontendId}
+                setUpdateRequestStatus={setUpdateRequestStatus}
+                onSaveUpdatedContentClicked={onSaveUpdatedContentClicked}
               />
             </Dialog>
 
@@ -559,7 +566,6 @@ function CreateContentDialog({
             value={contentTitle}
             onChange={(e) => setContentTitle(e.target.value)}
           />
-
           <Label htmlFor="contentDescription" className="text-right">
             Description
           </Label>
@@ -641,7 +647,131 @@ function CreateContentDialog({
   )
 }
 
-function EditContentDialog() {}
+function EditContentDialog({
+  title,
+  description,
+  url,
+  category,
+  position,
+  frontendId,
+  setUpdateRequestStatus,
+  onSaveUpdatedContentClicked,
+}) {
+  // component-internal state
+  const [contentTitle, setContentTitle] = useState(title)
+  const [contentDescription, setContentDescription] = useState(description)
+  const [contentUrl, setContentUrl] = useState(url)
+  const [contentCategory, setContentCategory] = useState(category)
+  const contentPosition = position
+
+  // used for network and Redux state-management
+  const dispatch = useDispatch()
+
+  // reading from context
+  const { handle } = useContext(ProfilePageContext)
+
+  // this is why it can display the wrong text if mixed up position values
+  // TODO: update view independent of the backend
+  // useEffect(() => {}
+
+  return (
+    <DialogContent className="sm:max-w-[425px]">
+      <DialogHeader>
+        <DialogTitle>Edit Content</DialogTitle>
+        <DialogDescription>
+          Change your content here. Click save when you're done.
+        </DialogDescription>
+      </DialogHeader>
+
+      <div className="grid gap-4 py-4">
+        <div className="grid grid-cols-4 items-center gap-4">
+          <Label htmlFor="contentTitle" className="text-right">
+            Title
+          </Label>
+          <Input
+            id={"contentTitleInput-" + contentPosition}
+            type="text"
+            className="col-span-3"
+            value={contentTitle}
+            onChange={(e) => setContentTitle(e.target.value)}
+          />
+          <Label htmlFor="contentDescription" className="text-right">
+            Description
+          </Label>
+          <Input
+            id={"contentDescriptionInput-" + contentPosition}
+            type="text"
+            className="col-span-3"
+            value={contentDescription}
+            onChange={(e) => setContentDescription(e.target.value)}
+          />
+          <Label htmlFor="contentUrl" className="text-right">
+            Url
+          </Label>
+          <Input
+            id={"contentUrlInput-" + contentPosition}
+            type="text"
+            className="col-span-3"
+            value={contentUrl}
+            onChange={(e) => setContentUrl(e.target.value)}
+          />
+          <Label htmlFor="contentCategory" className="text-right">
+            Category
+          </Label>
+          <Input
+            id={"contentCategoryInput-" + contentPosition}
+            type="text"
+            className="col-span-3"
+            value={contentCategory}
+            onChange={(e) => setContentCategory(e.target.value)}
+          />
+        </div>
+      </div>
+      <DialogFooter>
+        <DialogClose>
+          <div className="flex justify-end gap-5">
+            <Button
+              className="bg-white text-black"
+              variant="outline"
+              type="reset"
+              onClick={() => {
+                setContentTitle(title)
+                setContentDescription(description)
+                setContentUrl(url)
+                setContentCategory(category)
+              }}
+            >
+              cancel
+            </Button>
+
+            <Button
+              className="bg-white text-black"
+              variant="outline"
+              type="submit"
+              onClick={() =>
+                onSaveUpdatedContentClicked(
+                  handle,
+                  {
+                    frontendId: frontendId,
+                    title: contentTitle,
+                    description: contentDescription,
+                    url: contentUrl,
+                    category: contentCategory,
+                    position: contentPosition,
+                  },
+                  setUpdateRequestStatus,
+                  dispatch
+                )
+              }
+            >
+              save
+            </Button>
+          </div>
+        </DialogClose>
+      </DialogFooter>
+    </DialogContent>
+  )
+}
 
 function DeleteContentDialog({ frontendId, setDeleteRequestStatus }) {
   // Hooks can only be called inside of the body of a function component.
@@ -857,6 +987,30 @@ async function onSaveUpdateClicked(
       "[onSaveUpdateClicked] Failed to save the featured content to the collection:",
       error
     )
+  } finally {
+    setUpdateRequestStatus("idle")
+  }
+}
+
+async function onSaveUpdatedContentClicked(
+  handle,
+  updatedContent,
+  setUpdateRequestStatus,
+  dispatch
+) {
+  try {
+    setUpdateRequestStatus("pending")
+
+    // createAsyncThunk only takes one argument
+    const updateData = {
+      handle,
+      content: updatedContent,
+    }
+    announce("[featuredContent] updateData to dispatch", updateData)
+
+    dispatch(updateSingleContentEntry(updateData))
+  } catch (error) {
+    console.error("Failed to update content: ", error)
   } finally {
     setUpdateRequestStatus("idle")
   }
