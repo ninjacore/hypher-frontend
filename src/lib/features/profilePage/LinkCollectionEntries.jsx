@@ -116,7 +116,10 @@ export const LinkCollectionEntries = ({ handle, mode, sectionTitle }) => {
         setNextHighestPosition(
           mutableLinkCollection[mutableLinkCollection.length - 1].position + 1
         )
-        console.log("incremented nextHighestPosition:", nextHighestPosition)
+        console.log(
+          "[LinkCollection] incremented nextHighestPosition:",
+          nextHighestPosition
+        )
       } else if (mutableLinkCollection.length > initialAmountOfLinks) {
         console.log("link was added, but other condition was not met.")
         console.log("initialAmountOfLinks:", initialAmountOfLinks)
@@ -152,11 +155,11 @@ export const LinkCollectionEntries = ({ handle, mode, sectionTitle }) => {
   useEffect(() => {
     if (nextHighestPosition > 0) {
       console.log(
-        `%c nextHighestPosition is set to: ${nextHighestPosition}`,
+        `%c [linkCollection] nextHighestPosition is set to: ${nextHighestPosition}`,
         "color: cyan;"
       )
       console.log(
-        `%c position of last element is set to: ${
+        `%c [linkCollection] position of last element is set to: ${
           mutableLinkCollection[mutableLinkCollection.length - 1].position
         }`,
         "color: cyan;"

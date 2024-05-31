@@ -103,6 +103,7 @@ export const FeaturedContentEntries = ({ handle, mode, sectionTitle }) => {
 
   // to make sure links are always added at the end
   const [nextHighestPosition, setNextHighestPosition] = useState(0)
+
   // "there's something wrong, I can feel it" ./
 
   announce("TOP LEVEL mutableLinkCollection", mutableFeaturedContent)
@@ -117,12 +118,43 @@ export const FeaturedContentEntries = ({ handle, mode, sectionTitle }) => {
       initialAmountOfFeaturedContent,
       initialLastPosition,
       mutableFeaturedContent,
+      nextHighestPosition,
       setNextHighestPosition
     )
 
     // de-activate 'change order' button if there's not more than 1 featured content
     checkChangeOrderButton(mutableFeaturedContent)
   }, [featuredContentStatus, dispatch, mutableFeaturedContent])
+
+  // duplicate of the above
+  // useEffect(() => {
+  //   if (mutableFeaturedContent.length > 0) {
+  //     // if content was added we need to update the nextHighestPosition
+  //     checkNextHighestPosition(
+  //       initialAmountOfFeaturedContent,
+  //       initialLastPosition,
+  //       mutableFeaturedContent,
+  //       nextHighestPosition,
+  //       setNextHighestPosition
+  //     )
+  //   }
+  // }, [mutableFeaturedContent, dispatch, featuredContentStatus])
+
+  // for debugging
+  useEffect(() => {
+    if (nextHighestPosition > 0) {
+      console.log(
+        `%c [featuredContent] nextHighestPosition is set to: ${nextHighestPosition}`,
+        "color: cyan;"
+      )
+      console.log(
+        `%c [featuredContent] position of last element is set to: ${
+          mutableFeaturedContent[mutableFeaturedContent.length - 1].position
+        }`,
+        "color: cyan;"
+      )
+    }
+  }, [nextHighestPosition])
 
   // switches for content rendering /.
   if (featuredContentStatus === "loading") {
@@ -314,21 +346,31 @@ function checkNextHighestPosition(
   initialAmountOfFeaturedContent,
   initialLastPosition,
   mutableFeaturedContent,
+  nextHighestPosition,
   setNextHighestPosition
 ) {
-  // cover the case when there's no content
-  if (!mutableFeaturedContent.length > 0) {
-    setNextHighestPosition(0)
-  }
+  // // cover the case when there's no content
+  // if (!mutableFeaturedContent.length > 0) {
+  //   setNextHighestPosition(0)
+  // }
+
+  // needs to reflect positions as they were initially given by the backend
+  setNextHighestPosition(initialLastPosition + 1)
 
   try {
+    // if content was added we need to update the nextHighestPosition
     if (
       mutableFeaturedContent.length > initialAmountOfFeaturedContent ||
       mutableFeaturedContent[mutableFeaturedContent.length - 1].position !==
         initialLastPosition
     ) {
+      // set to true last position + 1
       setNextHighestPosition(
         mutableFeaturedContent[mutableFeaturedContent.length - 1].position + 1
+      )
+      console.log(
+        "[FeaturedContent] incremented nextHighestPosition:",
+        nextHighestPosition
       )
     }
   } catch (error) {
