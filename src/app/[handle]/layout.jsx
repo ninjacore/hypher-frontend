@@ -7,6 +7,12 @@ import { Button } from "@/components/ui/button"
 import { EditButton } from "@/components/ui/editButtonPen"
 import { Card, CardContent, CardSingleLineHeader } from "@/components/ui/card"
 
+// TODO: delete , temp while building
+import {
+  TagsHTMLTEMP,
+  AboutHtmlTemp,
+} from "@/app/[handle]/utils/temporary/ProfilePageHtmlSnippets"
+
 // to be handled by token
 const pageOwner = true
 
@@ -27,7 +33,7 @@ export default function Layout({
           <CardSingleLineHeader className="flex justify-between my-4">
             <h1 className="text-3xl font-bold mx-1">
               {/* {name} */}
-              Setting up name...
+              Master of the Universe
             </h1>
             <ProfilePageButton
               isOwner={pageOwner}
@@ -38,7 +44,7 @@ export default function Layout({
           <CardContent>
             <div className="px-1 py-2 group/edit">
               {/* {editableAbout} */}
-              Setting up editableAbout...
+              <AboutHtmlTemp />
             </div>
 
             <div className="mt-2 px-1">
@@ -49,13 +55,18 @@ export default function Layout({
                 <a href={"/profile/" + { handle } + "/tags/edit"}>
                   <div className="mt-2 group/edit">
                     {/* {tags} */}
-                    Setting up tags...
+                    <TagsHTMLTEMP />
                     <EditButton />
                   </div>
                 </a>
               </>
             ) : (
-              <>No handle, cannot create linked tags field.</>
+              // <>No handle, cannot create linked tags field.</>
+              // TODO: delete
+              <div className="mt-2">
+                <TagsHTMLTEMP />
+              </div>
+              // temp snippet
             )}
           </CardContent>
         </Card>
@@ -80,7 +91,7 @@ export default function Layout({
         <CardSingleLineHeader className="flex justify-between my-4">
           <h1 className="text-3xl font-bold mx-1">
             {/* {name} */}
-            Setting up name...
+            Master of the Universe
           </h1>
           <ProfilePageButton
             isOwner={pageOwner}
@@ -91,14 +102,14 @@ export default function Layout({
         <CardContent>
           <div className="px-1 py-2">
             {/* {about} */}
-            Setting up about...
+            <AboutHtmlTemp />
           </div>
           <div className="mt-2 px-1">
             <hr className="border-gray-400 border-t-2" />
           </div>
           <div className="mt-2">
             {/* {tags} */}
-            Setting up tags...
+            <TagsHTMLTEMP />
           </div>
         </CardContent>
       </Card>
